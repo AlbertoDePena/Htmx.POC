@@ -1,0 +1,7 @@
+root = true
+
+[*.fs]
+indent_size=4
+fsharp_multiline_block_brackets_on_same_column=true
+fsharp_experimental_stroustrup_style=true
+fsharp_experimental_elmish=true
