@@ -5,6 +5,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="templates\index.html" />
+	</ItemGroup>
+	
+	<ItemGroup>		
 		<Compile Include="Domain\Extensions.fs" />
 		<Compile Include="Domain\Invariants.fs" />
 		<Compile Include="Domain\Shared.fs" />
@@ -13,7 +17,7 @@
 		<Compile Include="Infrastructure\Options.fs" />
 		<Compile Include="Infrastructure\SqlDataReaderExtensions.fs" />
 		<Compile Include="Infrastructure\UserDatabase.fs" />
-		<Compile Include="Controllers\ViewEngineExtensions.fs" />
+		<Compile Include="Controllers\HtmlTemplate.fs" />
 		<Compile Include="Controllers\HttpRequestExtensions.fs" />
 		<Compile Include="Controllers\ControllerExtensions.fs" />
 		<Compile Include="Controllers/HomeController.fs" />
@@ -21,7 +25,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Feliz.ViewEngine" Version="0.24.0" />
 		<PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.10.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.23" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTMX POC</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon">
+</head>
+
+<body class="has-navbar-fixed-top">
+    <div class="is-flex is-flex-direction-column">
+        <!--navbar-->
+        <nav class="navbar is-fixed-top is-white has-shadow" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="#/">
+                    <img src="https://bulma.io/images/bulma-logo.png">
+                </a>
+                <a aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" _="on click toggle .is-active on me then toggle .is-active on #MainNavbar">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu" id="MainNavbar">
+                <div class="navbar-start">
+                    <a class="navbar-item is-size-7 has-text-link has-text-weight-semibold"
+                       href="#/dashboard">Dashboard</a>
+                    <a class="navbar-item is-size-7 has-text-link has-text-weight-semibold"
+                       href="#/administration">Administration</a>
+                </div>
+                <div class="navbar-end">
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link is-size-7 has-text-link has-text-weight-semibold">${UserName}</a>
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item is-size-7"
+                               href="#/logout">
+                                Log Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!--main-->
+        <main class="mb-6 p-6 is-size-7">
+            <div class="container">
+                <div class="box">
+                    <p>HTML POC</p>
+                </div>
+                <div class="box">
+                    <button type="button" 
+                            class="button is-small"
+                            hx-post="/Home/SayHello"
+                            hx-trigger="click"
+                            hx-target="#SayHelloContainer"
+                            hx-swap="innerHTML">Click Me!</button>
+                    <hr />
+                    <div id="SayHelloContainer"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+</body>
+
+</html>
