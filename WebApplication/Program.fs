@@ -16,6 +16,8 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 
+open WebApplication.Controllers
+
 module Program =
     let exitCode = 0
 
@@ -24,6 +26,8 @@ module Program =
         let builder = WebApplication.CreateBuilder(args)
 
         builder.Services.AddControllers()
+
+        builder.Services.AddTransient<IHtmlTemplate, HtmlTemplate>()
 
         let app = builder.Build()
 

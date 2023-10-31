@@ -4,10 +4,6 @@
 		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Include="templates\index.html" />
-	</ItemGroup>
-	
 	<ItemGroup>		
 		<Compile Include="Domain\Extensions.fs" />
 		<Compile Include="Domain\Invariants.fs" />
@@ -29,10 +25,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.23" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
 		<PackageReference Include="RT.Comb" Version="4.0.1" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>

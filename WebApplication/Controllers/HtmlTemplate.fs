@@ -3,7 +3,7 @@
 open System
 open System.Text
 open System.IO
-open System.Reflection
+open Microsoft.AspNetCore.Hosting
 
 /// Can be either a plain HTML string or a path to an HTML file.
 type FileOrContent = string
@@ -20,43 +20,36 @@ type Variables = Map<VariableName, VariableValue>
 /// The compiled HTML as a string.
 type HtmlContent = string
 
-/// Initialize an HTML template. The fileOrContent can be with either a plain HTML string or a path to an HTML file.
-type HtmlTemplate(fileOrContent: FileOrContent) =
+type IHtmlTemplate =
+    abstract Bind: name: VariableName * value: VariableValue -> IHtmlTemplate
+    abstract Compile: fileOrContent: FileOrContent -> HtmlContent
 
-    let mutable variables: Variables = Map.empty
+type HtmlTemplate(environment: IWebHostEnvironment) =
 
-    let hasVariables () =
-        variables.IsEmpty |> not
+    let mutable _variables: Variables = Map.empty
 
-    let isHtmlString (fileOrContent: string) =
-        fileOrContent.Contains("<")
-
-    let getFileContent (fileOrContent: string) =
+    let getFileContent (fileOrContent: FileOrContent) =
         if String.IsNullOrWhiteSpace fileOrContent then
             invalidArg (nameof fileOrContent) "cannot be null nor empty"
 
-        if isHtmlString fileOrContent then
+        if fileOrContent.Contains("<") then
             fileOrContent
         else
-            let filePath = fileOrContent.Replace("/", ".")
-            let assembly = Assembly.GetExecutingAssembly()
-            let resourceName = sprintf "WebApplication.%s" filePath
-            use stream = assembly.GetManifestResourceStream(resourceName)
-            use reader = new StreamReader(stream)
-            reader.ReadToEnd()
+            Path.Combine(environment.WebRootPath, fileOrContent) |> File.ReadAllText
 
-    member this.Bind(name: VariableName, value: VariableValue) =
-        variables <- variables |> Map.add name value
-        this
+    interface IHtmlTemplate with
 
-    member this.Compile() : HtmlContent =
-        let stringBuilder = StringBuilder(getFileContent fileOrContent)
+        member this.Bind(name: VariableName, value: VariableValue) =
+            _variables <- _variables |> Map.add name value
+            this
 
-        if hasVariables () then            
-            variables
+        member this.Compile(fileOrContent: FileOrContent) : HtmlContent =
+            let stringBuilder = StringBuilder(getFileContent fileOrContent)
+
+            _variables
             |> Map.iter (fun name value ->
                 let pattern = sprintf "${%s}" name
                 let valueToString = value.ToString()
                 stringBuilder.Replace(pattern, valueToString) |> ignore)
 
-        stringBuilder.ToString()
+            stringBuilder.ToString()
