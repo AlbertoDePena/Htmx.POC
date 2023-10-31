@@ -10,6 +10,7 @@ open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
 open WebApplication.Domain.Extensions
+open WebApplication.Infrastructure
 
 type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate) =
     inherit Controller()

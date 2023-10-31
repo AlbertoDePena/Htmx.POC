@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Controllers
+﻿namespace WebApplication.Infrastructure
 
 open System
 open System.Text

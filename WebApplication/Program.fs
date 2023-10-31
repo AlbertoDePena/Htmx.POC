@@ -16,7 +16,7 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 
-open WebApplication.Controllers
+open WebApplication.Infrastructure
 
 module Program =
     let exitCode = 0
@@ -31,9 +31,11 @@ module Program =
 
         let app = builder.Build()
 
-        if not (builder.Environment.IsDevelopment()) then
-            app.UseExceptionHandler("/Home/Error")
-            app.UseHsts() |> ignore // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        if builder.Environment.IsDevelopment() then
+            app.UseDeveloperExceptionPage()
+        else
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts()
 
         app.UseHttpsRedirection()
 
