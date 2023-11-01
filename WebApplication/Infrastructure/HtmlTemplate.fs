@@ -3,6 +3,7 @@
 open System
 open System.Text
 open System.IO
+open System.Text.RegularExpressions
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Caching.Memory
 
@@ -21,8 +22,14 @@ type Variables = Map<VariableName, VariableValue>
 /// The compiled HTML as a string.
 type HtmlContent = string
 
+type HtmlTemplateException(ex: Exception) =
+    inherit Exception(ex.Message, ex)
+    new(message: string) = HtmlTemplateException(Exception message)
+
 type IHtmlTemplate =
+    /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract Bind: name: VariableName * value: VariableValue -> IHtmlTemplate
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Compile: fileOrContent: FileOrContent -> HtmlContent
 
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
@@ -31,7 +38,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let getFileContent (fileOrContent: FileOrContent) =
         if String.IsNullOrWhiteSpace fileOrContent then
-            invalidArg (nameof fileOrContent) "cannot be null nor empty"
+            nameof fileOrContent |> sprintf "%s cannot be null nor empty" |> failwith
 
         if fileOrContent.Contains("<") then
             fileOrContent
@@ -41,23 +48,53 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             match cache.TryGetValue<string>(filePath) with
             | true, fileContent -> fileContent
             | _ ->
-                let fileContent = File.ReadAllText filePath
+                let fileContent = filePath |> File.ReadAllText
                 cache.Set(filePath, fileContent) |> ignore
                 fileContent
+
+    let bindVariables (htmlContentBuilder: StringBuilder) =
+        _variables
+        |> Map.iter (fun name value ->
+            let pattern = sprintf "${%s}" name
+            let valueToString = value.ToString()
+            htmlContentBuilder.Replace(pattern, valueToString) |> ignore)
+
+    let failOnUnboundedVariables (htmlContent: string) =
+        let stringBuilder = StringBuilder()
+
+        Regex.Matches(htmlContent, @"\${\b\w+\b}")
+        |> Seq.iter (fun match' ->
+            match'.Groups
+            |> Seq.iter (fun group -> stringBuilder.AppendLine(group.Value) |> ignore))
+
+        let unbounded = stringBuilder.ToString()
+
+        if String.IsNullOrWhiteSpace unbounded |> not then
+            sprintf "Found unbounded variables in the HTML content: %s" unbounded
+            |> failwith
 
     interface IHtmlTemplate with
 
         member this.Bind(name: VariableName, value: VariableValue) =
+            if String.IsNullOrWhiteSpace name then
+                HtmlTemplateException "The variable name cannot be null/empty" |> raise
+
+            if isNull value then
+                HtmlTemplateException "The variable value cannot be null" |> raise
+
             _variables <- _variables |> Map.add name value
             this
 
         member this.Compile(fileOrContent: FileOrContent) : HtmlContent =
-            let stringBuilder = StringBuilder(getFileContent fileOrContent)
+            try
+                let htmlContentBuilder = getFileContent fileOrContent |> StringBuilder
 
-            _variables
-            |> Map.iter (fun name value ->
-                let pattern = sprintf "${%s}" name
-                let valueToString = value.ToString()
-                stringBuilder.Replace(pattern, valueToString) |> ignore)
+                bindVariables htmlContentBuilder
 
-            stringBuilder.ToString()
+                let htmlContent = htmlContentBuilder.ToString()
+
+                failOnUnboundedVariables htmlContent
+
+                htmlContent
+            with ex ->
+                (HtmlTemplateException ex) |> raise

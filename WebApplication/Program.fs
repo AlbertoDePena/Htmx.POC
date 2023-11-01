@@ -19,6 +19,7 @@ open Microsoft.Extensions.Logging
 open WebApplication.Infrastructure
 
 module Program =
+
     let exitCode = 0
 
     [<EntryPoint>]
