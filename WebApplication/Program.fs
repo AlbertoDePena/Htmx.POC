@@ -26,7 +26,7 @@ module Program =
         let builder = WebApplication.CreateBuilder(args)
 
         builder.Services.AddControllers()
-
+        builder.Services.AddMemoryCache()
         builder.Services.AddTransient<IHtmlTemplate, HtmlTemplate>()
 
         let app = builder.Build()

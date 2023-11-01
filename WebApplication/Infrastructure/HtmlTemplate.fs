@@ -4,6 +4,7 @@ open System
 open System.Text
 open System.IO
 open Microsoft.AspNetCore.Hosting
+open Microsoft.Extensions.Caching.Memory
 
 /// Can be either a plain HTML string or a path to an HTML file.
 type FileOrContent = string
@@ -24,7 +25,7 @@ type IHtmlTemplate =
     abstract Bind: name: VariableName * value: VariableValue -> IHtmlTemplate
     abstract Compile: fileOrContent: FileOrContent -> HtmlContent
 
-type HtmlTemplate(environment: IWebHostEnvironment) =
+type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let mutable _variables: Variables = Map.empty
 
@@ -35,7 +36,14 @@ type HtmlTemplate(environment: IWebHostEnvironment) =
         if fileOrContent.Contains("<") then
             fileOrContent
         else
-            Path.Combine(environment.WebRootPath, fileOrContent) |> File.ReadAllText
+            let filePath = Path.Combine(environment.WebRootPath, fileOrContent)
+
+            match cache.TryGetValue<string>(filePath) with
+            | true, fileContent -> fileContent
+            | _ ->
+                let fileContent = File.ReadAllText filePath
+                cache.Set(filePath, fileContent) |> ignore
+                fileContent
 
     interface IHtmlTemplate with
 
