@@ -98,3 +98,15 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 htmlContent
             with ex ->
                 (HtmlTemplateException ex) |> raise
+
+[<AutoOpen>]
+module ServiceCollectionExtensions =
+
+    open Microsoft.Extensions.DependencyInjection
+
+    type IServiceCollection with
+        
+        /// Register a lightweight HTML template compiler.
+        member this.AddHtmlTemplate() =
+            this.AddMemoryCache() |> ignore
+            this.AddTransient<IHtmlTemplate, HtmlTemplate>()
