@@ -1,9 +1,21 @@
-﻿{  
+﻿{
   "profiles": {
     "WebApplication": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5030",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "WebApplicationWatch": {
+      "commandName": "Executable",
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5030",
+      "executablePath": "dotnet",
+      "commandLineArgs": "watch run",
+      "workingDirectory": "$(ProjectDir)",
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
