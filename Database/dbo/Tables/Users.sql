@@ -1,0 +1,15 @@
+﻿CREATE TABLE [dbo].[Users]
+(
+	[Id] UNIQUEIDENTIFIER NOT NULL,
+	[EmailAddress] NVARCHAR(256) NOT NULL,
+	[DisplayName] NVARCHAR(256) NOT NULL,
+	[TypeId] UNIQUEIDENTIFIER NOT NULL,
+	[IsActive] BIT NOT NULL CONSTRAINT [Default_Users_IsActive] DEFAULT 0,
+	[IsDeleted] BIT NOT NULL CONSTRAINT [Default_Users_IsDeleted] DEFAULT 0,
+	CONSTRAINT PK_Users PRIMARY KEY CLUSTERED ([Id]),
+	CONSTRAINT FK_Users_Type FOREIGN KEY ([TypeId]) REFERENCES [dbo].[UserTypes] (Id)
+);
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX [UX_Users_EmailAddress] ON [dbo].[Users] ([EmailAddress]);
+GO

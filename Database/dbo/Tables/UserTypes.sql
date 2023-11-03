@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[UserTypes]
+(
+	[Id] UNIQUEIDENTIFIER NOT NULL,
+	[Name] NVARCHAR(256) NOT NULL,
+	CONSTRAINT PK_UserTypes PRIMARY KEY CLUSTERED ([Id])
+);
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX [UX_UserTypes_Name] ON [dbo].[UserTypes] ([Name]);
+GO

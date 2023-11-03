@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HTMX POC</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon">
+    <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon">    
 </head>
 
 <body class="has-navbar-fixed-top">
@@ -45,21 +45,7 @@
         </nav>
         <!--main-->
         <main class="mb-6 p-6 is-size-7">
-            <div class="container">
-                <div class="box">
-                    <p>HTML POC</p>
-                </div>
-                <div class="box">
-                    <button type="button" 
-                            class="button is-small"
-                            hx-post="/Home/SayHello"
-                            hx-trigger="click"
-                            hx-target="#SayHelloContainer"
-                            hx-swap="innerHTML">Click Me!</button>
-                    <hr />
-                    <div id="SayHelloContainer"></div>
-                </div>
-            </div>
+            ${PageContent}
         </main>
     </div>
 

@@ -6,44 +6,69 @@ open System.Linq
 open System.Threading.Tasks
 open System.Diagnostics
 
+open FsToolkit.ErrorHandling
+
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Options
 
+open WebApplication.Domain.User
+open WebApplication.Domain.Shared
 open WebApplication.Domain.Extensions
+open WebApplication.Infrastructure.Options
+open WebApplication.Infrastructure.Database
+open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure
 
-type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate) =
+
+type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, databaseOptions: IOptions<Database>) =
     inherit Controller()
 
-    member this.Clicked() =
+    let dbConnectionString =
+        databaseOptions.Value.ConnectionString
+        |> String.valueOrThrow "The database connection string is missing"
 
-        let htmlContent =
-            htmlTemplate
-                .Bind("Htmx", "HTMX")
-                .Bind("Age", 33.5)
-                .Compile("<div><p>Content retrieved by ${Htmx}, so cool!</p><p>I am ${Age}</p></div>")
+    member this.Search() =
+        task {
+            let query =
+                { SearchCriteria = this.Request.TryGetQueryStringValue "search"
+                  ActiveOnly =
+                    this.Request.TryGetQueryStringValue "view-active-users"
+                    |> Option.bind (bool.TryParse >> Option.ofPair)
+                    |> Option.defaultValue false
+                  Page = 1
+                  PageSize = 15
+                  SortBy = None
+                  SortDirection = SortDirection.tryCreate "Ascending" }
 
-        this.HtmlContent htmlContent
+            let! pagedData = UserDatabase.getPagedData dbConnectionString query
 
-    member this.SayHello() =
-        let content =
-            htmlTemplate.Compile("""<div class="has-text-centered has-text-weight-bold">Hello World!</div>""")
+            let buildUserTemplate (user: User) =
+                $"""
+                <tr class="is-clickable">
+                    <td class="p-2">{user.DisplayName}</td>
+                    <td class="p-2">{user.EmailAddress}</td>
+                    <td class="p-2">{user.TypeName |> UserType.value}</td>
+                    <td class="p-2"><span class="tag is-success">{if user.IsActive then "Yes" else "No"}</span></td>
+                </tr>
+                """
 
-        this.HtmlContent content
+            let template =
+                pagedData.Data
+                |> List.fold (fun template user -> template + buildUserTemplate user) String.Empty
 
-    member this.TriggerDelay() =
-        let value =
-            this.Request.TryGetQueryStringValue "q"
-            |> Option.defaultValue String.defaultValue
-
-        let content =
-            htmlTemplate.Bind("Value", value).Compile("<div>The value is ${Value}</div>")
-
-        this.HtmlContent content
+            return this.HtmlContent template
+        }
 
     member this.Index() =
+        task {
+            let pageContent = htmlTemplate.Compile("templates/user/search-control.html")
 
-        let content =
-            htmlTemplate.Bind("UserName", "Alberto De Pena").Compile("templates/index.html")
+            let content =
+                htmlTemplate
+                    .Bind("UserName", "Alberto De Pena")
+                    .Bind("PageContent", pageContent)
+                    .Compile("templates/index.html")
 
-        this.HtmlContent content
+            return this.HtmlContent content
+        }

@@ -1,5 +1,11 @@
 ﻿namespace WebApplication.Infrastructure.Database
 
+[<RequireQualifiedAccess>]
+module UniqueId =
+
+    let create () =
+        RT.Comb.Provider.Sql.Create()
+
 [<AutoOpen>]
 module SqlDataReaderExtensions =
     open System.Threading.Tasks
@@ -13,8 +19,8 @@ module SqlDataReaderExtensions =
                 let items = ResizeArray<'T>()
 
                 let mutable keepGoing = false
-                let! hasMoreItems = this.ReadAsync()
-                keepGoing <- hasMoreItems
+                let! hasNextRecord = this.ReadAsync()
+                keepGoing <- hasNextRecord
 
                 while keepGoing do
                     items.Add(mapper this)

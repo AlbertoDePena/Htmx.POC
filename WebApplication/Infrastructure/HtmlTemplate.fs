@@ -5,6 +5,7 @@ open System.Text
 open System.IO
 open System.Text.RegularExpressions
 open Microsoft.AspNetCore.Hosting
+open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Caching.Memory
 
 /// Can be either a plain HTML string or a path to an HTML file.
@@ -36,13 +37,14 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let mutable _variables: Variables = Map.empty
 
+    let isFile (fileOrContent: FileOrContent) =
+        fileOrContent.Contains("<") |> not
+
     let getFileContent (fileOrContent: FileOrContent) =
         if String.IsNullOrWhiteSpace fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null nor empty" |> failwith
 
-        if fileOrContent.Contains("<") then
-            fileOrContent
-        else
+        if isFile fileOrContent then
             let filePath = Path.Combine(environment.WebRootPath, fileOrContent)
 
             match cache.TryGetValue<string>(filePath) with
@@ -51,6 +53,8 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 let fileContent = filePath |> File.ReadAllText
                 cache.Set(filePath, fileContent) |> ignore
                 fileContent
+        else
+            fileOrContent
 
     let bindVariables (htmlContentBuilder: StringBuilder) =
         _variables
@@ -60,18 +64,19 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             htmlContentBuilder.Replace(pattern, valueToString) |> ignore)
 
     let failOnUnboundedVariables (htmlContent: string) =
-        let stringBuilder = StringBuilder()
+        if environment.IsDevelopment() then
+            let stringBuilder = StringBuilder()
 
-        Regex.Matches(htmlContent, @"\${\b\w+\b}")
-        |> Seq.iter (fun match' ->
-            match'.Groups
-            |> Seq.iter (fun group -> stringBuilder.AppendLine(group.Value) |> ignore))
+            Regex.Matches(htmlContent, @"\${\b\w+\b}")
+            |> Seq.iter (fun match' ->
+                match'.Groups
+                |> Seq.iter (fun group -> stringBuilder.AppendLine(group.Value) |> ignore))
 
-        let unbounded = stringBuilder.ToString()
+            let unbounded = stringBuilder.ToString()
 
-        if String.IsNullOrWhiteSpace unbounded |> not then
-            sprintf "Found unbounded variables in the HTML content: %s" unbounded
-            |> failwith
+            if String.IsNullOrWhiteSpace unbounded |> not then
+                sprintf "Found unbounded variables in the HTML content: %s" unbounded
+                |> failwith
 
     interface IHtmlTemplate with
 

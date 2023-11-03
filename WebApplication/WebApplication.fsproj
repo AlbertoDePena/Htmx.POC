@@ -6,7 +6,6 @@
 
 	<ItemGroup>		
 		<Compile Include="Domain\Extensions.fs" />
-		<Compile Include="Domain\Invariants.fs" />
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />

@@ -16,6 +16,7 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 
+open WebApplication.Infrastructure.Options
 open WebApplication.Infrastructure
 
 module Program =
@@ -25,6 +26,14 @@ module Program =
     [<EntryPoint>]
     let main args =
         let builder = WebApplication.CreateBuilder(args)
+
+        builder
+            .Services
+            .AddOptions<Database>()
+            .Configure<IConfiguration>(fun settings configuration ->
+                configuration
+                    .GetSection(nameof Database)
+                    .Bind(settings))
 
         builder.Services.AddControllers()
         builder.Services.AddHtmlTemplate()

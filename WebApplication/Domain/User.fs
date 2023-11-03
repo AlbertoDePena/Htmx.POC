@@ -1,6 +1,6 @@
 ﻿namespace WebApplication.Domain.User
 
-open WebApplication.Domain.Invariants
+open System
 
 [<RequireQualifiedAccess>]
 type UserGroup =
@@ -45,37 +45,32 @@ module UserType =
 
 [<RequireQualifiedAccess>]
 type UserPermission =
-    | ViewAirShipments
-    | ViewGroundShipments
-    | ViewOceanShipments
+    | ViewTransportationData
     | ViewFinancials
-    | ViewBookings
     | ExportSearchResults
-    | ViewInventory
-    | ViewAnalytics
 
 [<RequireQualifiedAccess>]
 module UserPermission =
 
     let value this =
         match this with
-        | UserPermission.ViewAirShipments -> "View Air Shipments"
-        | UserPermission.ViewGroundShipments -> "View Ground Shipments"
-        | UserPermission.ViewOceanShipments -> "View Ocean Shipments"
+        | UserPermission.ViewTransportationData -> "View Tranportation Data"
         | UserPermission.ViewFinancials -> "View Financials"
-        | UserPermission.ViewBookings -> "View Bookings"
         | UserPermission.ExportSearchResults -> "Export Search Results"
-        | UserPermission.ViewInventory -> "View Inventory"
-        | UserPermission.ViewAnalytics -> "View Analytics"
 
     let tryCreate (value: string) =
-        None
+        match value with
+        | "View Tranportation Data" -> Some UserPermission.ViewTransportationData
+        | "View Financials" -> Some UserPermission.ViewFinancials
+        | "Export Search Results" -> Some UserPermission.ExportSearchResults
+        | _ -> None
 
 type User =
-    { Id: UniqueId
-      EmailAddress: EmailAddress
-      DisplayName: Text
-      Type: UserType }
+    { Id: Guid
+      EmailAddress: string
+      DisplayName: string
+      TypeName: UserType
+      IsActive: bool }
 
 type UserDetails =
     { User: User
