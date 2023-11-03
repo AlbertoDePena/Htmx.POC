@@ -14,7 +14,7 @@ module SqlDataReaderExtensions =
     type SqlDataReader with
 
         /// Map all records available in the result set
-        member this.ReadAllAsync<'T>(mapper: SqlDataReader -> 'T) : Task<'T seq> =
+        member this.ReadManyAsync<'T>(mapper: SqlDataReader -> 'T) : Task<'T seq> =
             task {
                 let items = ResizeArray<'T>()
 

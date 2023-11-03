@@ -47,13 +47,13 @@ module UserDatabase =
 
             use! reader = command.ExecuteReaderAsync()
 
-            let! users = reader.ReadAllAsync readUser
+            let! users = reader.ReadManyAsync readUser
 
             let! hasNextResult = reader.NextResultAsync()
 
             let! userPermissions =
                 if hasNextResult then
-                    reader.ReadAllAsync readUserPermission
+                    reader.ReadManyAsync readUserPermission
                 else
                     Task.singleton []
 
@@ -61,7 +61,7 @@ module UserDatabase =
 
             let! userGroups =
                 if hasNextResult then
-                    reader.ReadAllAsync readUserGroup
+                    reader.ReadManyAsync readUserGroup
                 else
                     Task.singleton []
 
@@ -112,7 +112,7 @@ module UserDatabase =
 
                 use! reader = command.ExecuteReaderAsync()
 
-                let! users = reader.ReadAllAsync readUser
+                let! users = reader.ReadManyAsync readUser
 
                 let! totalCount =
                     task {
