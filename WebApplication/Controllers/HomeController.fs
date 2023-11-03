@@ -16,10 +16,8 @@ open WebApplication.Domain.User
 open WebApplication.Domain.Shared
 open WebApplication.Domain.Extensions
 open WebApplication.Infrastructure.Options
-open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
-open WebApplication.Infrastructure
-
+open WebApplication.Infrastructure.HtmlTemplate
 
 type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, databaseOptions: IOptions<Database>) =
     inherit Controller()
@@ -91,7 +89,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                 htmlTemplate
                     .Bind("UserName", "Alberto De Pena")
                     .Bind("PageContent", "templates/user/search-control.html")
-                    .Compile("templates/index.html")
+                    .Render("templates/index.html")
 
             return this.HtmlContent content
         }

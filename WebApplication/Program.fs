@@ -17,7 +17,7 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 
 open WebApplication.Infrastructure.Options
-open WebApplication.Infrastructure
+open WebApplication.Infrastructure.HtmlTemplate
 
 module Program =
 

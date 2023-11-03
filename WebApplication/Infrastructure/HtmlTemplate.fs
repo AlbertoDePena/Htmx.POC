@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Infrastructure
+﻿namespace WebApplication.Infrastructure.HtmlTemplate
 
 open System
 open System.Text
@@ -31,7 +31,7 @@ type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract Bind: name: VariableName * value: VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
-    abstract Compile: fileOrContent: FileOrContent -> HtmlContent
+    abstract Render: fileOrContent: FileOrContent -> HtmlContent
 
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
@@ -90,7 +90,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             _variables <- _variables |> Map.add name value
             this
 
-        member this.Compile(fileOrContent: FileOrContent) : HtmlContent =
+        member this.Render(fileOrContent: FileOrContent) : HtmlContent =
             try
                 let htmlContentBuilder = getFileOrContent fileOrContent |> StringBuilder
 

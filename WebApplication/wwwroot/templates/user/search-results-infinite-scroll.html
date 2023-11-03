@@ -1,6 +1,9 @@
-<tr class="is-clickable" 
+﻿<tr class="is-clickable" 
     hx-include="#user-search-form" 
-    hx-swap="innerHTML">
+    hx-swap="afterend"
+    hx-get="/Home/Search?page=${Page}"
+    hx-trigger="intersect once"
+    hx-target="this">
     <td class="p-2">${DisplayName}</td>
     <td class="p-2">${EmailAddress}</td>
     <td class="p-2">${TypeName}</td>
