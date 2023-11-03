@@ -95,7 +95,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 let htmlContentBuilder = getFileContent fileOrContent |> StringBuilder
 
                 bindVariables htmlContentBuilder
-
+                
                 let htmlContent = htmlContentBuilder.ToString()
 
                 failOnUnboundedVariables htmlContent

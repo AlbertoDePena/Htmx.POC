@@ -1,4 +1,4 @@
-<form class="container" id="user-search-form" hx-trigger="load" hx-get="/Home/Search" hx-target="#search-results">
+<form class="container" id="user-search-form" hx-trigger="load" hx-get="/Home/Search" hx-target="#search-results" hx-swap="innerHTML">
     <div class="box">
         <h1 class="has-text-weight-semibold has-text-link">Users | All Users</h1>
         <div class="columns">
@@ -10,28 +10,23 @@
             <div class="column">
                 <div class="columns">
                     <div class="column">
-                        <div class="field has-addons has-addons-right">
-                            <p class="control is-expanded">
-                                <input class="input is-small" name="search"
-                                       hx-trigger="keyup changed delay:500ms, search"                                       
-                                       hx-get="/Home/Search"
-                                       hx-indicator=".htmx-indicator"
-                                       hx-include="#user-search-form"
-                                       placeholder="Begin typing to search users...">
-                            </p>
-                            <p class="control">
-                                <button class="button is-small" type="button">
-                                    <span class="material-icons is-small"><i>search</i></span><span class="is-sr-only">Search</span>
-                                </button>
-                            </p>
+                        <div class="control">
+                            <input class="input is-small" name="search"
+                                   hx-trigger="keyup changed delay:500ms, search"
+                                   hx-get="/Home/Search"
+                                   hx-include="#user-search-form"
+                                   hx-vals='{"page": "1"}'
+                                   hx-indicator=".htmx-indicator"
+                                   placeholder="Begin typing to search users...">
                         </div>
                     </div>
                     <div class="column is-narrow">
                         <div class="is-flex is-justify-content-right">
                             <div class="is-flex is-align-items-center is-justify-content-right">
                                 <input id="view-active-users" name="view-active-users" type="checkbox" value="true"
-                                       hx-get="/Home/Search"    
+                                       hx-get="/Home/Search"
                                        hx-include="#user-search-form"
+                                       hx-vals='{"page": "1"}'
                                        class="is-clickable ml-2">
                                 <label class="is-clickable mx-2"
                                        for="view-active-users">Active Only</label>
