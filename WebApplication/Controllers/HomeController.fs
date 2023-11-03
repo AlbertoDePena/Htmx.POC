@@ -34,7 +34,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                     this.Request.TryGetQueryStringValue "view-active-users"
                     |> Option.bind (bool.TryParse >> Option.ofPair)
                     |> Option.defaultValue false
-                  Page = 
+                  Page =
                     this.Request.TryGetQueryStringValue "page"
                     |> Option.bind (Int32.TryParse >> Option.ofPair)
                     |> Option.defaultValue 1
@@ -54,29 +54,26 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                         .Bind("DisplayName", user.DisplayName)
                         .Bind("EmailAddress", user.EmailAddress)
                         .Bind("TypeName", user.TypeName |> UserType.value)
-                        .Bind("TagClass", if user.IsActive then "tag is-success" else "tag")
-                        .Bind("IsActive", if user.IsActive then "Yes" else "No")
+                        .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
+                        .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Bind("Page", query.Page + 1)
                         .Render("templates/user/search-results-infinite-scroll.html")
                 else
-                   htmlTemplate
+                    htmlTemplate
                         .Bind("DisplayName", user.DisplayName)
                         .Bind("EmailAddress", user.EmailAddress)
                         .Bind("TypeName", user.TypeName |> UserType.value)
-                        .Bind("TagClass", if user.IsActive then "tag is-success" else "tag")
-                        .Bind("IsActive", if user.IsActive then "Yes" else "No")
+                        .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
+                        .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-results.html")
 
-            let template =
-                pagedData.Data
-                |> List.mapi (fun index user -> renderSearchResults index user)
-                |> List.fold (+) String.Empty
+            let content = htmlTemplate.Reduce(pagedData.Data, renderSearchResults)
 
-            return this.HtmlContent template
+            return this.HtmlContent content
         }
 
     member this.Index() =
-        task {            
+        task {
             let content =
                 htmlTemplate
                     .Bind("UserName", "Alberto De Pena")
