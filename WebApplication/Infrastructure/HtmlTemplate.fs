@@ -47,12 +47,15 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         if isFile fileOrContent then
             let filePath = Path.Combine(environment.WebRootPath, fileOrContent)
 
-            match cache.TryGetValue<string>(filePath) with
-            | true, fileContent -> fileContent
-            | _ ->
-                let fileContent = filePath |> File.ReadAllText
-                cache.Set(filePath, fileContent) |> ignore
-                fileContent
+            if environment.IsDevelopment () then
+                filePath |> File.ReadAllText
+            else
+                match cache.TryGetValue<string>(filePath) with
+                | true, fileContent -> fileContent
+                | _ ->
+                    let fileContent = filePath |> File.ReadAllText
+                    cache.Set(filePath, fileContent) |> ignore
+                    fileContent
         else
             fileOrContent
 
