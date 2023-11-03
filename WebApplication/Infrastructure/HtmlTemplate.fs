@@ -38,9 +38,9 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
     let mutable _variables: Variables = Map.empty
 
     let isFile (fileOrContent: FileOrContent) =
-        fileOrContent.Contains("<") |> not
+        fileOrContent.EndsWith(".html")
 
-    let getFileContent (fileOrContent: FileOrContent) =
+    let getFileOrContent (fileOrContent: FileOrContent) =
         if String.IsNullOrWhiteSpace fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null nor empty" |> failwith
 
@@ -60,7 +60,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         _variables
         |> Map.iter (fun name value ->
             let pattern = sprintf "${%s}" name
-            let valueToString = value.ToString()
+            let valueToString = value.ToString() |> getFileOrContent
             htmlContentBuilder.Replace(pattern, valueToString) |> ignore)
 
     let failOnUnboundedVariables (htmlContent: string) =
@@ -92,7 +92,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
         member this.Compile(fileOrContent: FileOrContent) : HtmlContent =
             try
-                let htmlContentBuilder = getFileContent fileOrContent |> StringBuilder
+                let htmlContentBuilder = getFileOrContent fileOrContent |> StringBuilder
 
                 bindVariables htmlContentBuilder
                 

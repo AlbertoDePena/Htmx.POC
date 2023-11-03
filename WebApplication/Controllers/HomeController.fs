@@ -86,13 +86,11 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
         }
 
     member this.Index() =
-        task {
-            let pageContent = htmlTemplate.Compile("templates/user/search-control.html")
-
+        task {            
             let content =
                 htmlTemplate
                     .Bind("UserName", "Alberto De Pena")
-                    .Bind("PageContent", pageContent)
+                    .Bind("PageContent", "templates/user/search-control.html")
                     .Compile("templates/index.html")
 
             return this.HtmlContent content
