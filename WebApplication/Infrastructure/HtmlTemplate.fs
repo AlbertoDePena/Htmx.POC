@@ -23,6 +23,7 @@ type Variables = Map<VariableName, VariableValue>
 /// The compiled HTML as a string.
 type HtmlContent = string
 
+/// The index of a collection
 type Index = int
 
 type HtmlTemplateException(ex: Exception) =
@@ -35,7 +36,7 @@ type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Render: fileOrContent: FileOrContent -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
-    abstract Reduce: items: 'T list * map: (Index -> 'T -> HtmlContent) -> HtmlContent
+    abstract Reduce: items: 'T list * mapping: (Index -> 'T -> HtmlContent) -> HtmlContent
 
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
@@ -113,10 +114,10 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             with ex ->
                 (HtmlTemplateException ex) |> raise
 
-        member this.Reduce(items, mapper) =
+        member this.Reduce(items, mapping) =
             try
                 items
-                |> List.mapi (fun index -> mapper index)
+                |> List.mapi (fun index -> mapping index)
                 |> List.fold (+) String.Empty
             with ex ->
                 (HtmlTemplateException ex) |> raise
