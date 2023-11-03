@@ -44,40 +44,32 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
 
             let! pagedData = UserDatabase.getPagedData dbConnectionString query
 
-            let buildUserTemplate (index: int) (user: User) =
+            let renderSearchResults (index: int) (user: User) =
                 let hadNextPage = (query.Page * pagedData.PageSize) < pagedData.TotalCount
 
                 let isLastItem = pagedData.Data.Length = (index + 1)
 
-                let htmx =
-                    if hadNextPage && isLastItem then
-                        $"""
-                            hx-get="/Home/Search?page={query.Page + 1}"
-                            hx-trigger="intersect once"
-                            hx-swap="afterend"
-                            hx-target="this"
-                        """
-                    else 
-                        $"""
-                            hx-swap="innerHTML"
-                        """
-
-                $"""
-                <tr class="is-clickable" hx-include="#user-search-form" {htmx}>
-                    <td class="p-2">{user.DisplayName}</td>
-                    <td class="p-2">{user.EmailAddress}</td>
-                    <td class="p-2">{user.TypeName |> UserType.value}</td>
-                    <td class="p-2">
-                        <span class="tag {if user.IsActive then "is-success" else ""}">
-                            {if user.IsActive then "Yes" else "No"}
-                        </span>
-                    </td>
-                </tr>
-                """
+                if hadNextPage && isLastItem then
+                    htmlTemplate
+                        .Bind("DisplayName", user.DisplayName)
+                        .Bind("EmailAddress", user.EmailAddress)
+                        .Bind("TypeName", user.TypeName |> UserType.value)
+                        .Bind("TagClass", if user.IsActive then "tag is-success" else "tag")
+                        .Bind("IsActive", if user.IsActive then "Yes" else "No")
+                        .Bind("Page", query.Page + 1)
+                        .Render("templates/user/search-results-infinite-scroll.html")
+                else
+                   htmlTemplate
+                        .Bind("DisplayName", user.DisplayName)
+                        .Bind("EmailAddress", user.EmailAddress)
+                        .Bind("TypeName", user.TypeName |> UserType.value)
+                        .Bind("TagClass", if user.IsActive then "tag is-success" else "tag")
+                        .Bind("IsActive", if user.IsActive then "Yes" else "No")
+                        .Render("templates/user/search-results.html")
 
             let template =
                 pagedData.Data
-                |> List.mapi (fun index user -> buildUserTemplate index user)
+                |> List.mapi (fun index user -> renderSearchResults index user)
                 |> List.fold (+) String.Empty
 
             return this.HtmlContent template

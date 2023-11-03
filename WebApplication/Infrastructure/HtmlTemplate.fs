@@ -103,6 +103,8 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
                 failOnUnboundedVariables htmlContent
 
+                _variables <- Map.empty
+
                 htmlContent
             with ex ->
                 (HtmlTemplateException ex) |> raise
