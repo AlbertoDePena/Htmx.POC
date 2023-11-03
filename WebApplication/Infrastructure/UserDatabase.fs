@@ -21,13 +21,13 @@ module UserDatabase =
     let private readUserGroup (reader: SqlDataReader) : UserGroup =
         reader.GetOrdinal("Name")
         |> reader.GetString
-        |> UserGroup.tryCreate
+        |> UserGroup.optional
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
     let private readUserPermission (reader: SqlDataReader) : UserPermission =
         reader.GetOrdinal("Name")
         |> reader.GetString
-        |> UserPermission.tryCreate
+        |> UserPermission.optional
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
     let private readUser (reader: SqlDataReader) : User =
@@ -37,7 +37,7 @@ module UserDatabase =
           TypeName =
             reader.GetOrdinal("TypeName")
             |> reader.GetString
-            |> UserType.tryCreate
+            |> UserType.optional
             |> Option.defaultWith (fun () -> failwith "Missing TypeName column")
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 

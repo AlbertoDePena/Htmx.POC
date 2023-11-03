@@ -17,7 +17,7 @@ module UserGroup =
         | UserGroup.Editor -> "Editor"
         | UserGroup.Administrator -> "Administrator"
 
-    let tryCreate (value: string) =
+    let optional (value: string) =
         match value with
         | "Viewer" -> Some UserGroup.Viewer
         | "Editor" -> Some UserGroup.Editor
@@ -37,7 +37,7 @@ module UserType =
         | UserType.Customer -> "Customer"
         | UserType.Employee -> "Employee"
 
-    let tryCreate (value: string) =
+    let optional (value: string) =
         match value with
         | "Customer" -> Some UserType.Customer
         | "Employee" -> Some UserType.Employee
@@ -58,7 +58,7 @@ module UserPermission =
         | UserPermission.ViewFinancials -> "View Financials"
         | UserPermission.ExportSearchResults -> "Export Search Results"
 
-    let tryCreate (value: string) =
+    let optional (value: string) =
         match value with
         | "View Tranportation Data" -> Some UserPermission.ViewTransportationData
         | "View Financials" -> Some UserPermission.ViewFinancials

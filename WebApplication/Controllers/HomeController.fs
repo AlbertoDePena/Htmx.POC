@@ -40,7 +40,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                     |> Option.defaultValue 1
                   PageSize = 15
                   SortBy = None
-                  SortDirection = SortDirection.tryCreate "Ascending" }
+                  SortDirection = SortDirection.optional "Ascending" }
 
             let! pagedData = UserDatabase.getPagedData dbConnectionString query
 
