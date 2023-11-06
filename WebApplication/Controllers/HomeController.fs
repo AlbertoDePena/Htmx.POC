@@ -77,7 +77,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
             let content =
                 htmlTemplate
                     .Bind("UserName", "Alberto De Pena")
-                    .Bind("PageContent", "templates/user/search-control.html")
+                    .Bind("PageContent", "templates/user/search.html")
                     .Render("templates/index.html")
 
             return this.HtmlContent content
