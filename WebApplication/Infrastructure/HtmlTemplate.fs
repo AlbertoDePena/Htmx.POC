@@ -37,6 +37,8 @@ type IHtmlTemplate =
     abstract Render: FileOrContent -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Reduce: items: 'T list * mapping: (Index -> 'T -> HtmlContent) -> HtmlContent
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
+    abstract Reduce: items: 'T list * mapping: ('T -> HtmlContent) -> HtmlContent
 
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
@@ -118,6 +120,14 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             try
                 items
                 |> List.mapi (fun index -> mapping index)
+                |> List.fold (+) String.Empty
+            with ex ->
+                (HtmlTemplateException ex) |> raise
+
+        member this.Reduce(items, mapping) =
+            try
+                items
+                |> List.map mapping
                 |> List.fold (+) String.Empty
             with ex ->
                 (HtmlTemplateException ex) |> raise
