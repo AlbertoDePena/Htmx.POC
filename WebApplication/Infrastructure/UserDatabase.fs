@@ -16,7 +16,7 @@ open WebApplication.Domain.User
 [<RequireQualifiedAccess>]
 module UserDatabase =
 
-    type DbConnectionString = Text
+    type DbConnectionString = string
 
     let private readUserGroup (reader: SqlDataReader) : UserGroup =
         reader.GetOrdinal("Name")
