@@ -1,5 +1,28 @@
 ﻿namespace WebApplication.Domain.Shared
 
+/// Represents a non-null string
+type Text =
+    private
+    | Text of string
+
+    member this.Value =
+        match this with
+        | Text value -> value
+
+    override this.ToString() = this.Value
+
+    /// The default value of a Text is the empty string.
+    static member DefaultValue = Text System.String.Empty
+
+    static member op_Implicit(value: string) =
+        if isNull value then Text.DefaultValue else Text value
+
+    static member TryCreate(value: string) =
+        if isNull value then
+            Error "Text cannot be null"
+        else
+            Ok(Text value)
+
 [<RequireQualifiedAccess>]
 type SortDirection =
     | Ascending
