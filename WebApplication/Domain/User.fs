@@ -54,13 +54,13 @@ module UserPermission =
 
     let value this =
         match this with
-        | UserPermission.ViewTransportationData -> "View Tranportation Data"
+        | UserPermission.ViewTransportationData -> "View Transportation Data"
         | UserPermission.ViewFinancials -> "View Financials"
         | UserPermission.ExportSearchResults -> "Export Search Results"
 
     let optional (value: string) =
         match value with
-        | "View Tranportation Data" -> Some UserPermission.ViewTransportationData
+        | "View Transportation Data" -> Some UserPermission.ViewTransportationData
         | "View Financials" -> Some UserPermission.ViewFinancials
         | "Export Search Results" -> Some UserPermission.ExportSearchResults
         | _ -> None
