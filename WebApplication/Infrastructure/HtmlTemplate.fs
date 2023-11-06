@@ -32,9 +32,9 @@ type HtmlTemplateException(ex: Exception) =
 
 type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
-    abstract Bind: name: VariableName * value: VariableValue -> IHtmlTemplate
+    abstract Bind: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
-    abstract Render: fileOrContent: FileOrContent -> HtmlContent
+    abstract Render: FileOrContent -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Reduce: items: 'T list * mapping: (Index -> 'T -> HtmlContent) -> HtmlContent
 
