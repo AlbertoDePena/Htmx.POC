@@ -137,7 +137,7 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let tryFindById (dbConnectionString: DbConnectionString) (id: Guid) : Task<UserDetails option> =
+    let tryFindById (dbConnectionString: DbConnectionString) (id: UniqueId) : Task<UserDetails option> =
         task {
             try
                 use connection = new SqlConnection(dbConnectionString)
