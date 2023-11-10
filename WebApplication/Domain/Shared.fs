@@ -45,3 +45,13 @@ type PagedData<'T> =
                 pageCount + 1
 
         integer
+
+[<AutoOpen>]
+module Alias =
+    open System
+
+    type DbConnectionString = string
+
+    type EmailAddress = string
+
+    type UniqueId = Guid

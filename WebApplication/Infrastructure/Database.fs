@@ -1,9 +1,11 @@
 ﻿namespace WebApplication.Infrastructure.Database
 
+open WebApplication.Domain.Shared
+
 [<RequireQualifiedAccess>]
 module UniqueId =
 
-    let create () =
+    let create () : UniqueId =
         RT.Comb.Provider.Sql.Create()
 
 [<AutoOpen>]

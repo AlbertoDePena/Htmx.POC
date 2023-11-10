@@ -16,8 +16,6 @@ open WebApplication.Domain.User
 [<RequireQualifiedAccess>]
 module UserDatabase =
 
-    type DbConnectionString = string
-
     let private readUserGroup (reader: SqlDataReader) : UserGroup =
         reader.GetOrdinal("Name")
         |> reader.GetString
@@ -159,7 +157,7 @@ module UserDatabase =
     /// <exception cref="DataStorageException"></exception>
     let tryFindByEmailAddress
         (dbConnectionString: DbConnectionString)
-        (emailAddress: string)
+        (emailAddress: EmailAddress)
         : Task<UserDetails option> =
         task {
             try
