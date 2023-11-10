@@ -44,7 +44,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
 
             let! pagedData = UserDatabase.getPagedData dbConnectionString query
 
-            let renderSearchResults (index: int) (user: User) =
+            let searchResultsContent (index: int) (user: User) =
                 let hadNextPage = (query.Page * pagedData.PageSize) < pagedData.TotalCount
 
                 let isLastItem = pagedData.Data.Length = (index + 1)
@@ -67,7 +67,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-results.html")
 
-            let content = htmlTemplate.Reduce(pagedData.Data, renderSearchResults)
+            let content = htmlTemplate.Reduce(pagedData.Data, searchResultsContent)
 
             return this.HtmlContent content
         }

@@ -77,7 +77,7 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let getPagedData (dbConnectionString: string) (query: Query) : Task<PagedData<User>> =
+    let getPagedData (dbConnectionString: DbConnectionString) (query: Query) : Task<PagedData<User>> =
         task {
             try
                 use connection = new SqlConnection(dbConnectionString)
@@ -137,7 +137,7 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let tryFindById (dbConnectionString: string) (id: Guid) : Task<UserDetails option> =
+    let tryFindById (dbConnectionString: DbConnectionString) (id: Guid) : Task<UserDetails option> =
         task {
             try
                 use connection = new SqlConnection(dbConnectionString)
@@ -155,7 +155,7 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let tryFindByEmailAddress (dbConnectionString: string) (emailAddress: string) : Task<UserDetails option> =
+    let tryFindByEmailAddress (dbConnectionString: DbConnectionString) (emailAddress: string) : Task<UserDetails option> =
         task {
             try
                 use connection = new SqlConnection(dbConnectionString)

@@ -7,45 +7,91 @@
     <title>HTMX POC</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon">
+    <style>        
+        body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
+            padding-bottom: 3.25rem;
+        }
+
+        footer {
+            padding: 1.0rem !important;
+        }
+
+        .is-fixed-bottom {
+            bottom: 0;
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 30;
+        }
+
+        /* BEGIN - fixed table header */
+        .table-has-fixed-header {
+            overflow: auto;
+        }
+
+            /* If we use border,
+        we must use table-collapse to avoid
+        a slight movement of the header row */
+            .table-has-fixed-header table {
+                border-collapse: collapse;
+            }
+
+            /* Because we must set sticky on th,
+        we have to apply background styles here
+        rather than on thead */
+            .table-has-fixed-header th {
+                background: white;
+            }
+
+            /* Set header to stick to the top of the container. */
+            .table-has-fixed-header thead tr th {
+                position: sticky;
+                top: 0;
+            }
+        /* END - fixed table header */
+    </style>
 </head>
 
-<body class="has-navbar-fixed-top">
-    <div class="is-flex is-flex-direction-column">
-        <!--navbar-->
-        <nav class="navbar is-fixed-top is-white has-shadow" role="navigation" aria-label="main navigation">
-            <div class="navbar-brand">
-                <a class="navbar-item" href="#/">
-                    <img src="https://bulma.io/images/bulma-logo.png">
-                </a>
-                <a aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" _="on click toggle .is-active on me then toggle .is-active on #MainNavbar">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                </a>
+<body class="has-navbar-fixed-top has-footer-fixed-bottom">
+
+    <!--navbar-->
+    <nav class="navbar is-fixed-top is-white has-shadow" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#/">
+                <img src="https://bulma.io/images/bulma-logo.png">
+            </a>
+            <a aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" _="on click toggle .is-active on me then toggle .is-active on #MainNavbar">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="MainNavbar">
+            <div class="navbar-start">
+                <a class="navbar-item is-size-7 has-text-link has-text-weight-semibold"
+                   href="#/users">Users</a>
             </div>
-            <div class="navbar-menu" id="MainNavbar">
-                <div class="navbar-start">
-                    <a class="navbar-item is-size-7 has-text-link has-text-weight-semibold"
-                       href="#/users">Users</a>
-                </div>
-                <div class="navbar-end">
-                    <div class="navbar-item has-dropdown is-hoverable">
-                        <a class="navbar-link is-size-7 has-text-link has-text-weight-semibold">${UserName}</a>
-                        <div class="navbar-dropdown">
-                            <a class="navbar-item is-size-7"
-                               href="#/logout">
-                                Log Out
-                            </a>
-                        </div>
+            <div class="navbar-end">
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link is-size-7 has-text-link has-text-weight-semibold">${UserName}</a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item is-size-7"
+                           href="#/logout">
+                            Log Out
+                        </a>
                     </div>
                 </div>
             </div>
-        </nav>
-        <!--main-->
-        <main class="mb-6 p-6 is-size-7">
-            ${PageContent}
-        </main>
-    </div>
+        </div>
+    </nav>
+    <!--main-->
+    <main class="container-fluid p-6 is-size-7">
+        ${PageContent}
+    </main>
+
+    <footer class="footer is-fixed-bottom">
+        <p class="has-text-centered">This is a test</p>
+    </footer>
 
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
