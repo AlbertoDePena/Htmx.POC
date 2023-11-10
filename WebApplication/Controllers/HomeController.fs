@@ -24,7 +24,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
 
     let dbConnectionString =
         databaseOptions.Value.ConnectionString
-        |> String.valueOrThrow "The database connection string is missing"
+        |> String.valueOrFailWith "The database connection string is missing"
 
     member this.Search() =
         task {
@@ -40,7 +40,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                     |> Option.defaultValue 1
                   PageSize = 15
                   SortBy = None
-                  SortDirection = SortDirection.optional "Ascending" }
+                  SortDirection = SortDirection.fromString "Ascending" }
 
             let! pagedData = UserDatabase.getPagedData dbConnectionString query
 

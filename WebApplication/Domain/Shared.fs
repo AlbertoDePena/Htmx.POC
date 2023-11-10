@@ -13,7 +13,7 @@ module SortDirection =
         | SortDirection.Ascending -> "Ascending"
         | SortDirection.Descending -> "Descending"
 
-    let optional (value: string) =
+    let fromString (value: string) =
         match value with
         | "Ascending" -> Some SortDirection.Ascending
         | "Descending" -> Some SortDirection.Descending

@@ -21,24 +21,26 @@ module UserDatabase =
     let private readUserGroup (reader: SqlDataReader) : UserGroup =
         reader.GetOrdinal("Name")
         |> reader.GetString
-        |> UserGroup.optional
+        |> UserGroup.fromString
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
     let private readUserPermission (reader: SqlDataReader) : UserPermission =
         reader.GetOrdinal("Name")
         |> reader.GetString
-        |> UserPermission.optional
+        |> UserPermission.fromString
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
+
+    let private readUserType (reader: SqlDataReader) : UserType =
+        reader.GetOrdinal("TypeName")
+        |> reader.GetString
+        |> UserType.fromString
+        |> Option.defaultWith (fun () -> failwith "Missing TypeName column")
 
     let private readUser (reader: SqlDataReader) : User =
         { Id = reader.GetOrdinal("Id") |> reader.GetGuid
           EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
           DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
-          TypeName =
-            reader.GetOrdinal("TypeName")
-            |> reader.GetString
-            |> UserType.optional
-            |> Option.defaultWith (fun () -> failwith "Missing TypeName column")
+          TypeName = readUserType reader
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 
     let private getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
@@ -155,7 +157,10 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let tryFindByEmailAddress (dbConnectionString: DbConnectionString) (emailAddress: string) : Task<UserDetails option> =
+    let tryFindByEmailAddress
+        (dbConnectionString: DbConnectionString)
+        (emailAddress: string)
+        : Task<UserDetails option> =
         task {
             try
                 use connection = new SqlConnection(dbConnectionString)

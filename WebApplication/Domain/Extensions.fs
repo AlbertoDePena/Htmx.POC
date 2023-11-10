@@ -31,7 +31,7 @@ module String =
 
     /// <summary>Check for null on a string</summary>
     /// <exception cref="System.Exception">Throw exception when the string is null</exception>
-    let valueOrThrow exceptionMessage (value: string) =
+    let valueOrFailWith exceptionMessage (value: string) =
         match value with
         | null -> failwith exceptionMessage
         | _ -> value
