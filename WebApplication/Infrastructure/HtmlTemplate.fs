@@ -1,9 +1,10 @@
 ﻿namespace WebApplication.Infrastructure.HtmlTemplate
 
 open System
-open System.Text
 open System.IO
+open System.Text
 open System.Text.RegularExpressions
+
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Caching.Memory
@@ -22,9 +23,6 @@ type Variables = Map<VariableName, VariableValue>
 
 /// The compiled HTML as a string.
 type HtmlContent = string
-
-/// The index of a collection
-type Index = int
 
 type HtmlTemplateException(ex: Exception) =
     inherit Exception(ex.Message, ex)
@@ -124,7 +122,6 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =
-
     open Microsoft.Extensions.DependencyInjection
 
     type IServiceCollection with

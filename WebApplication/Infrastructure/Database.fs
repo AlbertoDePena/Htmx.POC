@@ -12,8 +12,7 @@ open WebApplication.Domain.Shared
 [<RequireQualifiedAccess>]
 module UniqueId =
 
-    let create () : UniqueId =
-        RT.Comb.Provider.Sql.Create()
+    let create () : UniqueId = RT.Comb.Provider.Sql.Create()
 
 [<AutoOpen>]
 module SqlDataReaderExtensions =
@@ -49,11 +48,28 @@ module SqlDataReaderExtensions =
             }
 
 type ISqlConnectionFactory =
-    abstract Create : unit -> SqlConnection
+    abstract Create: unit -> SqlConnection
 
 type SqlConnectionFactory(options: IOptions<Database>) =
 
     interface ISqlConnectionFactory with
 
-        member this.Create () =
+        member this.Create() =
             new SqlConnection(options.Value.ConnectionString)
+
+[<AutoOpen>]
+module ServiceCollectionExtensions =
+    open Microsoft.Extensions.Configuration
+    open Microsoft.Extensions.DependencyInjection
+
+    type IServiceCollection with
+
+        /// Register SQL connection factory
+        member this.AddSqlConnectionFactory() =
+            this
+                .AddOptions<Database>()
+                .Configure<IConfiguration>(fun settings configuration ->
+                    configuration.GetSection(nameof Database).Bind(settings))
+            |> ignore
+
+            this.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>()
