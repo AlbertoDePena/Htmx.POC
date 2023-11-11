@@ -96,7 +96,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             _variables <- _variables |> Map.add name value
             this
 
-        member this.Join(items) =
+        member this.Join(items: HtmlContent list) =
             try
                 let htmlContentBuilder = StringBuilder()
                 for item in items do htmlContentBuilder.AppendLine(item) |> ignore
