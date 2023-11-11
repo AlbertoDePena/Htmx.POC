@@ -28,19 +28,10 @@ module Program =
     let main args =
         let builder = WebApplication.CreateBuilder(args)
 
-        builder
-            .Services
-            .AddOptions<Database>()
-            .Configure<IConfiguration>(fun settings configuration ->
-                configuration
-                    .GetSection(nameof Database)
-                    .Bind(settings))
-
-        builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>()
-
-        builder.Services.AddControllers()
+        builder.Services.AddSqlConnectionFactory()
         builder.Services.AddHtmlTemplate()
-
+        builder.Services.AddControllers()
+        
         let app = builder.Build()
 
         if builder.Environment.IsDevelopment() then
