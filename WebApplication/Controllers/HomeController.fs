@@ -63,8 +63,10 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-results.html")
 
-            let content = htmlTemplate.Reduce(pagedData.Data, searchResultsContent)
+            let contents = pagedData.Data |> List.mapi searchResultsContent
 
+            let content = htmlTemplate.Join(contents)
+            
             return this.HtmlContent content
         }
 

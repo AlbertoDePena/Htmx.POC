@@ -34,12 +34,10 @@ type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract Bind: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
+    abstract Join: HtmlContent list -> HtmlContent
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Render: FileOrContent -> HtmlContent
-    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
-    abstract Reduce: items: 'T list * mapping: (Index -> 'T -> HtmlContent) -> HtmlContent
-    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
-    abstract Reduce: items: 'T list * mapping: ('T -> HtmlContent) -> HtmlContent
-
+    
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let mutable _variables: Variables = Map.empty
@@ -100,6 +98,14 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             _variables <- _variables |> Map.add name value
             this
 
+        member this.Join(items) =
+            try
+                let htmlContentBuilder = StringBuilder()
+                for item in items do htmlContentBuilder.AppendLine(item) |> ignore
+                htmlContentBuilder.ToString()
+            with ex ->
+                (HtmlTemplateException ex) |> raise
+
         member this.Render(fileOrContent: FileOrContent) : HtmlContent =
             try
                 let htmlContentBuilder = getFileOrContent fileOrContent |> StringBuilder
@@ -113,22 +119,6 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 _variables <- Map.empty
 
                 htmlContent
-            with ex ->
-                (HtmlTemplateException ex) |> raise
-
-        member this.Reduce(items, mapping) =
-            try
-                items
-                |> List.mapi (fun index -> mapping index)
-                |> List.fold (+) String.Empty
-            with ex ->
-                (HtmlTemplateException ex) |> raise
-
-        member this.Reduce(items, mapping) =
-            try
-                items
-                |> List.map mapping
-                |> List.fold (+) String.Empty
             with ex ->
                 (HtmlTemplateException ex) |> raise
 
