@@ -1,5 +1,12 @@
 ﻿namespace WebApplication.Infrastructure.Database
 
+open System
+open System.Data
+
+open Microsoft.Data.SqlClient
+open Microsoft.Extensions.Options
+
+open WebApplication.Infrastructure.Options
 open WebApplication.Domain.Shared
 
 [<RequireQualifiedAccess>]
@@ -11,7 +18,6 @@ module UniqueId =
 [<AutoOpen>]
 module SqlDataReaderExtensions =
     open System.Threading.Tasks
-    open Microsoft.Data.SqlClient
 
     type SqlDataReader with
 
@@ -42,3 +48,12 @@ module SqlDataReaderExtensions =
                 return item
             }
 
+type ISqlConnectionFactory =
+    abstract Create : unit -> SqlConnection
+
+type SqlConnectionFactory(options: IOptions<Database>) =
+
+    interface ISqlConnectionFactory with
+
+        member this.Create () =
+            new SqlConnection(options.Value.ConnectionString)

@@ -17,6 +17,7 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 
 open WebApplication.Infrastructure.Options
+open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.HtmlTemplate
 
 module Program =
@@ -34,6 +35,8 @@ module Program =
                 configuration
                     .GetSection(nameof Database)
                     .Bind(settings))
+
+        builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>()
 
         builder.Services.AddControllers()
         builder.Services.AddHtmlTemplate()

@@ -15,16 +15,12 @@ open Microsoft.Extensions.Options
 open WebApplication.Domain.User
 open WebApplication.Domain.Shared
 open WebApplication.Domain.Extensions
-open WebApplication.Infrastructure.Options
+open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
-type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, databaseOptions: IOptions<Database>) =
+type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, sqlConnectionFactory: ISqlConnectionFactory) =
     inherit Controller()
-
-    let dbConnectionString =
-        databaseOptions.Value.ConnectionString
-        |> String.valueOrFailWith "The database connection string is missing"
 
     member this.Search() =
         task {
@@ -42,7 +38,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                   SortBy = None
                   SortDirection = SortDirection.fromString "Ascending" }
 
-            let! pagedData = UserDatabase.getPagedData dbConnectionString query
+            let! pagedData = UserDatabase.getPagedData sqlConnectionFactory query
 
             let searchResultsContent (index: int) (user: User) =
                 let hadNextPage = (query.Page * pagedData.PageSize) < pagedData.TotalCount

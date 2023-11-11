@@ -77,10 +77,10 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let getPagedData (dbConnectionString: DbConnectionString) (query: Query) : Task<PagedData<User>> =
+    let getPagedData (sqlConnectionFactory: ISqlConnectionFactory) (query: Query) : Task<PagedData<User>> =
         task {
             try
-                use connection = new SqlConnection(dbConnectionString)
+                use connection = sqlConnectionFactory.Create()
                 use command = new SqlCommand("dbo.Users_Search", connection)
 
                 command.CommandType <- CommandType.StoredProcedure
@@ -137,10 +137,10 @@ module UserDatabase =
         }
 
     /// <exception cref="DataStorageException"></exception>
-    let tryFindById (dbConnectionString: DbConnectionString) (id: UniqueId) : Task<UserDetails option> =
+    let tryFindById (sqlConnectionFactory: ISqlConnectionFactory) (id: UniqueId) : Task<UserDetails option> =
         task {
             try
-                use connection = new SqlConnection(dbConnectionString)
+                use connection = sqlConnectionFactory.Create()
                 use command = new SqlCommand("dbo.Users_FindById", connection)
 
                 command.CommandType <- CommandType.StoredProcedure
@@ -156,12 +156,12 @@ module UserDatabase =
 
     /// <exception cref="DataStorageException"></exception>
     let tryFindByEmailAddress
-        (dbConnectionString: DbConnectionString)
+        (sqlConnectionFactory: ISqlConnectionFactory)
         (emailAddress: EmailAddress)
         : Task<UserDetails option> =
         task {
             try
-                use connection = new SqlConnection(dbConnectionString)
+                use connection = sqlConnectionFactory.Create()
                 use command = new SqlCommand("dbo.Users_FindByEmailAddress", connection)
 
                 command.CommandType <- CommandType.StoredProcedure

@@ -50,8 +50,6 @@ type PagedData<'T> =
 module Alias =
     open System
 
-    type DbConnectionString = string
-
     type EmailAddress = string
 
     type UniqueId = Guid
