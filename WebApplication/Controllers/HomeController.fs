@@ -19,7 +19,7 @@ open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
-type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, sqlConnectionFactory: ISqlConnectionFactory) =
+type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, dbConnectionFactory: IDbConnectionFactory) =
     inherit Controller()
 
     member this.Search() =
@@ -38,7 +38,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                   SortBy = None
                   SortDirection = SortDirection.fromString "Ascending" }
 
-            let! pagedData = UserDatabase.getPagedData sqlConnectionFactory query
+            let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
 
             let searchResultsContent (index: int) (user: User) =
                 let hadNextPage = (query.Page * pagedData.PageSize) < pagedData.TotalCount

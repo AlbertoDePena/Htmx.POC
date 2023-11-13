@@ -47,14 +47,14 @@ module SqlDataReaderExtensions =
                 return item
             }
 
-type ISqlConnectionFactory =
-    abstract Create: unit -> SqlConnection
+type IDbConnectionFactory =
+    abstract CreateSqlConnection: unit -> SqlConnection
 
-type SqlConnectionFactory(options: IOptions<Database>) =
+type DbConnectionFactory(options: IOptions<Database>) =
 
-    interface ISqlConnectionFactory with
+    interface IDbConnectionFactory with
 
-        member this.Create() =
+        member this.CreateSqlConnection() =
             new SqlConnection(options.Value.ConnectionString)
 
 [<AutoOpen>]
@@ -64,12 +64,12 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
 
-        /// Register SQL connection factory
-        member this.AddSqlConnectionFactory() =
+        /// Register the database connection factory
+        member this.AddDbConnectionFactory() =
             this
                 .AddOptions<Database>()
                 .Configure<IConfiguration>(fun settings configuration ->
                     configuration.GetSection(nameof Database).Bind(settings))
             |> ignore
 
-            this.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>()
+            this.AddSingleton<IDbConnectionFactory, DbConnectionFactory>()
