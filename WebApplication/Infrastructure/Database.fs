@@ -12,7 +12,7 @@ open WebApplication.Domain.Shared
 [<RequireQualifiedAccess>]
 module UniqueId =
 
-    let create () : UniqueId = RT.Comb.Provider.Sql.Create()
+    let createSqlUniqueId () : UniqueId = RT.Comb.Provider.Sql.Create()
 
 [<AutoOpen>]
 module SqlDataReaderExtensions =
