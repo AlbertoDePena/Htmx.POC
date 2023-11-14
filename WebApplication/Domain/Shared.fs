@@ -35,7 +35,7 @@ type PagedData<'T> =
       SortDirection: SortDirection option
       Data: 'T list }
 
-    member this.NumberOfPage =
+    member this.TotalPages =
         let pageCount = this.TotalCount / this.PageSize
 
         let integer =

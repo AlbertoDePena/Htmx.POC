@@ -56,7 +56,7 @@ type HomeController
                         .Bind("SearchResults", pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join)
                         .Bind("TotalCount", pagedData.TotalCount)
                         .Bind("Page", pagedData.Page)
-                        .Bind("TotalPages", pagedData.NumberOfPage)
+                        .Bind("TotalPages", pagedData.TotalPages)
                         .Render("templates/user/search-table.html")
 
                 return this.HtmlContent searchResultsContent
@@ -68,8 +68,8 @@ type HomeController
         task {
             let content =
                 htmlTemplate
-                    .Bind("UserName", "Alberto De Pena")
-                    .Bind("PageContent", "templates/user/search.html")
+                    .Bind("CurrentUserName", "Alberto De Pena")
+                    .Bind("MainContent", "templates/user/search.html")
                     .Render("templates/index.html")
 
             return this.HtmlContent content

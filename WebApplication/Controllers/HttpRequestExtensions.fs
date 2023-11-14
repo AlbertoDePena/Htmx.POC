@@ -27,6 +27,7 @@ module HttpRequestExtensions =
         member this.TryGetQueryStringValue(key: string) =
             this.Query.TryGetValue key |> Option.ofPair |> Option.map string
 
+        /// Determines if the current HTTP Request was invoked by Htmx on the client.
         member this.IsHtmx() =
             this.TryGetHeaderValue "HX-Request"
             |> Option.exists (String.IsNullOrWhiteSpace >> not)

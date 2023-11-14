@@ -41,7 +41,6 @@ module Program =
             app.UseHsts()
 
         app.UseHttpsRedirection()
-
         app.UseStaticFiles()
         app.UseRouting()
         app.UseAuthorization()

@@ -86,7 +86,7 @@
             </div>
             <div class="navbar-end">
                 <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link is-size-7 has-text-link has-text-weight-semibold">${UserName}</a>
+                    <a class="navbar-link is-size-7 has-text-link has-text-weight-semibold">${CurrentUserName}</a>
                     <div class="navbar-dropdown">
                         <a class="navbar-item is-size-7"
                            href="#/logout">
@@ -99,7 +99,7 @@
     </nav>
     <!--main-->
     <main class="container-fluid p-6 is-size-7">
-        ${PageContent}
+        ${MainContent}
     </main>
 
     <footer class="footer is-fixed-bottom">
@@ -108,6 +108,20 @@
 
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <script>
+        var poc = (function () {
+
+            return {
+                getQueryStringValue: function (name) {
+                    const searchParams = new URLSearchParams(window.location.search);
+                    return searchParams.get(name);
+                },
+                getQueryStringIntValue: function (name) {                    
+                    return Number(this.getQueryStringValue(name));
+                }
+            };
+        })();
+    </script>
 </body>
 
 </html>
