@@ -1,5 +1,6 @@
 ﻿namespace WebApplication.Controllers
 
+open System
 open Microsoft.AspNetCore.Http
 open FsToolkit.ErrorHandling
 
@@ -25,3 +26,7 @@ module HttpRequestExtensions =
 
         member this.TryGetQueryStringValue(key: string) =
             this.Query.TryGetValue key |> Option.ofPair |> Option.map string
+
+        member this.IsHtmx() =
+            this.TryGetHeaderValue "HX-Request"
+            |> Option.exists (String.IsNullOrWhiteSpace >> not)

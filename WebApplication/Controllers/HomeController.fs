@@ -25,40 +25,43 @@ type HomeController
 
     member this.Search() =
         task {
-            let query =
-                { SearchCriteria = this.Request.TryGetQueryStringValue "search"
-                  ActiveOnly =
-                    this.Request.TryGetQueryStringValue "view-active-users"
-                    |> Option.bind (bool.TryParse >> Option.ofPair)
-                    |> Option.defaultValue false
-                  Page =
-                    this.Request.TryGetQueryStringValue "page"
-                    |> Option.bind (Int32.TryParse >> Option.ofPair)
-                    |> Option.defaultValue 1
-                  PageSize = 15
-                  SortBy = None
-                  SortDirection = SortDirection.fromString "Ascending" }
+            if this.Request.IsHtmx () then
+                let query =
+                    { SearchCriteria = this.Request.TryGetQueryStringValue "search"
+                      ActiveOnly =
+                        this.Request.TryGetQueryStringValue "view-active-users"
+                        |> Option.bind (bool.TryParse >> Option.ofPair)
+                        |> Option.defaultValue false
+                      Page =
+                        this.Request.TryGetQueryStringValue "page"
+                        |> Option.bind (Int32.TryParse >> Option.ofPair)
+                        |> Option.defaultValue 1
+                      PageSize = 15
+                      SortBy = None
+                      SortDirection = SortDirection.fromString "Ascending" }
 
-            let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
+                let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
 
-            let toHtmlContent (user: User) =
-                htmlTemplate
-                    .Bind("DisplayName", user.DisplayName)
-                    .Bind("EmailAddress", user.EmailAddress)
-                    .Bind("TypeName", user.TypeName |> UserType.value)
-                    .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
-                    .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-                    .Render("templates/user/search-results.html")
+                let toHtmlContent (user: User) =
+                    htmlTemplate
+                        .Bind("DisplayName", user.DisplayName)
+                        .Bind("EmailAddress", user.EmailAddress)
+                        .Bind("TypeName", user.TypeName |> UserType.value)
+                        .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
+                        .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
+                        .Render("templates/user/search-results.html")
 
-            let searchResultsContent =
-                htmlTemplate
-                    .Bind("SearchResults", pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join)
-                    .Bind("TotalCount", pagedData.TotalCount)
-                    .Bind("Page", pagedData.Page)
-                    .Bind("TotalPages", pagedData.NumberOfPage)
-                    .Render("templates/user/search-table.html")
+                let searchResultsContent =
+                    htmlTemplate
+                        .Bind("SearchResults", pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join)
+                        .Bind("TotalCount", pagedData.TotalCount)
+                        .Bind("Page", pagedData.Page)
+                        .Bind("TotalPages", pagedData.NumberOfPage)
+                        .Render("templates/user/search-table.html")
 
-            return this.HtmlContent searchResultsContent
+                return this.HtmlContent searchResultsContent
+            else
+                return! this.Index()
         }
 
     member this.Index() =
