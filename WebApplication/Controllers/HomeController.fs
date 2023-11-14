@@ -19,7 +19,8 @@ open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
-type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, dbConnectionFactory: IDbConnectionFactory) =
+type HomeController
+    (logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, dbConnectionFactory: IDbConnectionFactory) =
     inherit Controller()
 
     member this.Search() =
@@ -40,34 +41,24 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
 
             let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
 
-            let searchResultsContent (index: int) (user: User) =
-                let hadNextPage = (query.Page * pagedData.PageSize) < pagedData.TotalCount
+            let toHtmlContent (user: User) =
+                htmlTemplate
+                    .Bind("DisplayName", user.DisplayName)
+                    .Bind("EmailAddress", user.EmailAddress)
+                    .Bind("TypeName", user.TypeName |> UserType.value)
+                    .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
+                    .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
+                    .Render("templates/user/search-results.html")
 
-                let isLastItem = pagedData.Data.Length = (index + 1)
+            let searchResultsContent =
+                htmlTemplate
+                    .Bind("SearchResults", pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join)
+                    .Bind("TotalCount", pagedData.TotalCount)
+                    .Bind("Page", pagedData.Page)
+                    .Bind("TotalPages", pagedData.NumberOfPage)
+                    .Render("templates/user/search-table.html")
 
-                if hadNextPage && isLastItem then
-                    htmlTemplate
-                        .Bind("DisplayName", user.DisplayName)
-                        .Bind("EmailAddress", user.EmailAddress)
-                        .Bind("TypeName", user.TypeName |> UserType.value)
-                        .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
-                        .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-                        .Bind("Page", query.Page + 1)
-                        .Render("templates/user/search-results-infinite-scroll.html")
-                else
-                    htmlTemplate
-                        .Bind("DisplayName", user.DisplayName)
-                        .Bind("EmailAddress", user.EmailAddress)
-                        .Bind("TypeName", user.TypeName |> UserType.value)
-                        .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
-                        .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-                        .Render("templates/user/search-results.html")
-
-            let contents = pagedData.Data |> List.mapi searchResultsContent
-
-            let content = htmlTemplate.Join(contents)
-            
-            return this.HtmlContent content
+            return this.HtmlContent searchResultsContent
         }
 
     member this.Index() =

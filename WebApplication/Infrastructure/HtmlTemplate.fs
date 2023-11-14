@@ -44,8 +44,8 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         fileOrContent.EndsWith(".html")
 
     let getFileOrContent (fileOrContent: FileOrContent) =
-        if String.IsNullOrWhiteSpace fileOrContent then
-            nameof fileOrContent |> sprintf "%s cannot be null nor empty" |> failwith
+        if isNull fileOrContent then
+            nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
         if isFile fileOrContent then
             let filePath = Path.Combine(environment.WebRootPath, fileOrContent)

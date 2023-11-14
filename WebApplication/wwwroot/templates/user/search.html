@@ -1,11 +1,6 @@
-<form id="user-search-form" hx-trigger="load" hx-get="/Home/Search" hx-target="#search-results" hx-swap="innerHTML">
+<form id="user-search-form" hx-trigger="load" hx-get="/Home/Search" hx-target="#user-search-table" hx-swap="outerHTML" hx-push-url="true">
     <div class="box">
-        <h1 class="has-text-weight-semibold has-text-link">Users | All Users</h1>
-        <div class="columns">
-            <div class="column is-flex is-align-items-center">
-                <h1 class="has-text-link">41 users found | showing page 1 of 3</h1>
-            </div>
-        </div>
+        <h1 class="block has-text-weight-semibold has-text-link">Users | All Users</h1>        
         <div class="columns">
             <div class="column">
                 <div class="columns">
@@ -31,6 +26,16 @@
                                 <label class="is-clickable mx-2"
                                        for="view-active-users">Active Only</label>
                             </div>
+                            <div>
+                                <button class="button is-small mr-1" type="button">
+                                    <span class="material-icons is-small"><i>navigate_before</i></span>
+                                    <span class="is-sr-only">Previous</span>
+                                </button>
+                                <button class="button is-small ml-1" type="button">
+                                    <span class="material-icons is-small"><i>navigate_next</i></span>
+                                    <span class="is-sr-only">Next</span>
+                                </button>
+                            </div>
                             <button class="button is-small ml-2"
                                     type="button">
                                 <span class="material-icons is-small"><i>add</i></span><span class="is-sr-only">New User</span>
@@ -44,16 +49,16 @@
 
     <div class="box">
         <div class="table-container table-has-fixed-header">
-            <table class="table is-narrow is-hoverable is-fullwidth">
+            <table id="user-search-table" class="table is-narrow is-hoverable is-fullwidth">
                 <thead>
                     <tr>
-                        <th class="p-2 has-text-link is-underlined is-clickable" scope="col">Name</th>
-                        <th class="p-2 has-text-link is-underlined is-clickable" scope="col">Email</th>
+                        <th class="p-2 has-text-link" scope="col">Name</th>
+                        <th class="p-2 has-text-link" scope="col">Email</th>
                         <th class="p-2 has-text-link" scope="col">Type</th>
                         <th class="p-2 has-text-link" scope="col">Active</th>
                     </tr>
                 </thead>
-                <tbody id="search-results"></tbody>
+                <tbody></tbody>                
             </table>
         </div>
     </div>

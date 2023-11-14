@@ -5,9 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HTMX POC</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon">
-    <style>        
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+    <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon" />
+    <style>
+        body {
+            font-family: Montserrat,sans-serif
+        }
         body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
             padding-bottom: 3.25rem;
         }
@@ -25,6 +30,14 @@
         }
 
         /* BEGIN - fixed table header */
+        .has-max-height {
+            max-height: 750px;
+        }
+
+        tbody tr td {
+            vertical-align: middle !important;
+        }
+
         .table-has-fixed-header {
             overflow: auto;
         }
