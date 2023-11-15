@@ -1,18 +1,7 @@
 <table id="user-search-table" class="table is-narrow is-hoverable is-fullwidth">
     <thead>
         <tr>
-            <th class="p-2" scope="col">Display Name</th>
-            <th class="p-2" scope="col">Email Address</th>
-            <th class="p-2" scope="col">Type</th>
-            <th class="p-2" scope="col">Active</th>
-        </tr>
-    </thead>
-    <tbody>
-        ${SearchResults}
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="4" class="py-4">
+            <th colspan="4" class="pb-3">
                 <div class="is-flex is-justify-content-space-between">
                     <div>${SearchResultSummary}</div>
 
@@ -40,5 +29,14 @@
                 </div>
             </th>
         </tr>
-    </tfoot>
+        <tr>
+            <th class="p-2" scope="col">Display Name</th>
+            <th class="p-2" scope="col">Email Address</th>
+            <th class="p-2" scope="col">Type</th>
+            <th class="p-2" scope="col">Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${SearchResults}
+    </tbody>
 </table>
