@@ -45,7 +45,7 @@ type HomeController
                         .Bind("TypeName", user.TypeName |> UserType.value)
                         .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-                        .Render("templates/user/search-results.html")
+                        .Render("templates/user/search-table-row.html")
 
                 let searchResultSummary =
                     sprintf
@@ -80,7 +80,7 @@ type HomeController
             let content =
                 htmlTemplate
                     .Bind("CurrentUserName", "Alberto De Pena")
-                    .Bind("MainContent", "templates/user/search.html")
+                    .Bind("MainContent", "templates/user/search-section.html")
                     .Render("templates/index.html")
 
             return this.HtmlContent content

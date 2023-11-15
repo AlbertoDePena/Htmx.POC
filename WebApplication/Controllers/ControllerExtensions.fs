@@ -6,7 +6,7 @@ open Microsoft.AspNetCore.Mvc
 module ControllerExtensions =
 
     [<Literal>]
-    let HtmlContentType = "text/html"
+    let HtmlContentType = "text/html; charset=UTF-8"
 
     type Controller with
         
