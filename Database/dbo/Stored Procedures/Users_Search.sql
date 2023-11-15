@@ -30,7 +30,8 @@ ORDER BY
 	CASE WHEN @SortBy = 'EmailAddress' AND @SortDirection = 'DESC'
 		THEN [Users].[EmailAddress] END DESC
 OFFSET(@Page - 1) * @PageSize ROWS
-FETCH NEXT @PageSize ROWS ONLY;
+FETCH NEXT @PageSize ROWS ONLY
+OPTION (RECOMPILE);
 
 -- Total Count
 SELECT Count(1) AS TotalCount

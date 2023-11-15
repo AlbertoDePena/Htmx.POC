@@ -1,17 +1,11 @@
 ﻿namespace WebApplication.Controllers
 
 open System
-open System.Collections.Generic
-open System.Linq
-open System.Threading.Tasks
-open System.Diagnostics
 
 open FsToolkit.ErrorHandling
 
-open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
-open Microsoft.Extensions.Options
 
 open WebApplication.Domain.User
 open WebApplication.Domain.Shared
@@ -30,7 +24,7 @@ type HomeController
                 let query =
                     { SearchCriteria = this.Request.TryGetQueryStringValue "search"
                       ActiveOnly =
-                        this.Request.TryGetQueryStringValue "view-active-users"
+                        this.Request.TryGetQueryStringValue "active-only"
                         |> Option.bind (bool.TryParse >> Option.ofPair)
                         |> Option.defaultValue false
                       Page =

@@ -1,6 +1,6 @@
 <div hx-target="#user-search-table" hx-swap="outerHTML" hx-push-url="true">
     <div class="box">
-        <h1 class="block has-text-weight-semibold has-text-link">Users | All Users</h1>
+        <h1 class="block has-text-weight-semibold">Users | All Users</h1>
         <div class="columns">
             <div class="column">
                 <form id="user-search-form" class="columns"
@@ -19,13 +19,13 @@
                     </div>
                     <div class="column is-narrow">
                         <div class="is-flex is-align-items-center">
-                            <input id="view-active-users" name="view-active-users" type="checkbox" value="true"
+                            <input id="active-only" name="active-only" type="checkbox" value="true"
                                    hx-get="/Home/Search"
                                    hx-include="#user-search-form"
                                    hx-vals='{"page": "1"}'
                                    class="is-clickable ml-2">
-                            <label class="is-clickable mx-2"
-                                   for="view-active-users">Active Only</label>
+                            <label class="is-clickable mx-2 has-text-weight-semibold"
+                                   for="active-only">Active Only</label>
                         </div>
                     </div>
                 </form>
@@ -38,10 +38,10 @@
             <table id="user-search-table" class="table is-narrow is-hoverable is-fullwidth">
                 <thead>
                     <tr>
-                        <th class="p-2 has-text-link" scope="col">Name</th>
-                        <th class="p-2 has-text-link" scope="col">Email</th>
-                        <th class="p-2 has-text-link" scope="col">Type</th>
-                        <th class="p-2 has-text-link" scope="col">Active</th>
+                        <th class="p-2" scope="col">Display Name</th>
+                        <th class="p-2" scope="col">Email Address</th>
+                        <th class="p-2" scope="col">Type</th>
+                        <th class="p-2" scope="col">Active</th>
                     </tr>
                 </thead>
             </table>
