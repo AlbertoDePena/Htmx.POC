@@ -113,10 +113,10 @@
 
             return {
                 getQueryStringValue: function (name) {
-                    const searchParams = new URLSearchParams(window.location.search);
+                    var searchParams = new URLSearchParams(window.location.search);
                     return searchParams.get(name);
                 },
-                getQueryStringIntValue: function (name) {                    
+                getQueryStringIntValue: function (name) {
                     return Number(this.getQueryStringValue(name));
                 }
             };

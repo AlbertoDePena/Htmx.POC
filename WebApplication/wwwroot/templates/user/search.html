@@ -1,9 +1,11 @@
-<form id="user-search-form" hx-trigger="load" hx-get="/Home/Search" hx-target="#user-search-table" hx-swap="outerHTML" hx-push-url="true">
+<div hx-target="#user-search-table" hx-swap="outerHTML" hx-push-url="true">
     <div class="box">
-        <h1 class="block has-text-weight-semibold has-text-link">Users | All Users</h1>        
+        <h1 class="block has-text-weight-semibold has-text-link">Users | All Users</h1>
         <div class="columns">
             <div class="column">
-                <div class="columns">
+                <form id="user-search-form" class="columns"
+                      hx-trigger="load"
+                      hx-get="/Home/Search">
                     <div class="column">
                         <div class="control">
                             <input class="input is-small" name="search"
@@ -16,33 +18,17 @@
                         </div>
                     </div>
                     <div class="column is-narrow">
-                        <div class="is-flex is-justify-content-right">
-                            <div class="is-flex is-align-items-center is-justify-content-right">
-                                <input id="view-active-users" name="view-active-users" type="checkbox" value="true"
-                                       hx-get="/Home/Search"
-                                       hx-include="#user-search-form"
-                                       hx-vals='{"page": "1"}'
-                                       class="is-clickable ml-2">
-                                <label class="is-clickable mx-2"
-                                       for="view-active-users">Active Only</label>
-                            </div>
-                            <div>
-                                <button class="button is-small mr-1" type="button">
-                                    <span class="material-icons is-small"><i>navigate_before</i></span>
-                                    <span class="is-sr-only">Previous</span>
-                                </button>
-                                <button class="button is-small ml-1" type="button">
-                                    <span class="material-icons is-small"><i>navigate_next</i></span>
-                                    <span class="is-sr-only">Next</span>
-                                </button>
-                            </div>
-                            <button class="button is-small ml-2"
-                                    type="button">
-                                <span class="material-icons is-small"><i>add</i></span><span class="is-sr-only">New User</span>
-                            </button>
+                        <div class="is-flex is-align-items-center">
+                            <input id="view-active-users" name="view-active-users" type="checkbox" value="true"
+                                   hx-get="/Home/Search"
+                                   hx-include="#user-search-form"
+                                   hx-vals='{"page": "1"}'
+                                   class="is-clickable ml-2">
+                            <label class="is-clickable mx-2"
+                                   for="view-active-users">Active Only</label>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -58,8 +44,7 @@
                         <th class="p-2 has-text-link" scope="col">Active</th>
                     </tr>
                 </thead>
-                <tbody></tbody>                
             </table>
         </div>
     </div>
-</form>
+</div>

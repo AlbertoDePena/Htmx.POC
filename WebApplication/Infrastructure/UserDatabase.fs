@@ -19,19 +19,19 @@ module UserDatabase =
     let private readUserGroup (reader: SqlDataReader) : UserGroup =
         reader.GetOrdinal("Name")
         |> reader.GetString
-        |> UserGroup.fromString
+        |> UserGroup.ofString
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
     let private readUserPermission (reader: SqlDataReader) : UserPermission =
         reader.GetOrdinal("Name")
         |> reader.GetString
-        |> UserPermission.fromString
+        |> UserPermission.ofString
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
     let private readUserType (reader: SqlDataReader) : UserType =
         reader.GetOrdinal("TypeName")
         |> reader.GetString
-        |> UserType.fromString
+        |> UserType.ofString
         |> Option.defaultWith (fun () -> failwith "Missing TypeName column")
 
     let private readUser (reader: SqlDataReader) : User =

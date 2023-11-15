@@ -12,8 +12,31 @@
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="4" class="p-4 has-text-centered">
-                ${TotalCount} users found | showing page ${Page} of ${TotalPages}
+            <th colspan="2" class="py-4">
+                ${SearchResultSummary}
+            </th>
+            <th colspan="2" class="py-4 has-text-right">
+                <div>
+                    <button class="button is-small" type="button" ${PreviousButtonDisabled}
+                            hx-get="/Home/Search"
+                            hx-include="#user-search-form"
+                            hx-vals='{"page": "${PreviousPage}"}'>
+                        <span class="material-icons is-small"><i>navigate_before</i></span>
+                        <span class="is-sr-only">Previous</span>
+                    </button>
+                    <button class="button is-small mx-2" type="button" ${NextButtonDisabled}
+                            hx-get="/Home/Search"
+                            hx-include="#user-search-form"
+                            hx-vals='{"page": "${NextPage}"}'>
+                        <span class="material-icons is-small"><i>navigate_next</i></span>
+                        <span class="is-sr-only">Next</span>
+                    </button>
+                    <button class="button is-small"
+                            type="button">
+                        <span class="material-icons is-small"><i>add</i></span>
+                        <span class="is-sr-only">New User</span>
+                    </button>
+                </div>
             </th>
         </tr>
     </tfoot>

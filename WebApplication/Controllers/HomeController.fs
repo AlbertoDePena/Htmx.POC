@@ -8,6 +8,7 @@ open System.Diagnostics
 
 open FsToolkit.ErrorHandling
 
+open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Options
@@ -25,7 +26,7 @@ type HomeController
 
     member this.Search() =
         task {
-            if this.Request.IsHtmx () then
+            if this.Request.IsHtmx() then
                 let query =
                     { SearchCriteria = this.Request.TryGetQueryStringValue "search"
                       ActiveOnly =
@@ -35,10 +36,11 @@ type HomeController
                       Page =
                         this.Request.TryGetQueryStringValue "page"
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
+                        |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
                       PageSize = 15
                       SortBy = None
-                      SortDirection = SortDirection.fromString "Ascending" }
+                      SortDirection = SortDirection.ofString "Ascending" }
 
                 let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
 
@@ -51,15 +53,30 @@ type HomeController
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-results.html")
 
-                let searchResultsContent =
+                let searchResultSummary =
+                    sprintf
+                        "%i users found | showing page %i of %i"
+                        pagedData.TotalCount
+                        pagedData.Page
+                        pagedData.TotalPages
+
+                let previousButtonDisabled =
+                    if pagedData.Page > 1 then String.Empty else "disabled"
+
+                let nextButtonDisabled =
+                    if (pagedData.Page * pagedData.PageSize) < pagedData.TotalCount then String.Empty else "disabled"
+
+                let tableContent =
                     htmlTemplate
                         .Bind("SearchResults", pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join)
-                        .Bind("TotalCount", pagedData.TotalCount)
-                        .Bind("Page", pagedData.Page)
-                        .Bind("TotalPages", pagedData.TotalPages)
+                        .Bind("SearchResultSummary", searchResultSummary)
+                        .Bind("PreviousButtonDisabled", previousButtonDisabled)
+                        .Bind("PreviousPage", pagedData.Page - 1)
+                        .Bind("NextButtonDisabled", nextButtonDisabled)
+                        .Bind("NextPage", pagedData.Page + 1)
                         .Render("templates/user/search-table.html")
 
-                return this.HtmlContent searchResultsContent
+                return this.HtmlContent tableContent
             else
                 return! this.Index()
         }
