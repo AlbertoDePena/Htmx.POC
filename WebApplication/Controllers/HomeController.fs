@@ -32,9 +32,9 @@ type HomeController
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
                         |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
-                      PageSize = 15
+                      PageSize = 20
                       SortBy = None
-                      SortDirection = SortDirection.ofString "Ascending" }
+                      SortDirection = None }
 
                 let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
 
