@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-    <link rel="icon shortcut" href="./favicon.ico" type="image/x-icon" />
+    <link rel="icon shortcut" href="../favicon.ico" type="image/x-icon" />
     <style>       
         body {
             font-family: Montserrat,sans-serif;
@@ -17,6 +17,11 @@
 
         body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
             padding-bottom: 3.25rem;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            height: 2.5em;
+            width: 1.5em;
         }
 
         footer {
@@ -110,20 +115,7 @@
 
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-    <script>
-        var poc = (function () {
-
-            return {
-                getQueryStringValue: function (name) {
-                    var searchParams = new URLSearchParams(window.location.search);
-                    return searchParams.get(name);
-                },
-                getQueryStringIntValue: function (name) {
-                    return Number(this.getQueryStringValue(name));
-                }
-            };
-        })();
-    </script>
+    <script src="../index.js"></script>
 </body>
 
 </html>
