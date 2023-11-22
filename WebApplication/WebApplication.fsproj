@@ -8,6 +8,7 @@
 		<Compile Include="Domain\Extensions.fs" />
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
+		<Compile Include="Infrastructure\Constants.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
 		<Compile Include="Infrastructure\Options.fs" />
 		<Compile Include="Infrastructure\Database.fs" />

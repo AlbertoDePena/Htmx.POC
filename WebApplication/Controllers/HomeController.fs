@@ -10,6 +10,7 @@ open Microsoft.Extensions.Logging
 open WebApplication.Domain.User
 open WebApplication.Domain.Shared
 open WebApplication.Domain.Extensions
+open WebApplication.Infrastructure.Constants
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
@@ -22,13 +23,13 @@ type HomeController
         task {
             if this.Request.IsHtmx() then
                 let query =
-                    { SearchCriteria = this.Request.TryGetQueryStringValue "search"
+                    { SearchCriteria = this.Request.TryGetQueryStringValue QueryName.Search
                       ActiveOnly =
-                        this.Request.TryGetQueryStringValue "active-only"
+                        this.Request.TryGetQueryStringValue QueryName.ActiveOnly
                         |> Option.bind (bool.TryParse >> Option.ofPair)
                         |> Option.defaultValue false
                       Page =
-                        this.Request.TryGetQueryStringValue "page"
+                        this.Request.TryGetQueryStringValue QueryName.Page
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
                         |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
@@ -54,11 +55,13 @@ type HomeController
                         pagedData.Page
                         pagedData.TotalPages
 
-                let previousButtonDisabled =
-                    if pagedData.Page > 1 then String.Empty else "disabled"
+                let previousButtonDisabled = if pagedData.Page > 1 then String.Empty else "disabled"
 
                 let nextButtonDisabled =
-                    if (pagedData.Page * pagedData.PageSize) < pagedData.TotalCount then String.Empty else "disabled"
+                    if (pagedData.Page * pagedData.PageSize) < pagedData.TotalCount then
+                        String.Empty
+                    else
+                        "disabled"
 
                 let tableContent =
                     htmlTemplate
@@ -81,7 +84,7 @@ type HomeController
                 htmlTemplate
                     .Bind("CurrentUserName", "Alberto De Pena")
                     .Bind("MainContent", "templates/user/search-section.html")
-                    .Render("templates/index.html")
+                    .Render("index.html")
 
             return this.HtmlContent content
         }

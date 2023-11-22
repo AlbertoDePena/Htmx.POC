@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
     const asideBurgers = Array.prototype.slice.call(document.querySelectorAll('.aside-burger'), 0);
 
-    navbarBurgers.forEach(navbarBurger => {
+    navbarBurgers.forEach(function (navbarBurger) {
         navbarBurger.addEventListener('click', function () {
             const navbarMenu = document.getElementById(navbarBurger.dataset.target);
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    asideBurgers.forEach(asideBurger => {
+    asideBurgers.forEach(function (asideBurger) {
         asideBurger.addEventListener('click', function () {
             const aside = document.getElementById(asideBurger.dataset.target);
             const main = document.getElementById(aside.dataset.target);
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
             isMobile = true;
         }
 
-        asideBurgers.forEach(asideBurger => {
+        asideBurgers.forEach(function (asideBurger) {
             const aside = document.getElementById(asideBurger.dataset.target);
             const main = document.getElementById(aside.dataset.target);
 
