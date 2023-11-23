@@ -1,0 +1,16 @@
+<div class="container" hx-target="#output" hx-swap="innerHTML" hx-indicator=".htmx-indicator" hx-push-url="true">
+    <h3 class="title is-size-1">
+        Random Number Generator
+    </h3>
+
+    <button class="button is-primary block" type="button" hx-get="/Demo/Random">Get
+        Random
+        Number</button>
+    
+    <div class="button htmx-indicator is-loading is-white">
+    </div>
+    
+    <h2 id="output" class="title is-size-2">
+        N/A
+    </h2>
+</div>
