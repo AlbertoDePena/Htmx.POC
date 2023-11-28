@@ -86,3 +86,21 @@ main.is-sidebar-hidden {
     transition: left 1s ease-in-out;
 }
 /* END side navbar */
+
+.loader-container {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-container .loader {
+    position: relative;
+    height: 80px;
+    width: 80px;
+}
