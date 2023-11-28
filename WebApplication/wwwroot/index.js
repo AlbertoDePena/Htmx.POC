@@ -34,10 +34,9 @@ document.addEventListener('DOMContentLoaded', function () {
             main.classList.toggle('is-sidebar-hidden');
         });
     });
-
-    let isResizing = false;
+    
     let isMobile = false;
-    window.onresize = function () {
+    window.addEventListener('resize', function () {
         if (window.outerWidth > 1024) {
             isMobile = false;
         } else {
@@ -56,5 +55,5 @@ document.addEventListener('DOMContentLoaded', function () {
                 main.classList.remove('is-sidebar-hidden');
             }
         });
-    };
+    });
 });
