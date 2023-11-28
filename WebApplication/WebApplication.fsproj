@@ -17,6 +17,7 @@
 		<Compile Include="Controllers\HttpRequestExtensions.fs" />
 		<Compile Include="Controllers\ControllerExtensions.fs" />
 		<Compile Include="Controllers/HomeController.fs" />
+		<Compile Include="Controllers/DemoController.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 
