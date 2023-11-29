@@ -34,16 +34,12 @@ tbody tr td {
     overflow: auto;
 }
 
-/* If we use border,
-    we must use table-collapse to avoid
-    a slight movement of the header row */
+/* If we use border, we must use table-collapse to avoid a slight movement of the header row */
 .table-has-fixed-header table {
     border-collapse: collapse;
 }
 
-/* Because we must set sticky on th,
-    we have to apply background styles here
-    rather than on thead */
+/* Because we must set sticky on th, we have to apply background styles here rather than on thead */
 .table-has-fixed-header th {
     background: white;
 }
