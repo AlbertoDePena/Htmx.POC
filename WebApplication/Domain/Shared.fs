@@ -1,5 +1,14 @@
 ﻿namespace WebApplication.Domain.Shared
 
+[<AutoOpen>]
+module Alias =
+    open System
+
+    type EmailAddress = string    
+    type Number = int32
+    type Text = string
+    type UniqueId = Guid
+
 [<RequireQualifiedAccess>]
 type SortDirection =
     | Ascending
@@ -20,18 +29,18 @@ module SortDirection =
         | _ -> None
 
 type Query =
-    { SearchCriteria: string option
+    { SearchCriteria: Text option
       ActiveOnly: bool
-      Page: int32
-      PageSize: int32
-      SortBy: string option
+      Page: Number
+      PageSize: Number
+      SortBy: Text option
       SortDirection: SortDirection option }
 
 type PagedData<'T> =
-    { Page: int32
-      PageSize: int32
-      TotalCount: int32
-      SortBy: string option
+    { Page: Number
+      PageSize: Number
+      TotalCount: Number
+      SortBy: Text option
       SortDirection: SortDirection option
       Data: 'T list }
 
@@ -46,10 +55,3 @@ type PagedData<'T> =
 
         integer
 
-[<AutoOpen>]
-module Alias =
-    open System
-
-    type EmailAddress = string
-
-    type UniqueId = Guid

@@ -23,12 +23,12 @@ type DemoController
     let random = Random()
 
     member this.Random() =
-        task {
-            do! Task.Delay(3000)
-
-            let randomNumber = random.NextDouble()
-            
+        task {                        
             if this.Request.IsHtmx() then
+                do! Task.Delay(3000)
+
+                let randomNumber = random.NextDouble()
+
                 return this.HtmlContent(randomNumber.ToString())
             else
                 return! this.Index()
