@@ -1,6 +1,7 @@
 ﻿namespace WebApplication.Domain.User
 
 open System
+open WebApplication.Domain.Shared
 
 [<RequireQualifiedAccess>]
 type UserGroup =
@@ -66,9 +67,9 @@ module UserPermission =
         | _ -> None
 
 type User =
-    { Id: Guid
-      EmailAddress: string
-      DisplayName: string
+    { Id: UniqueId
+      EmailAddress: EmailAddress
+      DisplayName: Text
       TypeName: UserType
       IsActive: bool }
 

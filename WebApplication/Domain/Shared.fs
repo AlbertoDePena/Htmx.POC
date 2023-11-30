@@ -4,9 +4,10 @@
 module Alias =
     open System
 
-    type EmailAddress = string    
-    type Number = int32
-    type Text = string
+    type BigInteger = Int64
+    type EmailAddress = String    
+    type Integer = Int32
+    type Text = String
     type UniqueId = Guid
 
 [<RequireQualifiedAccess>]
@@ -16,7 +17,7 @@ type SortDirection =
 
 [<RequireQualifiedAccess>]
 module SortDirection =
-
+    
     let value this =
         match this with
         | SortDirection.Ascending -> "Ascending"
@@ -31,15 +32,15 @@ module SortDirection =
 type Query =
     { SearchCriteria: Text option
       ActiveOnly: bool
-      Page: Number
-      PageSize: Number
+      Page: Integer
+      PageSize: Integer
       SortBy: Text option
       SortDirection: SortDirection option }
 
 type PagedData<'T> =
-    { Page: Number
-      PageSize: Number
-      TotalCount: Number
+    { Page: Integer
+      PageSize: Integer
+      TotalCount: Integer
       SortBy: Text option
       SortDirection: SortDirection option
       Data: 'T list }
