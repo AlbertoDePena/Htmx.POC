@@ -10,6 +10,6 @@ type AuthenticationException(ex: Exception) =
     inherit Exception(ex.Message, ex)
     new(message: string) = AuthenticationException(Exception message)
 
-type DataStorageException(ex: Exception) =
+type DatabaseException(ex: Exception) =
     inherit Exception(ex.Message, ex)
-    new(message: string) = DataStorageException(Exception message)
+    new(message: string) = DatabaseException(Exception message)

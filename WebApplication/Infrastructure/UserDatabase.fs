@@ -13,11 +13,11 @@ open WebApplication.Domain.Shared
 open WebApplication.Domain.User
 
 type IUserDatabase =
-    /// <exception cref="DataStorageException"></exception>
+    /// <exception cref="DatabaseException"></exception>
     abstract GetPagedData: Query -> Task<PagedData<User>>
-    /// <exception cref="DataStorageException"></exception>
+    /// <exception cref="DatabaseException"></exception>
     abstract FindById: UniqueId -> Task<UserDetails option>
-    /// <exception cref="DataStorageException"></exception>
+    /// <exception cref="DatabaseException"></exception>
     abstract FindByEmailAddress: EmailAddress -> Task<UserDetails option>
 
 type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
@@ -123,7 +123,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
                           SortDirection = query.SortDirection
                           Data = users |> Seq.toList }
                 with ex ->
-                    return (DataStorageException ex |> raise)
+                    return (DatabaseException ex |> raise)
             }
 
         member this.FindById(userId: UniqueId) : Task<UserDetails option> =
@@ -140,7 +140,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
                     return result
                 with ex ->
-                    return (DataStorageException ex |> raise)
+                    return (DatabaseException ex |> raise)
             }
 
         member this.FindByEmailAddress(emailAddress: EmailAddress) : Task<UserDetails option> =
@@ -157,7 +157,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
                     return result
                 with ex ->
-                    return (DataStorageException ex |> raise)
+                    return (DatabaseException ex |> raise)
             }
 
 [<AutoOpen>]
