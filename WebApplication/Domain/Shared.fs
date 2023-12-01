@@ -4,9 +4,10 @@
 module Alias =
     open System
 
-    type BigInteger = Int64
-    type EmailAddress = String    
-    type Integer = Int32
+    type BigNumber = Int64
+    type EmailAddress = String   
+    type Money = Decimal
+    type Number = Int32
     type Text = String
     type UniqueId = Guid
 
@@ -32,15 +33,15 @@ module SortDirection =
 type Query =
     { SearchCriteria: Text option
       ActiveOnly: bool
-      Page: Integer
-      PageSize: Integer
+      Page: Number
+      PageSize: Number
       SortBy: Text option
       SortDirection: SortDirection option }
 
 type PagedData<'T> =
-    { Page: Integer
-      PageSize: Integer
-      TotalCount: Integer
+    { Page: Number
+      PageSize: Number
+      TotalCount: Number
       SortBy: Text option
       SortDirection: SortDirection option
       Data: 'T list }
