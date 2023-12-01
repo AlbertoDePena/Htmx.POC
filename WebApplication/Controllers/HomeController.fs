@@ -14,8 +14,7 @@ open WebApplication.Infrastructure.Constants
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
-type HomeController
-    (logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
+type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
     inherit Controller()
 
     member this.Search() =
@@ -39,11 +38,20 @@ type HomeController
                 let! pagedData = userDatabase.GetPagedData query
 
                 let toHtmlContent (user: User) =
+                    let typeNameClass =
+                        match user.UserTypeName with
+                        | UserType.Customer -> "tag is-light is-info"
+                        | UserType.Employee -> "tag is-light is-success"
+
+                    let isActiveClass =
+                        if user.IsActive then "tag is-success" else "tag"
+
                     htmlTemplate
                         .Bind("DisplayName", user.DisplayName)
                         .Bind("EmailAddress", user.EmailAddress)
+                        .Bind("TypeNameClass", typeNameClass)
                         .Bind("TypeName", user.UserTypeName |> UserType.value)
-                        .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
+                        .Bind("IsActiveClass", isActiveClass)
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-table-row.html")
 
