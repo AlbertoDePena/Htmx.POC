@@ -102,7 +102,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 for item in items do htmlContentBuilder.AppendLine(item) |> ignore
                 htmlContentBuilder.ToString()
             with ex ->
-                (HtmlTemplateException ex) |> raise
+                HtmlTemplateException ex |> raise
 
         member this.Render(fileOrContent: FileOrContent) : HtmlContent =
             try
@@ -118,7 +118,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
                 htmlContent
             with ex ->
-                (HtmlTemplateException ex) |> raise
+                HtmlTemplateException ex |> raise
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =

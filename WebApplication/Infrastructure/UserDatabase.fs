@@ -1,6 +1,5 @@
 ﻿namespace WebApplication.Infrastructure.UserDatabase
 
-open System
 open System.Data
 open System.Threading.Tasks
 
@@ -13,35 +12,42 @@ open WebApplication.Domain.Extensions
 open WebApplication.Domain.Shared
 open WebApplication.Domain.User
 
-[<RequireQualifiedAccess>]
-module UserDatabase =
+type IUserDatabase =
+    /// <exception cref="DataStorageException"></exception>
+    abstract GetPagedData: Query -> Task<PagedData<User>>
+    /// <exception cref="DataStorageException"></exception>
+    abstract FindById: UniqueId -> Task<UserDetails option>
+    /// <exception cref="DataStorageException"></exception>
+    abstract FindByEmailAddress: EmailAddress -> Task<UserDetails option>
 
-    let private readUserGroup (reader: SqlDataReader) : UserGroup =
+type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
+
+    let readUserGroup (reader: SqlDataReader) : UserGroup =
         reader.GetOrdinal("Name")
         |> reader.GetString
         |> UserGroup.ofString
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
-    let private readUserPermission (reader: SqlDataReader) : UserPermission =
+    let readUserPermission (reader: SqlDataReader) : UserPermission =
         reader.GetOrdinal("Name")
         |> reader.GetString
         |> UserPermission.ofString
         |> Option.defaultWith (fun () -> failwith "Missing Name column")
 
-    let private readUserType (reader: SqlDataReader) : UserType =
+    let readUserType (reader: SqlDataReader) : UserType =
         reader.GetOrdinal("TypeName")
         |> reader.GetString
         |> UserType.ofString
         |> Option.defaultWith (fun () -> failwith "Missing TypeName column")
 
-    let private readUser (reader: SqlDataReader) : User =
+    let readUser (reader: SqlDataReader) : User =
         { Id = reader.GetOrdinal("Id") |> reader.GetGuid
           EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
           DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
           TypeName = readUserType reader
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 
-    let private getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
+    let getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
         task {
             do! connection.OpenAsync()
 
@@ -76,101 +82,107 @@ module UserDatabase =
             return userDetailsOption
         }
 
-    /// <exception cref="DataStorageException"></exception>
-    let getPagedData (dbConnectionFactory: IDbConnectionFactory) (query: Query) : Task<PagedData<User>> =
-        task {
-            try
-                use connection = dbConnectionFactory.CreateSqlConnection()
-                use command = new SqlCommand("dbo.Users_Search", connection)
+    interface IUserDatabase with
 
-                command.CommandType <- CommandType.StoredProcedure
+        member this.GetPagedData(query: Query) : Task<PagedData<User>> =
+            task {
+                try
+                    use connection = dbConnectionFactory.CreateSqlConnection()
+                    use command = new SqlCommand("dbo.Users_Search", connection)
 
-                command.Parameters.AddWithValue(
-                    "@SearchCriteria",
-                    query.SearchCriteria |> Option.defaultValue String.defaultValue
-                )
-                |> ignore
+                    command.CommandType <- CommandType.StoredProcedure
 
-                command.Parameters.AddWithValue("@ActiveOnly", query.ActiveOnly) |> ignore
+                    command.Parameters.AddWithValue(
+                        "@SearchCriteria",
+                        query.SearchCriteria |> Option.defaultValue String.defaultValue
+                    )
+                    |> ignore
 
-                command.Parameters.AddWithValue("@Page", query.Page) |> ignore
+                    command.Parameters.AddWithValue("@ActiveOnly", query.ActiveOnly) |> ignore
 
-                command.Parameters.AddWithValue("@PageSize", query.PageSize) |> ignore
+                    command.Parameters.AddWithValue("@Page", query.Page) |> ignore
 
-                command.Parameters.AddWithValue("@SortBy", query.SortBy |> Option.defaultValue String.defaultValue)
-                |> ignore
+                    command.Parameters.AddWithValue("@PageSize", query.PageSize) |> ignore
 
-                command.Parameters.AddWithValue(
-                    "@SortDirection",
-                    query.SortDirection
-                    |> Option.map SortDirection.value
-                    |> Option.defaultValue String.defaultValue
-                )
-                |> ignore
+                    command.Parameters.AddWithValue("@SortBy", query.SortBy |> Option.defaultValue String.defaultValue)
+                    |> ignore
 
-                do! connection.OpenAsync()
+                    command.Parameters.AddWithValue(
+                        "@SortDirection",
+                        query.SortDirection
+                        |> Option.map SortDirection.value
+                        |> Option.defaultValue String.defaultValue
+                    )
+                    |> ignore
 
-                use! reader = command.ExecuteReaderAsync()
+                    do! connection.OpenAsync()
 
-                let! users = reader.ReadManyAsync readUser
+                    use! reader = command.ExecuteReaderAsync()
 
-                let! totalCount =
-                    task {
-                        let! hasNextResult = reader.NextResultAsync()
+                    let! users = reader.ReadManyAsync readUser
 
-                        if hasNextResult then
-                            let! _ = reader.ReadAsync()
-                            return reader.GetInt32(0)
-                        else
-                            return 0
-                    }
+                    let! totalCount =
+                        task {
+                            let! hasNextResult = reader.NextResultAsync()
 
-                return
-                    { Page = query.Page
-                      PageSize = query.PageSize
-                      TotalCount = totalCount
-                      SortBy = query.SortBy
-                      SortDirection = query.SortDirection
-                      Data = users |> Seq.toList }
-            with ex ->
-                return (DataStorageException ex |> raise)
-        }
+                            if hasNextResult then
+                                let! _ = reader.ReadAsync()
+                                return reader.GetInt32(0)
+                            else
+                                return 0
+                        }
 
-    /// <exception cref="DataStorageException"></exception>
-    let tryFindById (dbConnectionFactory: IDbConnectionFactory) (id: UniqueId) : Task<UserDetails option> =
-        task {
-            try
-                use connection = dbConnectionFactory.CreateSqlConnection()
-                use command = new SqlCommand("dbo.Users_FindById", connection)
+                    return
+                        { Page = query.Page
+                          PageSize = query.PageSize
+                          TotalCount = totalCount
+                          SortBy = query.SortBy
+                          SortDirection = query.SortDirection
+                          Data = users |> Seq.toList }
+                with ex ->
+                    return (DataStorageException ex |> raise)
+            }
 
-                command.CommandType <- CommandType.StoredProcedure
+        member this.FindById(id: UniqueId) : Task<UserDetails option> =
+            task {
+                try
+                    use connection = dbConnectionFactory.CreateSqlConnection()
+                    use command = new SqlCommand("dbo.Users_FindById", connection)
 
-                command.Parameters.AddWithValue("@Id", id) |> ignore
+                    command.CommandType <- CommandType.StoredProcedure
 
-                let! result = getUserDetails connection command
+                    command.Parameters.AddWithValue("@Id", id) |> ignore
 
-                return result
-            with ex ->
-                return (DataStorageException ex |> raise)
-        }
+                    let! result = getUserDetails connection command
 
-    /// <exception cref="DataStorageException"></exception>
-    let tryFindByEmailAddress
-        (dbConnectionFactory: IDbConnectionFactory)
-        (emailAddress: EmailAddress)
-        : Task<UserDetails option> =
-        task {
-            try
-                use connection = dbConnectionFactory.CreateSqlConnection()
-                use command = new SqlCommand("dbo.Users_FindByEmailAddress", connection)
+                    return result
+                with ex ->
+                    return (DataStorageException ex |> raise)
+            }
 
-                command.CommandType <- CommandType.StoredProcedure
+        member this.FindByEmailAddress(emailAddress: EmailAddress) : Task<UserDetails option> =
+            task {
+                try
+                    use connection = dbConnectionFactory.CreateSqlConnection()
+                    use command = new SqlCommand("dbo.Users_FindByEmailAddress", connection)
 
-                command.Parameters.AddWithValue("@EmailAddress", emailAddress) |> ignore
+                    command.CommandType <- CommandType.StoredProcedure
 
-                let! result = getUserDetails connection command
+                    command.Parameters.AddWithValue("@EmailAddress", emailAddress) |> ignore
 
-                return result
-            with ex ->
-                return (DataStorageException ex |> raise)
-        }
+                    let! result = getUserDetails connection command
+
+                    return result
+                with ex ->
+                    return (DataStorageException ex |> raise)
+            }
+
+[<AutoOpen>]
+module ServiceCollectionExtensions =
+    open Microsoft.Extensions.DependencyInjection
+
+    type IServiceCollection with
+
+        /// Register the user database
+        member this.AddUserDatabase() =
+            this.AddSingleton<IUserDatabase, UserDatabase>()

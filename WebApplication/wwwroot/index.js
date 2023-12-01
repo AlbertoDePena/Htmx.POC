@@ -12,7 +12,6 @@ var poc = (function () {
 })();
 
 document.addEventListener('DOMContentLoaded', function () {
-
     const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
     const asideBurgers = Array.prototype.slice.call(document.querySelectorAll('.aside-burger'), 0);
 

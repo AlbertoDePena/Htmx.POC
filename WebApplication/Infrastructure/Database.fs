@@ -1,8 +1,5 @@
 ﻿namespace WebApplication.Infrastructure.Database
 
-open System
-open System.Data
-
 open Microsoft.Data.SqlClient
 open Microsoft.Extensions.Options
 

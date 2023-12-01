@@ -11,12 +11,11 @@ open WebApplication.Domain.User
 open WebApplication.Domain.Shared
 open WebApplication.Domain.Extensions
 open WebApplication.Infrastructure.Constants
-open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
 type HomeController
-    (logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, dbConnectionFactory: IDbConnectionFactory) =
+    (logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
     inherit Controller()
 
     member this.Search() =
@@ -37,7 +36,7 @@ type HomeController
                       SortBy = None
                       SortDirection = None }
 
-                let! pagedData = UserDatabase.getPagedData dbConnectionFactory query
+                let! pagedData = userDatabase.GetPagedData query
 
                 let toHtmlContent (user: User) =
                     htmlTemplate
