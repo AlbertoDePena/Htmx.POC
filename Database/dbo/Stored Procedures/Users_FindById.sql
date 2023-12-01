@@ -6,8 +6,8 @@ SELECT
 	[UserId],
 	[DisplayName],
 	[EmailAddress],
-	[TypeId],
-	[TypeName],
+	[UserTypeId],
+	[UserTypeName],
 	[IsActive]
 FROM [dbo].[UsersView]
 WHERE [UserId] = @UserId;

@@ -26,8 +26,8 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
         { UserId = reader.GetOrdinal("UserId") |> reader.GetGuid
           EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
           DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
-          TypeId = reader.GetOrdinal("TypeId") |> reader.GetGuid
-          TypeName = reader.GetString("TypeName", UserType.ofString)
+          UserTypeId = reader.GetOrdinal("UserTypeId") |> reader.GetGuid
+          UserTypeName = reader.GetString("UserTypeName", UserType.ofString)
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 
     let getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =

@@ -10,8 +10,8 @@ SELECT
 	[UserId],
 	[EmailAddress],
 	[DisplayName],
-	[TypeId],
-	[TypeName],
+	[UserTypeId],
+	[UserTypeName],
 	[IsActive]
 FROM [dbo].[UsersView]
 WHERE (@SearchCriteria IS NULL OR 

@@ -4,9 +4,9 @@ SELECT
 	[Users].[UserId],
 	[Users].[EmailAddress],
 	[Users].[DisplayName],
-	[Users].[TypeId],
-	[UserTypes].[Name] AS [TypeName],
+	[Users].[UserTypeId],
+	[UserTypes].[Name] AS [UserTypeName],
 	[Users].[IsActive]
 FROM [dbo].[Users]
 LEFT JOIN [dbo].[UserTypes]
-	ON [Users].[TypeId] = [UserTypes].[UserTypeId];
+	ON [Users].[UserTypeId] = [UserTypes].[UserTypeId];

@@ -70,8 +70,8 @@ type User =
     { UserId: UniqueId
       EmailAddress: EmailAddress
       DisplayName: Text
-      TypeId: UniqueId
-      TypeName: UserType
+      UserTypeId: UniqueId
+      UserTypeName: UserType
       IsActive: bool }
 
 type UserDetails =

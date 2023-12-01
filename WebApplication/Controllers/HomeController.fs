@@ -42,7 +42,7 @@ type HomeController
                     htmlTemplate
                         .Bind("DisplayName", user.DisplayName)
                         .Bind("EmailAddress", user.EmailAddress)
-                        .Bind("TypeName", user.TypeName |> UserType.value)
+                        .Bind("TypeName", user.UserTypeName |> UserType.value)
                         .Bind("TagClass", (if user.IsActive then "tag is-success" else "tag"))
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-table-row.html")
