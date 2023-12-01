@@ -12,7 +12,7 @@ type UserGroup =
 [<RequireQualifiedAccess>]
 module UserGroup =
 
-    let value this =
+    let toString this =
         match this with
         | UserGroup.Viewer -> "Viewer"
         | UserGroup.Editor -> "Editor"
@@ -33,7 +33,7 @@ type UserType =
 [<RequireQualifiedAccess>]
 module UserType =
 
-    let value this =
+    let toString this =
         match this with
         | UserType.Customer -> "Customer"
         | UserType.Employee -> "Employee"
@@ -53,7 +53,7 @@ type UserPermission =
 [<RequireQualifiedAccess>]
 module UserPermission =
 
-    let value this =
+    let toString this =
         match this with
         | UserPermission.ViewTransportationData -> "View Transportation Data"
         | UserPermission.ViewFinancials -> "View Financials"

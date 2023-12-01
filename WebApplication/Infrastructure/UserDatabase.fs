@@ -93,7 +93,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
                     command.Parameters.AddWithValue(
                         "@SortDirection",
                         query.SortDirection
-                        |> Option.map SortDirection.value
+                        |> Option.map SortDirection.toString
                         |> Option.defaultValue String.defaultValue
                     )
                     |> ignore

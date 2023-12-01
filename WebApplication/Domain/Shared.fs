@@ -19,7 +19,7 @@ type SortDirection =
 [<RequireQualifiedAccess>]
 module SortDirection =
     
-    let value this =
+    let toString this =
         match this with
         | SortDirection.Ascending -> "Ascending"
         | SortDirection.Descending -> "Descending"
