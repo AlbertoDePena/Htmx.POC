@@ -1,4 +1,7 @@
-﻿CREATE VIEW [dbo].[UsersView]
+﻿DROP VIEW IF EXISTS [dbo].[UsersView];
+GO
+
+CREATE VIEW [dbo].[UsersView]
 AS
 SELECT 
 	[Users].[UserId],

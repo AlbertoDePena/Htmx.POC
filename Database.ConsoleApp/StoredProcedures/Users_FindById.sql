@@ -1,4 +1,7 @@
-﻿CREATE PROCEDURE [dbo].[Users_FindById]
+﻿DROP PROCEDURE IF EXISTS [dbo].[Users_FindById];
+GO
+
+CREATE PROCEDURE [dbo].[Users_FindById]
 	@UserId UNIQUEIDENTIFIER
 AS
 

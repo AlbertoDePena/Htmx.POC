@@ -1,4 +1,7 @@
-﻿CREATE VIEW [dbo].[UserPermissionsView]
+﻿DROP VIEW IF EXISTS [dbo].[UserPermissionsView];
+GO
+
+CREATE VIEW [dbo].[UserPermissionsView]
 AS
 SELECT
 	[Users].[UserId],

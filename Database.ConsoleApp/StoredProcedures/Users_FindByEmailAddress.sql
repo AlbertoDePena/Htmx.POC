@@ -1,4 +1,7 @@
-﻿CREATE PROCEDURE [dbo].[Users_FindByEmailAddress]
+﻿DROP PROCEDURE IF EXISTS [dbo].[Users_FindByEmailAddress];
+GO
+
+CREATE PROCEDURE [dbo].[Users_FindByEmailAddress]
     @EmailAddress NVARCHAR(256)			
 AS
 

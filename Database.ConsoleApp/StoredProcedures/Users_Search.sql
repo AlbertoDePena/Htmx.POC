@@ -1,4 +1,7 @@
-﻿CREATE PROCEDURE [dbo].[Users_Search]
+﻿DROP PROCEDURE IF EXISTS [dbo].[Users_Search];
+GO
+
+CREATE PROCEDURE [dbo].[Users_Search]
 	@SearchCriteria NVARCHAR(256) = NULL,
 	@ActiveOnly  BIT = 0,
 	@Page INT = 1,
