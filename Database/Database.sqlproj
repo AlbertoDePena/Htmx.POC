@@ -60,6 +60,7 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Scripts" />
     <Folder Include="dbo\Stored Procedures" />
+    <Folder Include="dbo\Views" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Users.sql" />
@@ -71,6 +72,7 @@
     <Build Include="dbo\Stored Procedures\Users_Search.sql" />
     <Build Include="dbo\Stored Procedures\Users_FindById.sql" />
     <Build Include="dbo\Stored Procedures\Users_FindByEmailAddress.sql" />
+    <Build Include="dbo\Views\UsersView.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="dbo\Scripts\PostDeployment.sql" />
