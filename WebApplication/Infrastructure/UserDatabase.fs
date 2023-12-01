@@ -27,7 +27,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
           EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
           DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
           TypeId = reader.GetOrdinal("TypeId") |> reader.GetGuid
-          TypeName = reader.GetAs "TypeName" UserType.ofString
+          TypeName = reader.GetString("TypeName", UserType.ofString)
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 
     let getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
@@ -42,7 +42,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
             let! userPermissions =
                 if hasNextResult then
-                    reader.ReadManyAsync(fun reader -> reader.GetAs "PermissionName" UserPermission.ofString)
+                    reader.ReadManyAsync(fun reader -> reader.GetString("PermissionName", UserPermission.ofString))
                 else
                     Task.singleton []
 
@@ -50,7 +50,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
             let! userGroups =
                 if hasNextResult then
-                    reader.ReadManyAsync(fun reader -> reader.GetAs "GroupName" UserGroup.ofString)
+                    reader.ReadManyAsync(fun reader -> reader.GetString("GroupName", UserGroup.ofString))
                 else
                     Task.singleton []
 
