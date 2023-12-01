@@ -8,5 +8,5 @@ SELECT
 	[UserTypes].[Name] AS [UserTypeName],
 	[Users].[IsActive]
 FROM [dbo].[Users]
-LEFT JOIN [dbo].[UserTypes]
+INNER JOIN [dbo].[UserTypes]
 	ON [Users].[UserTypeId] = [UserTypes].[UserTypeId];
