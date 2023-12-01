@@ -183,6 +183,6 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
 
-        /// Register the user database
+        /// Adds a user database
         member this.AddUserDatabase() =
             this.AddSingleton<IUserDatabase, UserDatabase>()

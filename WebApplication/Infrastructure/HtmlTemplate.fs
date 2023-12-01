@@ -126,7 +126,7 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
         
-        /// Register a lightweight HTML template compiler.
+        /// Adds a lightweight HTML template compiler.
         member this.AddHtmlTemplate() =
             this.AddMemoryCache() |> ignore
             this.AddTransient<IHtmlTemplate, HtmlTemplate>()

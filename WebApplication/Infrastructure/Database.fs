@@ -61,7 +61,7 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
 
-        /// Register the database connection factory
+        /// Adds a database connection factory
         member this.AddDbConnectionFactory() =
             this
                 .AddOptions<Database>()
