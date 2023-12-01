@@ -22,29 +22,12 @@ type IUserDatabase =
 
 type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
-    let readUserGroup (reader: SqlDataReader) : UserGroup =
-        reader.GetOrdinal("Name")
-        |> reader.GetString
-        |> UserGroup.ofString
-        |> Option.defaultWith (fun () -> failwith "Missing Name column")
-
-    let readUserPermission (reader: SqlDataReader) : UserPermission =
-        reader.GetOrdinal("Name")
-        |> reader.GetString
-        |> UserPermission.ofString
-        |> Option.defaultWith (fun () -> failwith "Missing Name column")
-
-    let readUserType (reader: SqlDataReader) : UserType =
-        reader.GetOrdinal("TypeName")
-        |> reader.GetString
-        |> UserType.ofString
-        |> Option.defaultWith (fun () -> failwith "Missing TypeName column")
-
     let readUser (reader: SqlDataReader) : User =
-        { Id = reader.GetOrdinal("Id") |> reader.GetGuid
+        { UserId = reader.GetOrdinal("UserId") |> reader.GetGuid
           EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
           DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
-          TypeName = readUserType reader
+          TypeId = reader.GetOrdinal("TypeId") |> reader.GetGuid
+          TypeName = reader.GetAs "TypeName" UserType.ofString
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 
     let getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
@@ -59,7 +42,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
             let! userPermissions =
                 if hasNextResult then
-                    reader.ReadManyAsync readUserPermission
+                    reader.ReadManyAsync(fun reader -> reader.GetAs "PermissionName" UserPermission.ofString)
                 else
                     Task.singleton []
 
@@ -67,7 +50,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
             let! userGroups =
                 if hasNextResult then
-                    reader.ReadManyAsync readUserGroup
+                    reader.ReadManyAsync(fun reader -> reader.GetAs "GroupName" UserGroup.ofString)
                 else
                     Task.singleton []
 
@@ -143,7 +126,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
                     return (DataStorageException ex |> raise)
             }
 
-        member this.FindById(id: UniqueId) : Task<UserDetails option> =
+        member this.FindById(userId: UniqueId) : Task<UserDetails option> =
             task {
                 try
                     use connection = dbConnectionFactory.CreateSqlConnection()
@@ -151,7 +134,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
 
                     command.CommandType <- CommandType.StoredProcedure
 
-                    command.Parameters.AddWithValue("@Id", id) |> ignore
+                    command.Parameters.AddWithValue("@UserId", userId) |> ignore
 
                     let! result = getUserDetails connection command
 

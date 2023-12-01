@@ -67,9 +67,10 @@ module UserPermission =
         | _ -> None
 
 type User =
-    { Id: UniqueId
+    { UserId: UniqueId
       EmailAddress: EmailAddress
       DisplayName: Text
+      TypeId: UniqueId
       TypeName: UserType
       IsActive: bool }
 

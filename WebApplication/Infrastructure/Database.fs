@@ -44,6 +44,13 @@ module SqlDataReaderExtensions =
                 return item
             }
 
+        /// Gets the column's value by applying the provided mapper.
+        member this.GetAs<'T> (columnName: string) (mapper: string -> 'T option) : 'T =
+            this.GetOrdinal(columnName)
+            |> this.GetString
+            |> mapper
+            |> Option.defaultWith (fun () -> failwithf "Missing %s column" columnName)
+
 type IDbConnectionFactory =
     abstract CreateSqlConnection: unit -> SqlConnection
 

@@ -3,9 +3,9 @@
 AS
 
 DECLARE
-    @Id UNIQUEIDENTIFIER = (SELECT [Id]
+    @UserId UNIQUEIDENTIFIER = (SELECT [UserId]
                             FROM [dbo].[Users]
                             WHERE [EmailAddress] = @EmailAddress)
 
-    EXEC dbo.Users_FindById @Id
+    EXEC dbo.Users_FindById @UserId
 RETURN

@@ -73,6 +73,8 @@
     <Build Include="dbo\Stored Procedures\Users_FindById.sql" />
     <Build Include="dbo\Stored Procedures\Users_FindByEmailAddress.sql" />
     <Build Include="dbo\Views\UsersView.sql" />
+    <Build Include="dbo\Views\UserPermissionsView.sql" />
+    <Build Include="dbo\Views\UserGroupsView.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="dbo\Scripts\PostDeployment.sql" />
