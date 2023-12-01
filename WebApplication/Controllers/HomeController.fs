@@ -22,13 +22,13 @@ type HomeController
         task {
             if this.Request.IsHtmx() then
                 let query =
-                    { SearchCriteria = this.Request.TryGetQueryStringValue QueryName.Search
+                    { SearchCriteria = this.Request.GetQueryStringValue QueryName.Search
                       ActiveOnly =
-                        this.Request.TryGetQueryStringValue QueryName.ActiveOnly
+                        this.Request.GetQueryStringValue QueryName.ActiveOnly
                         |> Option.bind (bool.TryParse >> Option.ofPair)
                         |> Option.defaultValue false
                       Page =
-                        this.Request.TryGetQueryStringValue QueryName.Page
+                        this.Request.GetQueryStringValue QueryName.Page
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
                         |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
