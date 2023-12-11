@@ -15,6 +15,7 @@ open WebApplication.Infrastructure.Constants
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
+open WebApplication.Views
 
 type DemoController
     (logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate) =
@@ -35,12 +36,11 @@ type DemoController
         }
 
     member this.Index() =
-        task {
-            let content =
-                htmlTemplate
-                    .Bind("CurrentUserName", "Alberto De Pena")
-                    .Bind("MainContent", "demo.html")
-                    .Render("index.html")
+        task {            
+            let page = DemoView.render ()
 
-            return this.HtmlContent content
+            let index =
+                IndexView.render "Alberto De Pena" page
+
+            return this.HtmlContent index
         }
