@@ -6,11 +6,6 @@ open Microsoft.Extensions.Options
 open WebApplication.Infrastructure.Options
 open WebApplication.Domain.Shared
 
-[<RequireQualifiedAccess>]
-module UniqueId =
-
-    let createSqlUniqueId () : UniqueId = RT.Comb.Provider.Sql.Create()
-
 [<AutoOpen>]
 module SqlDataReaderExtensions =
     open System.Threading.Tasks
@@ -51,15 +46,19 @@ module SqlDataReaderExtensions =
             |> mapper
             |> Option.defaultWith (fun () -> failwithf "Missing %s column" columnName)
 
-type IDbConnectionFactory =
-    abstract CreateSqlConnection: unit -> SqlConnection
+type ISqlDatabase =
+    abstract CreateConnection: unit -> SqlConnection
+    abstract CreateUniqueId: unit -> UniqueId
 
-type DbConnectionFactory(options: IOptions<Database>) =
+type SqlDatabase(options: IOptions<Database>) =
 
-    interface IDbConnectionFactory with
+    interface ISqlDatabase with
 
-        member this.CreateSqlConnection() =
+        member this.CreateConnection() =
             new SqlConnection(options.Value.ConnectionString)
+
+        member this.CreateUniqueId() =
+            RT.Comb.Provider.Sql.Create()
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =
@@ -68,12 +67,11 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
 
-        /// Adds a database connection factory
-        member this.AddDbConnectionFactory() =
+        member this.AddSqlDatabase() =
             this
                 .AddOptions<Database>()
                 .Configure<IConfiguration>(fun settings configuration ->
                     configuration.GetSection(nameof Database).Bind(settings))
             |> ignore
 
-            this.AddSingleton<IDbConnectionFactory, DbConnectionFactory>()
+            this.AddSingleton<ISqlDatabase, SqlDatabase>()

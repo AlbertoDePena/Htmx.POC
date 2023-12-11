@@ -20,7 +20,7 @@ type IUserDatabase =
     /// <exception cref="DatabaseException"></exception>
     abstract FindByEmailAddress: EmailAddress -> Task<UserDetails option>
 
-type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
+type UserDatabase(database: ISqlDatabase) =
 
     let readUser (reader: SqlDataReader) : User =
         { UserId = reader.GetOrdinal("UserId") |> reader.GetGuid
@@ -70,7 +70,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
         member this.GetPagedData(query: Query) : Task<PagedData<User>> =
             task {
                 try
-                    use connection = dbConnectionFactory.CreateSqlConnection()
+                    use connection = database.CreateConnection()
                     use command = new SqlCommand("dbo.Users_Search", connection)
 
                     command.CommandType <- CommandType.StoredProcedure
@@ -129,7 +129,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
         member this.FindById(userId: UniqueId) : Task<UserDetails option> =
             task {
                 try
-                    use connection = dbConnectionFactory.CreateSqlConnection()
+                    use connection = database.CreateConnection()
                     use command = new SqlCommand("dbo.Users_FindById", connection)
 
                     command.CommandType <- CommandType.StoredProcedure
@@ -146,7 +146,7 @@ type UserDatabase(dbConnectionFactory: IDbConnectionFactory) =
         member this.FindByEmailAddress(emailAddress: EmailAddress) : Task<UserDetails option> =
             task {
                 try
-                    use connection = dbConnectionFactory.CreateSqlConnection()
+                    use connection = database.CreateConnection()
                     use command = new SqlCommand("dbo.Users_FindByEmailAddress", connection)
 
                     command.CommandType <- CommandType.StoredProcedure
