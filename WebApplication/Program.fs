@@ -18,7 +18,7 @@ module Program =
     let main args =
         let builder = WebApplication.CreateBuilder(args)
 
-        builder.Services.AddDbConnectionFactory()
+        builder.Services.AddSqlDatabase()
         builder.Services.AddUserDatabase()
         builder.Services.AddHtmlTemplate()
         builder.Services.AddControllers()

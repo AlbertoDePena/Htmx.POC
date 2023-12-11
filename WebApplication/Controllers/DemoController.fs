@@ -35,7 +35,7 @@ type DemoController
         }
 
     member this.Index() =
-        task {
+        task {            
             let content =
                 htmlTemplate
                     .Bind("CurrentUserName", "Alberto De Pena")
