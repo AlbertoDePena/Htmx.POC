@@ -55,6 +55,9 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-table-row.html")
 
+                let searchResults =
+                    pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join
+
                 let searchResultSummary =
                     sprintf
                         "%i users found | showing page %i of %i"
@@ -72,7 +75,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
 
                 let tableContent =
                     htmlTemplate
-                        .Bind("SearchResults", pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join)
+                        .Bind("SearchResults", searchResults)
                         .Bind("SearchResultSummary", searchResultSummary)
                         .Bind("PreviousButtonDisabled", previousButtonDisabled)
                         .Bind("PreviousPage", pagedData.Page - 1)

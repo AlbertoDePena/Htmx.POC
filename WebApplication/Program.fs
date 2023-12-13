@@ -2,6 +2,7 @@ namespace WebApplication
 
 #nowarn "20"
 
+open Microsoft.ApplicationInsights.Extensibility
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
@@ -9,6 +10,7 @@ open Microsoft.Extensions.Hosting
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
+open WebApplication.Infrastructure.Telemetry
 
 module Program =
 
@@ -22,6 +24,13 @@ module Program =
         builder.Services.AddUserDatabase()
         builder.Services.AddHtmlTemplate()
         builder.Services.AddControllers()
+
+        builder
+            .Services
+            .AddApplicationInsightsTelemetry()
+            .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
+            .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
+            .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
         
         let app = builder.Build()
 
