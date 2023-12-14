@@ -27,7 +27,7 @@ type UserDatabase(database: ISqlDatabase) =
           EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
           DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
           UserTypeId = reader.GetOrdinal("UserTypeId") |> reader.GetGuid
-          UserTypeName = reader.GetString("UserTypeName", UserType.ofString)
+          UserTypeName = reader.GetString("UserTypeName", UserType.OfString)
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
 
     let getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
@@ -42,7 +42,7 @@ type UserDatabase(database: ISqlDatabase) =
 
             let! userPermissions =
                 if hasNextResult then
-                    reader.ReadManyAsync(fun reader -> reader.GetString("PermissionName", UserPermission.ofString))
+                    reader.ReadManyAsync(fun reader -> reader.GetString("PermissionName", UserPermission.OfString))
                 else
                     Task.singleton []
 
@@ -50,7 +50,7 @@ type UserDatabase(database: ISqlDatabase) =
 
             let! userGroups =
                 if hasNextResult then
-                    reader.ReadManyAsync(fun reader -> reader.GetString("GroupName", UserGroup.ofString))
+                    reader.ReadManyAsync(fun reader -> reader.GetString("GroupName", UserGroup.OfString))
                 else
                     Task.singleton []
 
@@ -93,7 +93,7 @@ type UserDatabase(database: ISqlDatabase) =
                     command.Parameters.AddWithValue(
                         "@SortDirection",
                         query.SortDirection
-                        |> Option.map SortDirection.toString
+                        |> Option.map (fun x -> x.ToString())
                         |> Option.defaultValue String.defaultValue
                     )
                     |> ignore

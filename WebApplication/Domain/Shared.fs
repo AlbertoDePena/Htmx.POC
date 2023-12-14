@@ -15,16 +15,13 @@ module Alias =
 type SortDirection =
     | Ascending
     | Descending
-
-[<RequireQualifiedAccess>]
-module SortDirection =
-    
-    let toString this =
+        
+    override this.ToString() =
         match this with
         | SortDirection.Ascending -> "Ascending"
         | SortDirection.Descending -> "Descending"
 
-    let ofString (value: string) =
+    static member OfString (value: string) =
         match value with
         | "Ascending" -> Some SortDirection.Ascending
         | "Descending" -> Some SortDirection.Descending

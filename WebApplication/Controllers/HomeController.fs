@@ -50,7 +50,7 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
                         .Bind("DisplayName", user.DisplayName)
                         .Bind("EmailAddress", user.EmailAddress)
                         .Bind("TypeNameClass", typeNameClass)
-                        .Bind("TypeName", user.UserTypeName |> UserType.toString)
+                        .Bind("TypeName", user.UserTypeName)
                         .Bind("IsActiveClass", isActiveClass)
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("templates/user/search-table-row.html")

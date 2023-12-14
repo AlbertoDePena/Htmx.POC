@@ -9,16 +9,13 @@ type UserGroup =
     | Editor
     | Administrator
 
-[<RequireQualifiedAccess>]
-module UserGroup =
-
-    let toString this =
+    override this.ToString() =
         match this with
         | UserGroup.Viewer -> "Viewer"
         | UserGroup.Editor -> "Editor"
         | UserGroup.Administrator -> "Administrator"
 
-    let ofString (value: string) =
+    static member OfString (value: string) =
         match value with
         | "Viewer" -> Some UserGroup.Viewer
         | "Editor" -> Some UserGroup.Editor
@@ -30,15 +27,12 @@ type UserType =
     | Customer
     | Employee
 
-[<RequireQualifiedAccess>]
-module UserType =
-
-    let toString this =
+    override this.ToString() =
         match this with
         | UserType.Customer -> "Customer"
         | UserType.Employee -> "Employee"
 
-    let ofString (value: string) =
+    static member OfString (value: string) =
         match value with
         | "Customer" -> Some UserType.Customer
         | "Employee" -> Some UserType.Employee
@@ -50,16 +44,13 @@ type UserPermission =
     | ViewFinancials
     | ExportSearchResults
 
-[<RequireQualifiedAccess>]
-module UserPermission =
-
-    let toString this =
+    override this.ToString() =
         match this with
         | UserPermission.ViewTransportationData -> "View Transportation Data"
         | UserPermission.ViewFinancials -> "View Financials"
         | UserPermission.ExportSearchResults -> "Export Search Results"
 
-    let ofString (value: string) =
+    static member OfString (value: string) =
         match value with
         | "View Transportation Data" -> Some UserPermission.ViewTransportationData
         | "View Financials" -> Some UserPermission.ViewFinancials
