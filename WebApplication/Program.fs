@@ -7,10 +7,13 @@ open System
 open Microsoft.ApplicationInsights.Extensibility
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 
 open Serilog
 open Serilog.Events
+
+open FsToolkit.ErrorHandling
 
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
@@ -18,15 +21,21 @@ open WebApplication.Infrastructure.HtmlTemplate
 open WebApplication.Infrastructure.Telemetry
 
 module Program =
-    
+
     [<Literal>]
     let SuccessExitCode = 0
 
     [<Literal>]
     let FailureExitCode = -1
 
+    let getLogLevel (configuration: IConfiguration) (key: string) =
+        configuration.GetValue<string>(key)
+        |> Enum.TryParse<LogEventLevel>
+        |> Option.ofPair
+        |> Option.defaultValue LogEventLevel.Warning
+
     [<EntryPoint>]
-    let main args =        
+    let main args =
         try
             try
                 let builder = WebApplication.CreateBuilder(args)
@@ -36,26 +45,34 @@ module Program =
                 builder.Services.AddHtmlTemplate()
                 builder.Services.AddControllers()
 
-                builder
-                    .Services
+                builder.Services
                     .AddApplicationInsightsTelemetry()
                     .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
                     .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
                     .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
-        
-                builder.Host.UseSerilog(Action<HostBuilderContext,IServiceProvider,LoggerConfiguration>(
-                    fun context provider loggerConfig ->
-                        loggerConfig
-                            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                            .WriteTo.Console()     
-                            .WriteTo.ApplicationInsights(provider.GetRequiredService<TelemetryConfiguration>(), OperationTelemetryConverter())
-                            .Enrich.With<OperationIdEnricher>()
-                            .Enrich.WithMachineName()
-                            .Enrich.FromLogContext()
-                            .Enrich.WithProperty("Version", ApplicationVersion.Version)
-                            .Enrich.WithProperty("Application", "HTMX-POC")
-                        ()
-                ))
+
+                builder.Host.UseSerilog(
+                    Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
+                        (fun context provider loggerConfig ->        
+                            let defaultLogLevel = getLogLevel context.Configuration "Application:DefaultLogLevel"
+                            let infrastructureLogLevel = getLogLevel context.Configuration "Application:InfrastructureLogLevel"
+
+                            loggerConfig.MinimumLevel
+                                .Is(defaultLogLevel)
+                                .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLogLevel)
+                                .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLogLevel)                                                                
+                                .Enrich.WithMachineName()
+                                .Enrich.FromLogContext()
+                                .Enrich.WithProperty("Version", Application.Version)
+                                .Enrich.WithProperty("Application", "HTMX-POC")
+                                .Enrich.With<OperationIdEnricher>()
+                                .WriteTo.Console()
+                                .WriteTo.ApplicationInsights(
+                                    provider.GetRequiredService<TelemetryConfiguration>(),
+                                    OperationTelemetryConverter()
+                                )
+                            ())
+                )
 
                 let app = builder.Build()
 
@@ -77,9 +94,9 @@ module Program =
                 app.Run()
 
                 SuccessExitCode
-            with ex -> 
+            with ex ->
                 Console.Error.WriteLine(ex)
-            
+
                 FailureExitCode
-        finally            
+        finally
             Log.CloseAndFlush()

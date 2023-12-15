@@ -13,10 +13,10 @@ open Serilog.Sinks.ApplicationInsights.TelemetryConverters
 
 open WebApplication.Domain.Extensions
 
-type ApplicationVersion() =
+type Application() =
     static member Version =
         Assembly
-            .GetAssembly(typeof<ApplicationVersion>)
+            .GetAssembly(typeof<Application>)
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             .InformationalVersion
 
@@ -30,7 +30,7 @@ type ComponentVersionInitializer() =
 
     interface ITelemetryInitializer with
         member this.Initialize(telemetry: ApplicationInsights.Channel.ITelemetry) =
-            telemetry.Context.Component.Version <- ApplicationVersion.Version
+            telemetry.Context.Component.Version <- Application.Version
 
 type AuthenticatedUserInitializer(httpContextAccessor: IHttpContextAccessor) =
 
