@@ -64,7 +64,7 @@ module Program =
                                 .Enrich.WithMachineName()
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Version", Application.Version)
-                                .Enrich.WithProperty("Application", "HTMX-POC")
+                                .Enrich.WithProperty("Application", Application.Name)
                                 .Enrich.With<OperationIdEnricher>()
                                 .WriteTo.Console()
                                 .WriteTo.ApplicationInsights(

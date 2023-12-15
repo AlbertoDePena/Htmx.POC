@@ -14,6 +14,7 @@ open Serilog.Sinks.ApplicationInsights.TelemetryConverters
 open WebApplication.Domain.Extensions
 
 type Application() =
+    static member Name = "htmx-poc"
     static member Version =
         Assembly
             .GetAssembly(typeof<Application>)
@@ -24,7 +25,7 @@ type CloudRoleNameInitializer() =
 
     interface ITelemetryInitializer with
         member this.Initialize(telemetry: ApplicationInsights.Channel.ITelemetry) =
-            telemetry.Context.Cloud.RoleName <- "htmx-poc"
+            telemetry.Context.Cloud.RoleName <- Application.Name
 
 type ComponentVersionInitializer() =
 
