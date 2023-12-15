@@ -17,12 +17,14 @@
 		<Compile Include="Infrastructure\Telemetry.fs" />
 		<Compile Include="Controllers\HttpRequestExtensions.fs" />
 		<Compile Include="Controllers\ControllerExtensions.fs" />
+		<Compile Include="Controllers\HealthController.fs" />
 		<Compile Include="Controllers/HomeController.fs" />
 		<Compile Include="Controllers/DemoController.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
 		<PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.13.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.23" />		
@@ -30,7 +32,7 @@
 		<PackageReference Include="RT.Comb" Version="4.0.1" />
 		<PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
 		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
-		<PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
+		<PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />		
 	</ItemGroup>
 
 </Project>

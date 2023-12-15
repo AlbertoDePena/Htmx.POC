@@ -9,6 +9,7 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
+open Microsoft.Extensions.Options
 
 open Serilog
 open Serilog.Events
@@ -19,6 +20,7 @@ open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 open WebApplication.Infrastructure.Telemetry
+open WebApplication.Infrastructure.Options
 
 module Program =
 
@@ -53,26 +55,38 @@ module Program =
 
                 builder.Host.UseSerilog(
                     Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
-                        (fun context provider loggerConfig ->        
-                            let defaultLogLevel = getLogLevel context.Configuration "Application:DefaultLogLevel"
-                            let infrastructureLogLevel = getLogLevel context.Configuration "Application:InfrastructureLogLevel"
+                        (fun context services loggerConfig ->
+                            let defaultLogLevel =
+                                getLogLevel context.Configuration "Application:DefaultLogLevel"
+
+                            let infrastructureLogLevel =
+                                getLogLevel context.Configuration "Application:InfrastructureLogLevel"
 
                             loggerConfig.MinimumLevel
                                 .Is(defaultLogLevel)
                                 .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLogLevel)
-                                .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLogLevel)                                                                
+                                .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLogLevel)
                                 .Enrich.WithMachineName()
                                 .Enrich.FromLogContext()
-                                .Enrich.WithProperty("Version", Application.Version)
                                 .Enrich.WithProperty("Application", Application.Name)
+                                .Enrich.WithProperty("Version", Application.Version)
                                 .Enrich.With<OperationIdEnricher>()
                                 .WriteTo.Console()
                                 .WriteTo.ApplicationInsights(
-                                    provider.GetRequiredService<TelemetryConfiguration>(),
+                                    services.GetRequiredService<TelemetryConfiguration>(),
                                     OperationTelemetryConverter()
                                 )
+
                             ())
                 )
+
+                builder.Services
+                    .AddHealthChecks()
+                    .AddSqlServer(
+                        connectionStringFactory =
+                            (fun services -> services.GetRequiredService<IOptions<Database>>().Value.ConnectionString),
+                        name = "HTMX POC Database"
+                    )
 
                 let app = builder.Build()
 
