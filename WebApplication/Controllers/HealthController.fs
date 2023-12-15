@@ -5,6 +5,8 @@ open Microsoft.Extensions.Logging
 
 open Microsoft.Extensions.Diagnostics.HealthChecks
 open Microsoft.AspNetCore.Http
+open System.Text.Json
+open System.Text.Json.Serialization
 
 type HealthController(logger: ILogger<HealthController>, healthCheck: HealthCheckService) =
     inherit Controller()
@@ -17,7 +19,7 @@ type HealthController(logger: ILogger<HealthController>, healthCheck: HealthChec
                 healthReport.Status = HealthStatus.Healthy
                 || healthReport.Status = HealthStatus.Degraded
             then
-                return this.StatusCode(StatusCodes.Status200OK, "OK")
+                return this.StatusCode(StatusCodes.Status200OK, "Healthy")
             else
                 return this.StatusCode(StatusCodes.Status503ServiceUnavailable, healthReport.Entries)
         }
@@ -26,5 +28,12 @@ type HealthController(logger: ILogger<HealthController>, healthCheck: HealthChec
         task {
             let! healthReport = healthCheck.CheckHealthAsync()
 
-            return this.StatusCode(StatusCodes.Status200OK, healthReport)
+            let options = JsonSerializerOptions(
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            )
+
+            options.Converters.Add(JsonStringEnumConverter())
+
+            return this.Json(healthReport, options)
         }
