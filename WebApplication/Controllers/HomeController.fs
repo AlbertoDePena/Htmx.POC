@@ -90,11 +90,5 @@ type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate
 
     member this.Index() =
         task {
-            let content =
-                htmlTemplate
-                    .Bind("CurrentUserName", "Alberto De Pena")
-                    .Bind("MainContent", "templates/user/search-section.html")
-                    .Render("index.html")
-
-            return this.HtmlContent content
+            return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "templates/user/search-section.html")
         }
