@@ -18,7 +18,7 @@ open WebApplication.Infrastructure.HtmlTemplate
 
 type DemoController
     (logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate) =
-    inherit Controller()
+    inherit HtmxController(logger, htmlTemplate)
 
     let random = Random()
 
@@ -35,12 +35,6 @@ type DemoController
         }
 
     member this.Index() =
-        task {            
-            let content =
-                htmlTemplate
-                    .Bind("CurrentUserName", "Alberto De Pena")
-                    .Bind("MainContent", "demo.html")
-                    .Render("index.html")
-
-            return this.HtmlContent content
+        task {       
+            return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "demo.html")
         }

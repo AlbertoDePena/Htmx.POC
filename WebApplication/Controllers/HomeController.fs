@@ -15,7 +15,7 @@ open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
 type HomeController(logger: ILogger<HomeController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
-    inherit Controller()
+    inherit HtmxController(logger, htmlTemplate)
 
     member this.Search() =
         task {

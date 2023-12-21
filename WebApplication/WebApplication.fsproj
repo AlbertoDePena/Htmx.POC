@@ -16,7 +16,7 @@
 		<Compile Include="Infrastructure\HtmlTemplate.fs" />
 		<Compile Include="Infrastructure\Telemetry.fs" />
 		<Compile Include="Controllers\HttpRequestExtensions.fs" />
-		<Compile Include="Controllers\ControllerExtensions.fs" />
+		<Compile Include="Controllers\HtmxController.fs" />
 		<Compile Include="Controllers\HealthController.fs" />
 		<Compile Include="Controllers/HomeController.fs" />
 		<Compile Include="Controllers/DemoController.fs" />
