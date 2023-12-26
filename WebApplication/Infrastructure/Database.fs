@@ -66,7 +66,8 @@ module ServiceCollectionExtensions =
     open Microsoft.Extensions.DependencyInjection
 
     type IServiceCollection with
-
+        
+        /// Adds the SQL database
         member this.AddSqlDatabase() =
             this
                 .AddOptions<Database>()

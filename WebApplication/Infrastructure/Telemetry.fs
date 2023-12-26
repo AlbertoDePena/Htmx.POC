@@ -84,3 +84,16 @@ type OperationTelemetryConverter() =
                 telemetry.Context.Operation.ParentId <- parentOperationId |> Option.defaultValue String.defaultValue
 
             telemetry)
+
+[<AutoOpen>]
+module ServiceCollectionExtensions =
+    open Microsoft.Extensions.DependencyInjection
+
+    type IServiceCollection with
+
+        /// Adds custom telemetry initializers
+        member this.AddCustomTelemetryInitializers() =
+            this
+                .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
+                .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
+                .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()

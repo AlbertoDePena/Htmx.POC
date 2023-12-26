@@ -49,9 +49,7 @@ module Program =
 
                 builder.Services
                     .AddApplicationInsightsTelemetry()
-                    .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
-                    .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
-                    .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
+                    .AddCustomTelemetryInitializers()
 
                 builder.Host.UseSerilog(
                     Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
@@ -97,7 +95,6 @@ module Program =
                     app.UseHsts()
 
                 app.UseSerilogRequestLogging()
-
                 app.UseHttpsRedirection()
                 app.UseStaticFiles()
                 app.UseRouting()
