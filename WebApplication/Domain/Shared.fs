@@ -46,11 +46,11 @@ type PagedData<'T> =
     member this.TotalPages =
         let pageCount = this.TotalCount / this.PageSize
 
-        let integer =
+        let totalPages =
             if (this.TotalCount % this.PageSize) = 0 then
                 pageCount
             else
                 pageCount + 1
 
-        integer
+        totalPages
 

@@ -19,7 +19,7 @@ type HtmxController(logger: ILogger, htmlTemplate: IHtmlTemplate) =
         task {
             let content =
                 htmlTemplate
-                    .Bind("CurrentUserName", userName)
+                    .Bind("UserName", userName)
                     .Bind("MainContent", mainContent)
                     .Render("index.html")
 
