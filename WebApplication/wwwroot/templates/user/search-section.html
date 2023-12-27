@@ -5,12 +5,12 @@
             <div class="column">
                 <form id="user-search-form" class="columns"
                       hx-trigger="load"
-                      hx-get="/Home/Search">
+                      hx-get="/User/Search">
                     <div class="column">
                         <div class="control">
                             <input class="input is-small" name="search"
                                    hx-trigger="keyup changed delay:500ms, search"
-                                   hx-get="/Home/Search"
+                                   hx-get="/User/Search"
                                    hx-include="#user-search-form"
                                    hx-vals='{"page": "1"}'
                                    hx-indicator=".htmx-indicator"
@@ -20,7 +20,7 @@
                     <div class="column is-narrow">
                         <div class="is-flex is-align-items-center">
                             <input id="active-only" name="active-only" type="checkbox" value="true"
-                                   hx-get="/Home/Search"
+                                   hx-get="/User/Search"
                                    hx-include="#user-search-form"
                                    hx-vals='{"page": "1"}'
                                    class="is-clickable ml-2">
