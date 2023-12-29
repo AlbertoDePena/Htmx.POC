@@ -6,23 +6,23 @@
                     <div>${SearchResultSummary}</div>
 
                     <div class="is-flex is-justify-content-right">
-                        <button class="button is-small" type="button" ${PreviousButtonDisabled}
+                        <button class="button " type="button" ${PreviousButtonDisabled}
                                 hx-get="/User/Search"
                                 hx-include="#user-search-form"
                                 hx-vals='{"page": "${PreviousPage}"}'>
-                            <span class="material-icons is-small"><i>navigate_before</i></span>
+                            <span class="material-icons "><i>navigate_before</i></span>
                             <span class="is-sr-only">Previous</span>
                         </button>
-                        <button class="button is-small mx-1" type="button" ${NextButtonDisabled}
+                        <button class="button  mx-1" type="button" ${NextButtonDisabled}
                                 hx-get="/User/Search"
                                 hx-include="#user-search-form"
                                 hx-vals='{"page": "${NextPage}"}'>
-                            <span class="material-icons is-small"><i>navigate_next</i></span>
+                            <span class="material-icons "><i>navigate_next</i></span>
                             <span class="is-sr-only">Next</span>
                         </button>
-                        <button class="button is-small"
+                        <button class="button "
                                 type="button">
-                            <span class="material-icons is-small"><i>add</i></span>
+                            <span class="material-icons "><i>add</i></span>
                             <span class="is-sr-only">New User</span>
                         </button>
                     </div>

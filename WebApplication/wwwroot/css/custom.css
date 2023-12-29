@@ -21,6 +21,11 @@ footer {
 }
 
 input[type=checkbox], input[type=radio] {
+    height: 3em;
+    width: 2.5em;
+}
+
+input[type=checkbox].is-small, input[type=radio].is-small {
     height: 2.5em;
     width: 1.5em;
 }

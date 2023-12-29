@@ -1,6 +1,6 @@
 <section hx-target="#user-search-table" hx-swap="outerHTML" hx-push-url="true">
+    <h3 class="block is-size-3 has-text-weight-semibold">Users</h3>
     <div class="box">
-        <h1 class="block has-text-weight-semibold">Users</h1>
         <div class="columns">
             <div class="column">
                 <form id="user-search-form" class="columns"
@@ -8,7 +8,7 @@
                       hx-get="/User/Search">
                     <div class="column">
                         <div class="control">
-                            <input class="input is-small" name="search"
+                            <input class="input " name="search"
                                    hx-trigger="keyup changed delay:500ms, search"
                                    hx-get="/User/Search"
                                    hx-include="#user-search-form"
