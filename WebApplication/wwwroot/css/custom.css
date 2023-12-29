@@ -90,8 +90,7 @@ main.is-sidebar-hidden {
     top: 0;
     left: 0;
     height: 100%;
-    width: 100%;
-    background: #fff;
+    width: 100%;    
     display: flex;
     justify-content: center;
     align-items: center;
