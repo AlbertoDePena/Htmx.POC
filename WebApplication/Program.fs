@@ -68,11 +68,10 @@ module Program =
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", Application.Name)
                                 .Enrich.WithProperty("Version", Application.Version)
-                                .Enrich.With<OperationIdEnricher>()
                                 .WriteTo.Console()
                                 .WriteTo.ApplicationInsights(
                                     services.GetRequiredService<TelemetryConfiguration>(),
-                                    OperationTelemetryConverter()
+                                    TelemetryConverter.Traces
                                 )
 
                             ())
