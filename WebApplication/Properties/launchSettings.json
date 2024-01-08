@@ -5,7 +5,11 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5030",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
+        "Database:ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;",
+        "Application:DefaultLogLevel": "Information",
+        "Application:InfrastructureLogLevel": "Warning"
       }
     },
     "WebApplicationWatch": {
@@ -17,7 +21,11 @@
       "workingDirectory": "$(ProjectDir)",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
+        "Database:ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;",
+        "Application:DefaultLogLevel": "Information",
+        "Application:InfrastructureLogLevel": "Warning"
       }
     }
   }
