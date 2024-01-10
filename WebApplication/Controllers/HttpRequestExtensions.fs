@@ -9,13 +9,6 @@ module HttpRequestExtensions =
 
     type HttpRequest with
 
-        member this.GetBearerToken() =
-            this.Headers
-            |> Seq.tryFind (fun q -> q.Key = "Authorization")
-            |> Option.bind (fun q -> if Seq.isEmpty q.Value then None else q.Value |> Seq.tryHead)
-            |> Option.filter (fun h -> h.Contains("Bearer "))
-            |> Option.map (fun h -> h.Substring("Bearer ".Length).Trim())
-
         member this.GetHeaderValue(key: string) =
             this.Headers.TryGetValue key |> Option.ofPair |> Option.map string
 
@@ -26,6 +19,11 @@ module HttpRequestExtensions =
 
         member this.GetQueryStringValue(key: string) =
             this.Query.TryGetValue key |> Option.ofPair |> Option.map string
+
+        member this.GetBearerToken() =            
+            this.GetHeaderValue "Authorization"
+            |> Option.filter (fun value -> value.Contains("Bearer "))
+            |> Option.map (fun value -> value.Substring("Bearer ".Length).Trim())
 
         /// Determines if the current HTTP Request was invoked by Htmx on the client.
         member this.IsHtmx() =

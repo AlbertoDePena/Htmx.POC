@@ -3,9 +3,9 @@ body {
     min-height: 100vh;
 }
 
-body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
-    padding-bottom: 3.25rem;
-}
+    body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
+        padding-bottom: 3.25rem;
+    }
 
 footer {
     min-width: 3.25rem;
@@ -25,10 +25,10 @@ input[type=checkbox], input[type=radio] {
     width: 2.5em;
 }
 
-input[type=checkbox].is-small, input[type=radio].is-small {
-    height: 2.5em;
-    width: 1.5em;
-}
+    input[type=checkbox].is-small, input[type=radio].is-small {
+        height: 2.5em;
+        width: 1.5em;
+    }
 
 /* BEGIN - fixed table header */
 tbody tr td {
@@ -39,24 +39,32 @@ tbody tr td {
     overflow: auto;
 }
 
-/* If we use border, we must use table-collapse to avoid a slight movement of the header row */
-.table-has-fixed-header table {
-    border-collapse: collapse;
-}
+    /* If we use border, we must use table-collapse to avoid a slight movement of the header row */
+    .table-has-fixed-header table {
+        border-collapse: collapse;
+    }
 
-/* Because we must set sticky on th, we have to apply background styles here rather than on thead */
-.table-has-fixed-header th {
-    background: white;
-}
+    /* Because we must set sticky on th, we have to apply background styles here rather than on thead */
+    .table-has-fixed-header th {
+        background: white;
+    }
 
-/* Set header to stick to the top of the container. */
-.table-has-fixed-header thead tr th {
-    position: sticky;
-    top: 0;
-}
+    /* Set header to stick to the top of the container. */
+    .table-has-fixed-header thead tr th {
+        position: sticky;
+        top: 0;
+    }
 /* END - fixed table header */
 
 /* BEGIN - side navbar */
+button.aside-burger {
+    transition: rotate .2s ease-in-out;
+}
+
+button.aside-burger.is-sidebar-hidden {
+    rotate: 180deg
+}
+
 aside.has-sidebar,
 main.has-sidebar {
     position: fixed;
@@ -64,7 +72,7 @@ main.has-sidebar {
     bottom: 0;
     margin-top: 3rem;
     margin-bottom: 3rem;
-    transition: left 1s ease-in-out;
+    transition: left .2s ease-in-out;
 }
 
 aside.has-sidebar {
@@ -81,12 +89,12 @@ main.has-sidebar {
 
 aside.is-sidebar-hidden {
     left: -250px !important;
-    transition: left 1s ease-in-out;
+    transition: left .2s ease-in-out;
 }
 
 main.is-sidebar-hidden {
     left: 0 !important;
-    transition: left 1s ease-in-out;
+    transition: left .2s ease-in-out;
 }
 /* END side navbar */
 
@@ -95,7 +103,7 @@ main.is-sidebar-hidden {
     top: 0;
     left: 0;
     height: 100%;
-    width: 100%;    
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const aside = document.getElementById(asideBurger.dataset.target);
             const main = document.getElementById(aside.dataset.target);
 
+            asideBurger.classList.toggle('is-sidebar-hidden');
             aside.classList.toggle('is-sidebar-hidden');
             main.classList.toggle('is-sidebar-hidden');
         });
@@ -34,9 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const main = document.getElementById(aside.dataset.target);
 
             if (isMobile) {
+                asideBurger.classList.add('is-sidebar-hidden');
                 aside.classList.add('is-sidebar-hidden');
                 main.classList.add('is-sidebar-hidden');
             } else {
+                asideBurger.classList.remove('is-sidebar-hidden');
                 aside.classList.remove('is-sidebar-hidden');
                 main.classList.remove('is-sidebar-hidden');
             }
