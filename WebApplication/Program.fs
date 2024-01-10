@@ -3,7 +3,9 @@ namespace WebApplication
 #nowarn "20"
 
 open System
+open System.Threading
 
+open Microsoft.ApplicationInsights
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
@@ -57,6 +59,14 @@ module Program =
 
                 let app = builder.Build()
 
+                let telemetryClient = app.Services.GetRequiredService<TelemetryClient>()
+                let lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>()
+
+                lifetime.ApplicationStopped.Register(fun () ->
+                    telemetryClient.Flush()
+                    Console.WriteLine("Flushing telemetry...")
+                    Thread.Sleep(5000))
+
                 if builder.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage()
                 else
@@ -79,4 +89,5 @@ module Program =
 
                 FailureExitCode
         finally
+            Console.WriteLine("Flushing serilog...")
             Log.CloseAndFlush()
