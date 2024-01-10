@@ -1,4 +1,4 @@
-<section hx-target="#UserSearchTable" hx-swap="outerHTML" hx-push-url="true">
+<section hx-target="#UserSearchTable" hx-swap="outerHTML" hx-push-url="true" hx-indicator=".htmx-indicator">
     <div class="box">
         <nav class="breadcrumb" aria-label="breadcrumbs">
             <ul>
@@ -6,7 +6,7 @@
                 <li class="is-active"><a href="#" aria-current="page">Users</a></li>
             </ul>
         </nav>
-    </div>    
+    </div>
     <div class="box">
         <div class="columns">
             <div class="column">
@@ -20,7 +20,6 @@
                                    hx-get="/User/Search"
                                    hx-include="#UserSearchForm"
                                    hx-vals='{"page": "1"}'
-                                   hx-indicator=".htmx-indicator"
                                    placeholder="Begin typing to search users...">
                         </div>
                     </div>
@@ -53,5 +52,9 @@
                 </thead>
             </table>
         </div>
+    </div>
+
+    <div class="loader-container htmx-indicator">
+        <div class="loader"></div>
     </div>
 </section>
