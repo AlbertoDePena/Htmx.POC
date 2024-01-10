@@ -3,9 +3,9 @@ body {
     min-height: 100vh;
 }
 
-    body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
-        padding-bottom: 3.25rem;
-    }
+body.has-footer-fixed-bottom, html.has-footer-fixed-bottom {
+    padding-bottom: 3.25rem;
+}
 
 footer {
     min-width: 3.25rem;
@@ -25,10 +25,10 @@ input[type=checkbox], input[type=radio] {
     width: 2.5em;
 }
 
-    input[type=checkbox].is-small, input[type=radio].is-small {
-        height: 2.5em;
-        width: 1.5em;
-    }
+input[type=checkbox].is-small, input[type=radio].is-small {
+    height: 2.5em;
+    width: 1.5em;
+}
 
 /* BEGIN - fixed table header */
 tbody tr td {
@@ -39,29 +39,29 @@ tbody tr td {
     overflow: auto;
 }
 
-    /* If we use border, we must use table-collapse to avoid a slight movement of the header row */
-    .table-has-fixed-header table {
-        border-collapse: collapse;
-    }
+/* If we use border, we must use table-collapse to avoid a slight movement of the header row */
+.table-has-fixed-header table {
+    border-collapse: collapse;
+}
 
-    /* Because we must set sticky on th, we have to apply background styles here rather than on thead */
-    .table-has-fixed-header th {
-        background: white;
-    }
+/* Because we must set sticky on th, we have to apply background styles here rather than on thead */
+.table-has-fixed-header th {
+    background: white;
+}
 
-    /* Set header to stick to the top of the container. */
-    .table-has-fixed-header thead tr th {
-        position: sticky;
-        top: 0;
-    }
+/* Set header to stick to the top of the container. */
+.table-has-fixed-header thead tr th {
+    position: sticky;
+    top: 0;
+}
 /* END - fixed table header */
 
 /* BEGIN - side navbar */
-button.aside-burger {
+button#SideNavbarBurger {
     transition: rotate .2s ease-in-out;
 }
 
-button.aside-burger.is-sidebar-hidden {
+button#SideNavbarBurger.is-sidebar-hidden {
     rotate: 180deg
 }
 
