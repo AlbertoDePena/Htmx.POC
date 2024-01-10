@@ -53,7 +53,7 @@ type UserController(logger: ILogger<UserController>, htmlTemplate: IHtmlTemplate
                         .Bind("TypeName", user.UserTypeName)
                         .Bind("IsActiveClass", isActiveClass)
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-                        .Render("templates/user/search-table-row.html")
+                        .Render("user/search-table-row.html")
 
                 let searchResults =
                     pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join
@@ -81,7 +81,7 @@ type UserController(logger: ILogger<UserController>, htmlTemplate: IHtmlTemplate
                         .Bind("PreviousPage", pagedData.Page - 1)
                         .Bind("NextButtonDisabled", nextButtonDisabled)
                         .Bind("NextPage", pagedData.Page + 1)
-                        .Render("templates/user/search-table.html")
+                        .Render("user/search-table.html")
 
                 return this.HtmlContent tableContent
             else
@@ -90,5 +90,5 @@ type UserController(logger: ILogger<UserController>, htmlTemplate: IHtmlTemplate
 
     member this.Index() =
         task {
-            return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "templates/user/search-section.html")
+            return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/search-section.html")
         }
