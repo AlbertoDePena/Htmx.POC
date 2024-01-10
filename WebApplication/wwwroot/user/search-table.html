@@ -1,4 +1,4 @@
-<table id="user-search-table" class="table is-narrow is-hoverable is-fullwidth">
+<table id="UserSearchTable" class="table is-narrow is-hoverable is-fullwidth">
     <thead>
         <tr>
             <th colspan="4" class="pb-6">
@@ -8,14 +8,14 @@
                     <div class="is-flex is-justify-content-right">
                         <button class="button " type="button" ${PreviousButtonDisabled}
                                 hx-get="/User/Search"
-                                hx-include="#user-search-form"
+                                hx-include="#UserSearchForm"
                                 hx-vals='{"page": "${PreviousPage}"}'>
                             <span class="material-icons "><i>navigate_before</i></span>
                             <span class="is-sr-only">Previous</span>
                         </button>
                         <button class="button  mx-1" type="button" ${NextButtonDisabled}
                                 hx-get="/User/Search"
-                                hx-include="#user-search-form"
+                                hx-include="#UserSearchForm"
                                 hx-vals='{"page": "${NextPage}"}'>
                             <span class="material-icons "><i>navigate_next</i></span>
                             <span class="is-sr-only">Next</span>
