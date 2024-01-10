@@ -4,22 +4,18 @@ namespace WebApplication
 
 open System
 
-open Microsoft.ApplicationInsights.Extensibility
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
-open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Options
 
 open Serilog
-open Serilog.Events
-
-open FsToolkit.ErrorHandling
 
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 open WebApplication.Infrastructure.Telemetry
+open WebApplication.Infrastructure.Serilog
 open WebApplication.Infrastructure.Options
 
 module Program =
@@ -29,12 +25,6 @@ module Program =
 
     [<Literal>]
     let FailureExitCode = -1
-
-    let getLogLevel (configuration: IConfiguration) (key: string) =
-        configuration.GetValue<string>(key)
-        |> Enum.TryParse<LogEventLevel>
-        |> Option.ofPair
-        |> Option.defaultValue LogEventLevel.Warning
 
     [<EntryPoint>]
     let main args =
@@ -54,27 +44,7 @@ module Program =
                 builder.Host.UseSerilog(
                     Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
                         (fun context services loggerConfig ->
-                            let defaultLogLevel =
-                                getLogLevel context.Configuration "Application:DefaultLogLevel"
-
-                            let infrastructureLogLevel =
-                                getLogLevel context.Configuration "Application:InfrastructureLogLevel"
-
-                            loggerConfig.MinimumLevel
-                                .Is(defaultLogLevel)
-                                .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLogLevel)
-                                .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLogLevel)
-                                .Enrich.WithMachineName()
-                                .Enrich.FromLogContext()
-                                .Enrich.WithProperty("Application", Application.Name)
-                                .Enrich.WithProperty("Version", Application.Version)
-                                .WriteTo.Console()
-                                .WriteTo.ApplicationInsights(
-                                    services.GetRequiredService<TelemetryConfiguration>(),
-                                    TelemetryConverter.Traces
-                                )
-
-                            ())
+                            Serilog.configure context.Configuration services loggerConfig)
                 )
 
                 builder.Services
