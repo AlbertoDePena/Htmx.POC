@@ -12,12 +12,12 @@
             <div class="column">
                 <form id="UserSearchForm" class="columns"
                       hx-trigger="load"
-                      hx-get="/User/Search">
+                      hx-get="/Users/Search">
                     <div class="column">
                         <div class="control">
                             <input class="input " name="search"
                                    hx-trigger="keyup changed delay:500ms, search"
-                                   hx-get="/User/Search"
+                                   hx-get="/Users/Search"
                                    hx-include="#UserSearchForm"
                                    hx-vals='{"page": "1"}'
                                    placeholder="Begin typing to search users...">
@@ -26,7 +26,7 @@
                     <div class="column is-narrow">
                         <div class="is-flex is-align-items-center">
                             <input id="ActiveOnly" name="active-only" type="checkbox" value="true"
-                                   hx-get="/User/Search"
+                                   hx-get="/Users/Search"
                                    hx-include="#UserSearchForm"
                                    hx-vals='{"page": "1"}'
                                    class="is-clickable ml-2">

@@ -14,7 +14,7 @@ open WebApplication.Infrastructure.Constants
 open WebApplication.Infrastructure.UserDatabase
 open WebApplication.Infrastructure.HtmlTemplate
 
-type UserController(logger: ILogger<UserController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
+type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
     inherit HtmxController(logger, htmlTemplate)
 
     member this.Search() =
