@@ -21,13 +21,15 @@ type IUserDatabase =
 
 type UserDatabase(database: ISqlDatabase) =
 
+    let nullUser = Unchecked.defaultof<User>
+
     let readUser (reader: SqlDataReader) : User =
-        { UserId = reader.GetOrdinal("UserId") |> reader.GetGuid
-          EmailAddress = reader.GetString("EmailAddress", EmailAddress.OfString)
-          DisplayName = reader.GetString("DisplayName", Text.OfString)
-          UserTypeId = reader.GetOrdinal("UserTypeId") |> reader.GetGuid
-          UserTypeName = reader.GetString("UserTypeName", UserType.OfString)
-          IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
+        { UserId = reader.GetOrdinal(nameof nullUser.UserId) |> reader.GetGuid
+          EmailAddress = reader.GetString(nameof nullUser.EmailAddress, EmailAddress.OfString)
+          DisplayName = reader.GetString(nameof nullUser.DisplayName, Text.OfString)
+          UserTypeId = reader.GetOrdinal(nameof nullUser.UserTypeId) |> reader.GetGuid
+          UserTypeName = reader.GetString(nameof nullUser.UserTypeName, UserType.OfString)
+          IsActive = reader.GetOrdinal(nameof nullUser.IsActive) |> reader.GetBoolean }
 
     let getUserDetails (connection: SqlConnection) (command: SqlCommand) : Task<UserDetails Option> =
         task {
@@ -36,7 +38,7 @@ type UserDatabase(database: ISqlDatabase) =
             use! reader = command.ExecuteReaderAsync()
 
             let! users = reader.ReadManyAsync readUser
-
+            
             let! hasNextResult = reader.NextResultAsync()
 
             let! userPermissions =

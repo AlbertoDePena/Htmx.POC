@@ -30,17 +30,17 @@ module SqlDataReaderExtensions =
             }
 
         /// Map the first record available in the result set
-        member this.ReadFirstOrAsync<'T>(mapper: SqlDataReader -> 'T, defaultValue: 'T) : Task<'T> =
+        member this.ReadFirstAsync<'T>(mapper: SqlDataReader -> 'T) : Task<'T option> =
             task {
                 let! hasMoreItems = this.ReadAsync()
 
-                let item = if hasMoreItems then mapper this else defaultValue
+                let item = if hasMoreItems then mapper this |> Some else None
 
                 return item
             }
-        
+
         /// <summary>
-        /// Gets the column's value by applying the provided mapper.        
+        /// Gets the column's value by applying the provided mapper.
         /// </summary>
         /// <exception cref="Exception">Either the column 'columnName' is missing or the string is not the expected value.</exception>
         member this.GetString<'T>(columnName: string, mapper: string -> 'T option) : 'T =
