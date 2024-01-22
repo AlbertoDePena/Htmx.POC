@@ -19,6 +19,7 @@ open WebApp.Infrastructure.HtmlTemplate
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Options
+open WebApp.Infrastructure.ErrorHandlerMiddleware
 
 module Program =
 
@@ -71,7 +72,7 @@ module Program =
                 if builder.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage()
                 else
-                    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                    app.UseCustomErrorHandler()
                     app.UseHsts()
 
                 app.UseSerilogRequestLogging()
