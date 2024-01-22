@@ -61,8 +61,9 @@ module Program =
 
                 let telemetryClient = app.Services.GetRequiredService<TelemetryClient>()
                 let lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>()
+                let applicationStopped = lifetime.ApplicationStopped
 
-                lifetime.ApplicationStopped.Register(fun () ->
+                applicationStopped.Register(fun () ->
                     telemetryClient.Flush()
                     Console.WriteLine("Flushing telemetry...")
                     Thread.Sleep(5000))
