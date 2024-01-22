@@ -104,7 +104,7 @@ main.is-sidebar-hidden {
     left: 0;
     height: 100%;
     width: 100%;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
 }
@@ -113,4 +113,12 @@ main.is-sidebar-hidden {
     position: relative;
     height: 80px;
     width: 80px;
+}
+
+.loader-container .htmx-request {
+    display: flex;
+}
+
+.loader-container.htmx-request {
+    display: flex;
 }
