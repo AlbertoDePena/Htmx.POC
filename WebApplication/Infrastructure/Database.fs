@@ -1,10 +1,10 @@
-﻿namespace WebApplication.Infrastructure.Database
+﻿namespace WebApp.Infrastructure.Database
 
 open Microsoft.Data.SqlClient
 open Microsoft.Extensions.Options
 
-open WebApplication.Infrastructure.Options
-open WebApplication.Domain.Shared
+open WebApp.Infrastructure.Options
+open WebApp.Domain.Shared
 
 [<AutoOpen>]
 module SqlDataReaderExtensions =

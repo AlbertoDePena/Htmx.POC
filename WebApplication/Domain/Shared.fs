@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Domain.Shared
+﻿namespace WebApp.Domain.Shared
 
 [<AutoOpen>]
 module Alias =

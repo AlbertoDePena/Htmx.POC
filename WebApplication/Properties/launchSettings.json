@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "WebApplication": {
+    "WebApp": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5030",

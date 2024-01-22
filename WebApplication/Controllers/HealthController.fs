@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Controllers
+﻿namespace WebApp.Controllers
 
 open System.Text.Json
 open System.Text.Json.Serialization

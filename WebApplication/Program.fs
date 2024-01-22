@@ -1,4 +1,4 @@
-namespace WebApplication
+namespace WebApp
 
 #nowarn "20"
 
@@ -13,12 +13,12 @@ open Microsoft.Extensions.Options
 
 open Serilog
 
-open WebApplication.Infrastructure.Database
-open WebApplication.Infrastructure.UserDatabase
-open WebApplication.Infrastructure.HtmlTemplate
-open WebApplication.Infrastructure.Telemetry
-open WebApplication.Infrastructure.Serilog
-open WebApplication.Infrastructure.Options
+open WebApp.Infrastructure.Database
+open WebApp.Infrastructure.UserDatabase
+open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.Telemetry
+open WebApp.Infrastructure.Serilog
+open WebApp.Infrastructure.Options
 
 module Program =
 

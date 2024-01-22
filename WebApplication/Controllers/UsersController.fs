@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Controllers
+﻿namespace WebApp.Controllers
 
 open System
 
@@ -7,11 +7,11 @@ open FsToolkit.ErrorHandling
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApplication.Domain.User
-open WebApplication.Domain.Shared
-open WebApplication.Infrastructure.Constants
-open WebApplication.Infrastructure.UserDatabase
-open WebApplication.Infrastructure.HtmlTemplate
+open WebApp.Domain.User
+open WebApp.Domain.Shared
+open WebApp.Infrastructure.Constants
+open WebApp.Infrastructure.UserDatabase
+open WebApp.Infrastructure.HtmlTemplate
 
 type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
     inherit HtmxController(logger, htmlTemplate)

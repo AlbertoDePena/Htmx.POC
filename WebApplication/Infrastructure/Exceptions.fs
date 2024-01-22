@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Infrastructure.Exceptions
+﻿namespace WebApp.Infrastructure.Exceptions
 
 open System
 open Microsoft.Extensions.Logging

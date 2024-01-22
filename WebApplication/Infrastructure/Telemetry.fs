@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Infrastructure.Telemetry
+﻿namespace WebApp.Infrastructure.Telemetry
 
 open Microsoft.ApplicationInsights.Extensibility
 open Microsoft

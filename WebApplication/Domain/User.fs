@@ -1,6 +1,6 @@
-﻿namespace WebApplication.Domain.User
+﻿namespace WebApp.Domain.User
 
-open WebApplication.Domain.Shared
+open WebApp.Domain.Shared
 
 [<RequireQualifiedAccess>]
 type UserGroup =

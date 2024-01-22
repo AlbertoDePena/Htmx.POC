@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Infrastructure.UserDatabase
+﻿namespace WebApp.Infrastructure.UserDatabase
 
 open System.Data
 open System.Threading.Tasks
@@ -6,10 +6,10 @@ open System.Threading.Tasks
 open Microsoft.Data.SqlClient
 open FsToolkit.ErrorHandling
 
-open WebApplication.Infrastructure.Database
-open WebApplication.Infrastructure.Exceptions
-open WebApplication.Domain.Shared
-open WebApplication.Domain.User
+open WebApp.Infrastructure.Database
+open WebApp.Infrastructure.Exceptions
+open WebApp.Domain.Shared
+open WebApp.Domain.User
 
 type IUserDatabase =
     /// <exception cref="DatabaseException"></exception>

@@ -1,9 +1,9 @@
-﻿namespace WebApplication.Controllers
+﻿namespace WebApp.Controllers
 
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApplication.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.HtmlTemplate
 
 [<AbstractClass>]
 type HtmxController(logger: ILogger, htmlTemplate: IHtmlTemplate) =

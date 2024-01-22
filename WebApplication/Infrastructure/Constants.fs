@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Infrastructure.Constants
+﻿namespace WebApp.Infrastructure.Constants
 
 [<RequireQualifiedAccess>]
 module QueryName =

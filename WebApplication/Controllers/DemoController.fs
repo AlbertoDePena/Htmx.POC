@@ -1,4 +1,4 @@
-namespace WebApplication.Controllers
+namespace WebApp.Controllers
 
 open System
 open System.Threading.Tasks
@@ -8,12 +8,12 @@ open FsToolkit.ErrorHandling
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApplication.Domain.User
-open WebApplication.Domain.Shared
-open WebApplication.Infrastructure.Constants
-open WebApplication.Infrastructure.Database
-open WebApplication.Infrastructure.UserDatabase
-open WebApplication.Infrastructure.HtmlTemplate
+open WebApp.Domain.User
+open WebApp.Domain.Shared
+open WebApp.Infrastructure.Constants
+open WebApp.Infrastructure.Database
+open WebApp.Infrastructure.UserDatabase
+open WebApp.Infrastructure.HtmlTemplate
 
 type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate) =
     inherit HtmxController(logger, htmlTemplate)

@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Infrastructure.HtmlTemplate
+﻿namespace WebApp.Infrastructure.HtmlTemplate
 
 open System
 open System.IO

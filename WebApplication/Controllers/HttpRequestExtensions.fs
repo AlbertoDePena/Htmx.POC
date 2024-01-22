@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Controllers
+﻿namespace WebApp.Controllers
 
 open System
 open Microsoft.AspNetCore.Http
