@@ -21,14 +21,8 @@ type DatabaseException(ex: Exception) =
 
     static member EventId = EventId(10002, "DatabaseError")
 
-type DomainException(ex: Exception) =
-    inherit Exception(ex.Message, ex)
-    new(message: string) = DomainException(Exception message)
-
-    static member EventId = EventId(10003, "DomainError")
-
 type ServerException(ex: Exception) =
     inherit Exception(ex.Message, ex)
     new(message: string) = ServerException(Exception message)
 
-    static member EventId = EventId(10004, "ServerError")
+    static member EventId = EventId(10003, "ServerError")
