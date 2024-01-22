@@ -9,6 +9,12 @@ module Alias =
     type Number = Int32
     type UniqueId = Guid
 
+[<RequireQualifiedAccess>]
+module String =
+
+    /// The default value of a string is null.
+    let defaultValue = null
+
 /// Represents a non null/empty email address
 type EmailAddress =
     private

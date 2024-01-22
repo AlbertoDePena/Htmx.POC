@@ -8,7 +8,6 @@ open FsToolkit.ErrorHandling
 
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.Exceptions
-open WebApplication.Domain.Extensions
 open WebApplication.Domain.Shared
 open WebApplication.Domain.User
 

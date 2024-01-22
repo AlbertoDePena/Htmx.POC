@@ -10,7 +10,6 @@ open Microsoft.Extensions.Logging
 
 open WebApplication.Domain.User
 open WebApplication.Domain.Shared
-open WebApplication.Domain.Extensions
 open WebApplication.Infrastructure.Constants
 open WebApplication.Infrastructure.Database
 open WebApplication.Infrastructure.UserDatabase

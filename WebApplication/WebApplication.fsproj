@@ -7,8 +7,7 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
 
-	<ItemGroup>					
-		<Compile Include="Domain\Extensions.fs" />
+	<ItemGroup>
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
 		<Compile Include="Infrastructure\Constants.fs" />
