@@ -17,11 +17,14 @@ open WebApplication.Infrastructure.HtmlTemplate
 type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
     inherit HtmxController(logger, htmlTemplate)
 
+    member this.Index() =
+        task { return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/search-section.html") }
+
     member this.Search() =
         task {
             if this.Request.IsHtmx() then
                 let query =
-                    { SearchCriteria = this.Request.GetQueryStringValue QueryName.Search
+                    { SearchCriteria = this.Request.GetQueryStringValue QueryName.Search |> Option.bind Text.OfString
                       ActiveOnly =
                         this.Request.GetQueryStringValue QueryName.ActiveOnly
                         |> Option.bind (bool.TryParse >> Option.ofPair)
@@ -43,8 +46,7 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
                         | UserType.Customer -> "tag is-light is-info"
                         | UserType.Employee -> "tag is-light is-success"
 
-                    let isActiveClass =
-                        if user.IsActive then "tag is-success" else "tag"
+                    let isActiveClass = if user.IsActive then "tag is-success" else "tag"
 
                     htmlTemplate
                         .Bind("DisplayName", user.DisplayName)
@@ -55,8 +57,7 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
                         .Render("user/search-table-row.html")
 
-                let searchResults =
-                    pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join
+                let searchResults = pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join
 
                 let searchResultSummary =
                     sprintf
@@ -86,9 +87,4 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
                 return this.HtmlContent tableContent
             else
                 return! this.Index()
-        }
-
-    member this.Index() =
-        task {
-            return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/search-section.html")
         }

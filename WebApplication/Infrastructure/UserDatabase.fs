@@ -24,8 +24,8 @@ type UserDatabase(database: ISqlDatabase) =
 
     let readUser (reader: SqlDataReader) : User =
         { UserId = reader.GetOrdinal("UserId") |> reader.GetGuid
-          EmailAddress = reader.GetOrdinal("EmailAddress") |> reader.GetString
-          DisplayName = reader.GetOrdinal("DisplayName") |> reader.GetString
+          EmailAddress = reader.GetString("EmailAddress", EmailAddress.OfString)
+          DisplayName = reader.GetString("DisplayName", Text.OfString)
           UserTypeId = reader.GetOrdinal("UserTypeId") |> reader.GetGuid
           UserTypeName = reader.GetString("UserTypeName", UserType.OfString)
           IsActive = reader.GetOrdinal("IsActive") |> reader.GetBoolean }
@@ -77,7 +77,7 @@ type UserDatabase(database: ISqlDatabase) =
 
                     command.Parameters.AddWithValue(
                         "@SearchCriteria",
-                        query.SearchCriteria |> Option.defaultValue String.defaultValue
+                        query.SearchCriteria |> Option.either (fun x -> x.ToString()) (fun () -> String.defaultValue)
                     )
                     |> ignore
 
@@ -87,7 +87,7 @@ type UserDatabase(database: ISqlDatabase) =
 
                     command.Parameters.AddWithValue("@PageSize", query.PageSize) |> ignore
 
-                    command.Parameters.AddWithValue("@SortBy", query.SortBy |> Option.defaultValue String.defaultValue)
+                    command.Parameters.AddWithValue("@SortBy", query.SortBy |> Option.either (fun x -> x.ToString()) (fun () -> String.defaultValue))
                     |> ignore
 
                     command.Parameters.AddWithValue(

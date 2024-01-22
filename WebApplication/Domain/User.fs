@@ -1,6 +1,5 @@
 ﻿namespace WebApplication.Domain.User
 
-open System
 open WebApplication.Domain.Shared
 
 [<RequireQualifiedAccess>]

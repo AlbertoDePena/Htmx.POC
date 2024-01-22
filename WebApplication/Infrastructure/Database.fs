@@ -38,13 +38,17 @@ module SqlDataReaderExtensions =
 
                 return item
             }
-
-        /// Gets the column's value by applying the provided mapper.
-        member this.GetString<'T> (columnName: string, mapper: string -> 'T option) : 'T =
+        
+        /// <summary>
+        /// Gets the column's value by applying the provided mapper.        
+        /// </summary>
+        /// <exception cref="Exception">Either the column 'columnName' is missing or the string is not the expected value.</exception>
+        member this.GetString<'T>(columnName: string, mapper: string -> 'T option) : 'T =
             this.GetOrdinal(columnName)
             |> this.GetString
             |> mapper
-            |> Option.defaultWith (fun () -> failwithf "Missing %s column" columnName)
+            |> Option.defaultWith (fun () ->
+                failwithf "Either the column '%s' is missing or the string is not the expected value" columnName)
 
 type ISqlDatabase =
     abstract CreateConnection: unit -> SqlConnection
@@ -57,8 +61,7 @@ type SqlDatabase(options: IOptions<Database>) =
         member this.CreateConnection() =
             new SqlConnection(options.Value.ConnectionString)
 
-        member this.CreateUniqueId() =
-            RT.Comb.Provider.Sql.Create()
+        member this.CreateUniqueId() = RT.Comb.Provider.Sql.Create()
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =
@@ -66,7 +69,7 @@ module ServiceCollectionExtensions =
     open Microsoft.Extensions.DependencyInjection
 
     type IServiceCollection with
-        
+
         /// Adds the SQL database
         member this.AddSqlDatabase() =
             this
