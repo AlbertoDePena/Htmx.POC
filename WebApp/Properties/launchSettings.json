@@ -9,7 +9,13 @@
         "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
         "Database:ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;",
         "Application:DefaultLogLevel": "Information",
-        "Application:InfrastructureLogLevel": "Warning"
+        "Application:InfrastructureLogLevel": "Warning",
+        "AzureAd:Instance": "",
+        "AzureAd:Domain": "",
+        "AzureAd:TenantId": "",
+        "AzureAd:ClientId": "",
+        "AzureAd:CallbackPath": "/signin-oidc",
+        "AzureAd:SignedOutCallbackPath": "/signout-callback-oidc"
       }
     },
     "WebApplicationWatch": {
@@ -25,7 +31,13 @@
         "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
         "Database:ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;",
         "Application:DefaultLogLevel": "Information",
-        "Application:InfrastructureLogLevel": "Warning"
+        "Application:InfrastructureLogLevel": "Warning",
+        "AzureAd:Instance": "",
+        "AzureAd:Domain": "",
+        "AzureAd:TenantId": "",
+        "AzureAd:ClientId": "",
+        "AzureAd:CallbackPath": "/signin-oidc",
+        "AzureAd:SignedOutCallbackPath": "/signout-callback-oidc"
       }
     }
   }

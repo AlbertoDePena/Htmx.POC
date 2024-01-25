@@ -1,15 +1,19 @@
 namespace WebApp
 
-#nowarn "20"
-
 open System
 open System.Threading
 
+open Microsoft.Identity.Web
+open Microsoft.AspNetCore.Authentication.OpenIdConnect
+open Microsoft.AspNetCore.Http
+open Microsoft.AspNetCore.Authorization
+open Microsoft.AspNetCore.Mvc.Authorization
 open Microsoft.ApplicationInsights
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Options
+open Microsoft.Extensions.Configuration
 
 open Serilog
 
@@ -20,6 +24,8 @@ open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
+
+#nowarn "20"
 
 module Program =
 
@@ -38,7 +44,22 @@ module Program =
                 builder.Services.AddSqlDatabase()
                 builder.Services.AddUserDatabase()
                 builder.Services.AddHtmlTemplate()
-                builder.Services.AddControllers()
+
+                builder.Services.Configure<CookiePolicyOptions>(
+                    Action<CookiePolicyOptions>(fun options ->
+                        options.Secure <- CookieSecurePolicy.Always
+                        options.CheckConsentNeeded <- (fun context -> true)
+                        options.MinimumSameSitePolicy <- SameSiteMode.Lax
+                        options.HandleSameSiteCookieCompatibility() |> ignore)
+                )
+
+                builder.Services
+                    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                    .AddMicrosoftIdentityWebApp(fun options -> builder.Configuration.Bind("AzureAd", options))
+
+                builder.Services.AddControllers(fun options ->
+                    let policy = AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()
+                    options.Filters.Add(AuthorizeFilter(policy)))
 
                 builder.Services
                     .AddApplicationInsightsTelemetry()
@@ -78,7 +99,9 @@ module Program =
                 app.UseSerilogRequestLogging()
                 app.UseHttpsRedirection()
                 app.UseStaticFiles()
+                app.UseCookiePolicy()
                 app.UseRouting()
+                app.UseAuthentication()
                 app.UseAuthorization()
 
                 app.MapControllerRoute(name = "default", pattern = "{controller=Home}/{action=Index}/{id?}")

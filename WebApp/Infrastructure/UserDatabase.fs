@@ -78,7 +78,7 @@ type UserDatabase(database: ISqlDatabase) =
 
                     command.Parameters.AddWithValue(
                         "@SearchCriteria",
-                        query.SearchCriteria |> Option.either (fun x -> x.ToString()) (fun () -> String.defaultValue)
+                        query.SearchCriteria |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue)
                     )
                     |> ignore
 
@@ -88,13 +88,13 @@ type UserDatabase(database: ISqlDatabase) =
 
                     command.Parameters.AddWithValue("@PageSize", query.PageSize) |> ignore
 
-                    command.Parameters.AddWithValue("@SortBy", query.SortBy |> Option.either (fun x -> x.ToString()) (fun () -> String.defaultValue))
+                    command.Parameters.AddWithValue("@SortBy", query.SortBy |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue))
                     |> ignore
 
                     command.Parameters.AddWithValue(
                         "@SortDirection",
                         query.SortDirection
-                        |> Option.map (fun x -> x.ToString())
+                        |> Option.map (fun x -> x.Value)
                         |> Option.defaultValue String.defaultValue
                     )
                     |> ignore
