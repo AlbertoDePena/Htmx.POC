@@ -2,6 +2,7 @@
 
 open System
 open System.IO
+open System.Net
 open System.Text
 open System.Text.RegularExpressions
 
@@ -38,7 +39,7 @@ type IHtmlTemplate =
     
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
-    let mutable _variables: Variables = Map.empty
+    let mutable variables: Variables = Map.empty
 
     let isFile (fileOrContent: FileOrContent) =
         fileOrContent.EndsWith(".html")
@@ -63,7 +64,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             fileOrContent
 
     let bindVariables (htmlContentBuilder: StringBuilder) =
-        _variables
+        variables
         |> Map.iter (fun name value ->
             let pattern = sprintf "${%s}" name
             let valueToString = value.ToString() |> getFileOrContent
@@ -93,7 +94,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             if isNull value then
                 HtmlTemplateException "The variable value cannot be null" |> raise
 
-            _variables <- _variables |> Map.add name value
+            variables <- variables |> Map.add name value
             this
 
         member this.Join(items: HtmlContent list) =
@@ -114,7 +115,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
                 failOnUnboundedVariables htmlContent
 
-                _variables <- Map.empty
+                variables <- Map.empty
 
                 htmlContent
             with ex ->

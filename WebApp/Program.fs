@@ -8,6 +8,7 @@ open Microsoft.AspNetCore.Authentication.OpenIdConnect
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authorization
 open Microsoft.AspNetCore.Mvc.Authorization
+open Microsoft.AspNetCore.CookiePolicy
 open Microsoft.ApplicationInsights
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
@@ -48,8 +49,9 @@ module Program =
                 builder.Services.Configure<CookiePolicyOptions>(
                     Action<CookiePolicyOptions>(fun options ->
                         options.Secure <- CookieSecurePolicy.Always
-                        options.CheckConsentNeeded <- (fun context -> true)
+                        options.HttpOnly <- HttpOnlyPolicy.Always
                         options.MinimumSameSitePolicy <- SameSiteMode.Lax
+                        options.CheckConsentNeeded <- (fun context -> true)                        
                         options.HandleSameSiteCookieCompatibility() |> ignore)
                 )
 
