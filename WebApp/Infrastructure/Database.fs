@@ -40,15 +40,29 @@ module SqlDataReaderExtensions =
             }
 
         /// <summary>
+        /// Tries to get the column's value.
+        /// </summary>
+        member this.GetString(columnName: string) : string option =
+            let ordinal = this.GetOrdinal(columnName)
+
+            match this.IsDBNull ordinal with
+            | true -> None
+            | false -> this.GetString ordinal |> Some
+
+        /// <summary>
         /// Gets the column's value by applying the provided mapper.
         /// </summary>
         /// <exception cref="Exception">Either the column 'columnName' is missing or the string is not the expected value.</exception>
         member this.GetString<'T>(columnName: string, mapper: string -> 'T option) : 'T =
-            this.GetOrdinal(columnName)
-            |> this.GetString
-            |> mapper
-            |> Option.defaultWith (fun () ->
-                failwithf "Either the column '%s' is missing or the string is not the expected value" columnName)
+            let ordinal = this.GetOrdinal(columnName)
+
+            match this.IsDBNull ordinal with
+            | true -> failwithf "Either the column '%s' is missing or it has a missing value" columnName
+            | false ->
+                match this.GetString ordinal |> mapper with
+                | None ->
+                    failwithf "Either the column '%s' is missing or the string is not the expected value" columnName
+                | Some value -> value
 
 type ISqlDatabase =
     abstract CreateConnection: unit -> SqlConnection
