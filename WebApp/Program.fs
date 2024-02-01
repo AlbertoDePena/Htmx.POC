@@ -98,9 +98,9 @@ module Program =
                     app.UseCustomErrorHandler()
                     app.UseHsts()
 
-                app.UseSerilogRequestLogging()
                 app.UseHttpsRedirection()
                 app.UseStaticFiles()
+                app.UseSerilogRequestLogging()
                 app.UseCookiePolicy()
                 app.UseRouting()
                 app.UseAuthentication()
