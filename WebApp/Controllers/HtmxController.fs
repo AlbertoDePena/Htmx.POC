@@ -12,16 +12,14 @@ type HtmxController(logger: ILogger, htmlTemplate: IHtmlTemplate) =
     [<Literal>]
     let HtmlContentType = "text/html; charset=UTF-8"
 
-    member this.HtmlContent(content: string) =
-        this.Content(content, HtmlContentType)
+    member this.HtmlContent(content: string) : IActionResult =
+        this.Content(content, HtmlContentType) :> IActionResult
 
-    member this.HtmlContent(userName: string, mainContent: string) =
-        task {
-            let content =
-                htmlTemplate
-                    .Bind("UserName", userName)
-                    .Bind("MainContent", mainContent)
-                    .Render("index.html")
+    member this.HtmlContent(userName: string, mainContent: string) : IActionResult =
+        let content =
+            htmlTemplate
+                .Bind("UserName", userName)
+                .Bind("MainContent", mainContent)
+                .Render("index.html")
 
-            return this.HtmlContent content
-        }
+        this.HtmlContent content

@@ -17,6 +17,4 @@ type UserDetailsController(logger: ILogger<UserDetailsController>, htmlTemplate:
     inherit HtmxController(logger, htmlTemplate)
 
     member this.Index() =
-        task {
-            return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/details-section.html")
-        }
+        this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/details-section.html")

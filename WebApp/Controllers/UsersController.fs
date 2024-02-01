@@ -17,7 +17,7 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
     inherit HtmxController(logger, htmlTemplate)
 
     member this.Index() =
-        task { return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/search-section.html") }
+        this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/search-section.html")
 
     member this.Search() =
         task {
@@ -85,5 +85,5 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
 
                 return this.HtmlContent tableContent
             else
-                return! this.Index()
+                return this.Index()
         }

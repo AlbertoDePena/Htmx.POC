@@ -21,7 +21,7 @@ type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate
     let random = Random()
 
     member this.Index() =
-        task { return! this.HtmlContent(userName = "Alberto De Pena", mainContent = "demo.html") }
+        this.HtmlContent(userName = "Alberto De Pena", mainContent = "demo.html")
 
     member this.Random() =
         task {
@@ -32,5 +32,5 @@ type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate
 
                 return this.HtmlContent(randomNumber.ToString())
             else
-                return! this.Index()
+                return this.Index()
         }
