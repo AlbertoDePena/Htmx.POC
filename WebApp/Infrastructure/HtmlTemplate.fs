@@ -32,17 +32,18 @@ type HtmlTemplateException(ex: Exception) =
 type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract Bind: VariableName * VariableValue -> IHtmlTemplate
+    /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
+    abstract EncodeBind: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Join: HtmlContent list -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Render: FileOrContent -> HtmlContent
-    
+
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let mutable variables: Variables = Map.empty
 
-    let isFile (fileOrContent: FileOrContent) =
-        fileOrContent.EndsWith(".html")
+    let isFile (fileOrContent: FileOrContent) = fileOrContent.EndsWith(".html")
 
     let getFileOrContent (fileOrContent: FileOrContent) =
         if isNull fileOrContent then
@@ -51,7 +52,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         if isFile fileOrContent then
             let filePath = Path.Combine(environment.WebRootPath, fileOrContent)
 
-            if environment.IsDevelopment () then
+            if environment.IsDevelopment() then
                 filePath |> File.ReadAllText
             else
                 match cache.TryGetValue<string>(filePath) with
@@ -85,22 +86,38 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 sprintf "Found unbounded variables in the HTML content: %s" unbounded
                 |> failwith
 
+    let bindVariable (name: VariableName) (value: VariableValue) (encode: bool) =
+        if String.IsNullOrWhiteSpace name then
+            HtmlTemplateException "The variable name cannot be null/empty" |> raise
+
+        if isNull value then
+            HtmlTemplateException "The variable value cannot be null" |> raise
+
+        let encodedValue =
+            if encode then
+                value.ToString() |> WebUtility.HtmlEncode
+            else
+                value.ToString()
+
+        variables <- variables |> Map.add name encodedValue
+
     interface IHtmlTemplate with
 
-        member this.Bind(name: VariableName, value: VariableValue) =
-            if String.IsNullOrWhiteSpace name then
-                HtmlTemplateException "The variable name cannot be null/empty" |> raise
+        member this.Bind(name: VariableName, value: VariableValue) =            
+            bindVariable name value false
+            this
 
-            if isNull value then
-                HtmlTemplateException "The variable value cannot be null" |> raise
-
-            variables <- variables |> Map.add name value
+        member this.EncodeBind(name: VariableName, value: VariableValue) =
+            bindVariable name value true
             this
 
         member this.Join(items: HtmlContent list) =
             try
                 let htmlContentBuilder = StringBuilder()
-                for item in items do htmlContentBuilder.AppendLine(item) |> ignore
+
+                for item in items do
+                    htmlContentBuilder.AppendLine(item) |> ignore
+
                 htmlContentBuilder.ToString()
             with ex ->
                 HtmlTemplateException ex |> raise
@@ -110,7 +127,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 let htmlContentBuilder = getFileOrContent fileOrContent |> StringBuilder
 
                 bindVariables htmlContentBuilder
-                
+
                 let htmlContent = htmlContentBuilder.ToString()
 
                 failOnUnboundedVariables htmlContent
@@ -126,7 +143,7 @@ module ServiceCollectionExtensions =
     open Microsoft.Extensions.DependencyInjection
 
     type IServiceCollection with
-        
+
         /// Adds a lightweight HTML template compiler.
         member this.AddHtmlTemplate() =
             this.AddMemoryCache() |> ignore
