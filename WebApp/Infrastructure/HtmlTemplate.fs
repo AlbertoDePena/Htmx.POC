@@ -43,6 +43,18 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let mutable variables: Variables = Map.empty
 
+    let (|EncodedValue|_|) (value: obj) =
+        let isString = value.GetType() = typeof<String>
+
+        let valueToString = value.ToString()
+
+        let isNonHtml = valueToString.StartsWith("<") |> not
+
+        if isString && isNonHtml then
+            valueToString |> WebUtility.HtmlEncode :> obj |> Some
+        else
+            None
+
     let isFile (fileOrContent: FileOrContent) = fileOrContent.EndsWith(".html")
 
     let getFileOrContent (fileOrContent: FileOrContent) =
@@ -86,36 +98,38 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 sprintf "Found unbounded variables in the HTML content: %s" unbounded
                 |> failwith
 
-    let bindVariable (name: VariableName) (value: VariableValue) (encode: bool) =
+    let buildVariables (name: VariableName) (value: VariableValue) (encode: bool) =
         if String.IsNullOrWhiteSpace name then
-            HtmlTemplateException "The variable name cannot be null/empty" |> raise
+            failwith "The variable name cannot be null/empty"
 
         if isNull value then
-            HtmlTemplateException "The variable value cannot be null" |> raise
+            failwith "The variable value cannot be null"
 
-        let isString = value.GetType() = typeof<String>
-
-        let valueToString = value.ToString()
-
-        let isNonHtml = valueToString.StartsWith("<") |> not
-
-        let encodedValue =
-            if encode && isString && isNonHtml then
-                valueToString |> WebUtility.HtmlEncode :> obj
+        let sanitizedValue =
+            if encode then
+                match value with
+                | EncodedValue encodedValue -> encodedValue
+                | _ -> value
             else
                 value
 
-        variables <- variables |> Map.add name encodedValue
+        variables <- variables |> Map.add name sanitizedValue
 
     interface IHtmlTemplate with
 
-        member this.Bind(name: VariableName, value: VariableValue) =            
-            bindVariable name value true
-            this
+        member this.Bind(name: VariableName, value: VariableValue) =
+            try
+                buildVariables name value true
+                this
+            with ex ->
+                HtmlTemplateException ex |> raise
 
         member this.BindRaw(name: VariableName, value: VariableValue) =
-            bindVariable name value false
-            this
+            try
+                buildVariables name value false
+                this
+            with ex ->
+                HtmlTemplateException ex |> raise
 
         member this.Join(items: HtmlContent list) =
             try
