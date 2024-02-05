@@ -33,7 +33,7 @@ type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract Bind: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
-    abstract EncodeBind: VariableName * VariableValue -> IHtmlTemplate
+    abstract BindRaw: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Join: HtmlContent list -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
@@ -93,22 +93,28 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         if isNull value then
             HtmlTemplateException "The variable value cannot be null" |> raise
 
+        let isString = value.GetType() = typeof<String>
+
+        let valueToString = value.ToString()
+
+        let isNonHtml = valueToString.StartsWith("<") |> not
+
         let encodedValue =
-            if encode then
-                value.ToString() |> WebUtility.HtmlEncode
+            if encode && isString && isNonHtml then
+                valueToString |> WebUtility.HtmlEncode :> obj
             else
-                value.ToString()
+                value
 
         variables <- variables |> Map.add name encodedValue
 
     interface IHtmlTemplate with
 
         member this.Bind(name: VariableName, value: VariableValue) =            
-            bindVariable name value false
+            bindVariable name value true
             this
 
-        member this.EncodeBind(name: VariableName, value: VariableValue) =
-            bindVariable name value true
+        member this.BindRaw(name: VariableName, value: VariableValue) =
+            bindVariable name value false
             this
 
         member this.Join(items: HtmlContent list) =
