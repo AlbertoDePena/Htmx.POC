@@ -23,7 +23,7 @@ type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate
     member this.Index() =
         let htmlContent =
             htmlTemplate
-                .GenerateAntiforgeryToken("AntiforgeryToken", this.HttpContext)
+                .GenerateAntiforgery("Antiforgery", this.HttpContext)
                 .Render("demo.html")
 
         this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)

@@ -38,7 +38,7 @@ type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract BindRaw: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
-    abstract GenerateAntiforgeryToken: VariableName * HttpContext -> IHtmlTemplate
+    abstract GenerateAntiforgery: VariableName * HttpContext -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Join: HtmlContent list -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
@@ -136,7 +136,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
             with ex ->
                 HtmlTemplateException ex |> raise
 
-        member this.GenerateAntiforgeryToken(name: VariableName, httpContext: HttpContext) =
+        member this.GenerateAntiforgery(name: VariableName, httpContext: HttpContext) =
             try
                 let token = antiforgery.GetAndStoreTokens(httpContext)
                 let fragment = $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
