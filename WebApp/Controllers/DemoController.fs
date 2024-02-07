@@ -21,7 +21,12 @@ type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate
     let random = Random()
 
     member this.Index() =
-        this.HtmlContent(userName = "Alberto De Pena", mainContent = "demo.html")
+        let htmlContent =
+            htmlTemplate
+                .GenerateAntiforgeryToken("AntiforgeryToken", this.HttpContext)
+                .Render("demo.html")
+
+        this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
 
     member this.Random() =
         task {
@@ -31,6 +36,15 @@ type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate
                 let randomNumber = random.NextDouble()
 
                 return this.HtmlContent(randomNumber.ToString())
+            else
+                return this.Index()
+        }
+
+    member this.Save() =
+        task {
+            if this.Request.IsHtmx() then
+
+                return this.HtmlContent("Saved!")
             else
                 return this.Index()
         }

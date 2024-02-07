@@ -17,6 +17,15 @@
         <p>This is a test</p>
     </div>
 
+    <div class="box">
+        <form hx-post="/Demo/Save">
+            ${AntiforgeryToken}
+            <input class="input" placeholder="Enter some text" type="text"/>
+            <hr />
+            <button class="button" type="submit">Save</button>
+        </form>
+    </div>
+
     <div class="loader-container">
         <div class="loader"></div>
     </div>

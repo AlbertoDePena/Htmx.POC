@@ -7,6 +7,8 @@ open Microsoft.Identity.Web
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authorization
+open Microsoft.AspNetCore.Mvc
+open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc.Authorization
 open Microsoft.AspNetCore.CookiePolicy
 open Microsoft.ApplicationInsights
@@ -59,9 +61,12 @@ module Program =
                     .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     .AddMicrosoftIdentityWebApp(fun options -> builder.Configuration.Bind("AzureAd", options))
 
-                builder.Services.AddControllers(fun options ->
+                builder.Services.AddAntiforgery()
+
+                builder.Services.AddControllersWithViews(fun options ->
                     let policy = AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()
-                    options.Filters.Add(AuthorizeFilter(policy)))
+                    options.Filters.Add(AuthorizeFilter(policy))
+                    options.Filters.Add(AutoValidateAntiforgeryTokenAttribute()))
 
                 builder.Services
                     .AddApplicationInsightsTelemetry()

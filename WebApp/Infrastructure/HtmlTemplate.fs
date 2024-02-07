@@ -3,9 +3,12 @@
 open System
 open System.IO
 open System.Net
+open System.Threading.Tasks
 open System.Text
 open System.Text.RegularExpressions
 
+open Microsoft.AspNetCore.Antiforgery
+open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Caching.Memory
@@ -35,11 +38,13 @@ type IHtmlTemplate =
     /// <exception cref="HtmlTemplateException">The variable name or value is null/empty</exception>
     abstract BindRaw: VariableName * VariableValue -> IHtmlTemplate
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
+    abstract GenerateAntiforgeryToken: VariableName * HttpContext -> IHtmlTemplate
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Join: HtmlContent list -> HtmlContent
     /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     abstract Render: FileOrContent -> HtmlContent
-
-type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
+    
+type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
 
     let mutable variables: Variables = Map.empty
 
@@ -131,6 +136,16 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             with ex ->
                 HtmlTemplateException ex |> raise
 
+        member this.GenerateAntiforgeryToken(name: VariableName, httpContext: HttpContext) =
+            try
+                let token = antiforgery.GetAndStoreTokens(httpContext)
+                let fragment = $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
+
+                buildVariables name fragment false
+                this
+            with ex ->
+                HtmlTemplateException ex |> raise
+
         member this.Join(items: HtmlContent list) =
             try
                 let htmlContentBuilder = StringBuilder()
@@ -157,7 +172,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
                 htmlContent
             with ex ->
                 HtmlTemplateException ex |> raise
-
+        
 [<AutoOpen>]
 module ServiceCollectionExtensions =
     open Microsoft.Extensions.DependencyInjection

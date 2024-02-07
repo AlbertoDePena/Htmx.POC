@@ -32,6 +32,7 @@ module Serilog =
         loggerConfig.MinimumLevel
             .Is(defaultLogLevel)
             .MinimumLevel.Override("Azure.Messaging.ServiceBus", infrastructureLogLevel)
+            .MinimumLevel.Override("Microsoft", infrastructureLogLevel)
             .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLogLevel)
             .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLogLevel)
             .Enrich.WithMachineName()
