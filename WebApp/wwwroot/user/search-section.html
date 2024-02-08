@@ -10,14 +10,15 @@
     <div class="box">
         <div class="columns">
             <div class="column">
-                <form id="UserSearchForm" class="columns"
+                <form id="UserSearchForm" class="columns" hx-boost="true"
                       hx-trigger="load"
-                      hx-get="/Users/Search">
+                      hx-post="/Users/Search">
+                    ${Antiforgery}
                     <div class="column">
                         <div class="control">
-                            <input class="input " name="search"
+                            <input class="input " name="search" type="text"
                                    hx-trigger="keyup changed delay:500ms, search"
-                                   hx-get="/Users/Search"
+                                   hx-post="/Users/Search"
                                    hx-include="#UserSearchForm"
                                    hx-vals='{"page": "1"}'
                                    placeholder="Begin typing to search users...">
@@ -26,7 +27,7 @@
                     <div class="column is-narrow">
                         <div class="is-flex is-align-items-center">
                             <input id="ActiveOnly" name="active-only" type="checkbox" value="true"
-                                   hx-get="/Users/Search"
+                                   hx-post="/Users/Search"
                                    hx-include="#UserSearchForm"
                                    hx-vals='{"page": "1"}'
                                    class="is-clickable ml-2">

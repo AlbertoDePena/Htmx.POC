@@ -7,14 +7,14 @@
 
                     <div class="is-flex is-justify-content-right">
                         <button class="button " type="button" ${PreviousButtonDisabled}
-                                hx-get="/Users/Search"
+                                hx-post="/Users/Search"
                                 hx-include="#UserSearchForm"
                                 hx-vals='{"page": "${PreviousPage}"}'>
                             <span class="material-icons ">navigate_before</span>
                             <span class="is-sr-only">Previous</span>
                         </button>
                         <button class="button  mx-1" type="button" ${NextButtonDisabled}
-                                hx-get="/Users/Search"
+                                hx-post="/Users/Search"
                                 hx-include="#UserSearchForm"
                                 hx-vals='{"page": "${NextPage}"}'>
                             <span class="material-icons ">navigate_next</span>

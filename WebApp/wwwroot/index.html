@@ -18,12 +18,7 @@
         <div class="navbar-brand">
             <a class="navbar-item" href="/">
                 <img title="Bulma Logo" src="https://bulma.io/images/bulma-logo.png">
-            </a>
-            <div class="navbar-item p-0">
-                <button id="SideNavbarBurger" aria-expanded="false" aria-label="menu" class="button is-white material-icons" data-target="SideNavbar" type="button">
-                    menu_open
-                </button>
-            </div>
+            </a>            
             <a id="NavbarBurger" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="MainNavbar">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -31,7 +26,16 @@
             </a>
         </div>
         <div id="MainNavbar" class="navbar-menu">
-            <div class="navbar-start"></div>
+            <div class="navbar-start">
+                <a class="navbar-item" href="/Demo">
+                    <span class="material-icons mr-2">home_work</span>
+                    <span>Demo</span>
+                </a>
+                <a class="navbar-item" href="/Users">
+                    <span class="material-icons mr-2">manage_accounts</span>
+                    <span>Users</span>
+                </a>
+            </div>
             <div class="navbar-end">
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a class="navbar-link  has-text-link has-text-weight-semibold">${UserName}</a>
@@ -43,30 +47,9 @@
                 </div>
             </div>
         </div>
-    </nav>
-    <!--aside-->
-    <aside id="SideNavbar" data-target="MainContent" class="menu has-background-white p-5 has-sidebar">
-        <p class="menu-label">Default</p>
-        <ul class="menu-list">
-            <li class="">
-                <a class="is-flex is-align-items-center" href="/Demo">
-                    <span class="material-icons mr-2">home_work</span>
-                    <span>Demo</span>
-                </a>
-            </li>
-        </ul>
-        <p class="menu-label">Administration</p>
-        <ul class="menu-list">
-            <li class="">
-                <a class="is-flex is-align-items-center" href="/Users">
-                    <span class="material-icons mr-2">manage_accounts</span>
-                    <span>Users</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
+    </nav> 
     <!--main-->
-    <main id="MainContent" class="p-5 has-sidebar">
+    <main id="MainContent" class="container-fluid p-5 has-sidebar">
         ${MainContent}
     </main>
     <!--footer-->

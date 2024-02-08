@@ -56,48 +56,6 @@ tbody tr td {
 }
 /* END - fixed table header */
 
-/* BEGIN - side navbar */
-button#SideNavbarBurger {
-    transition: rotate .2s ease-in-out;
-}
-
-button#SideNavbarBurger.is-sidebar-hidden {
-    rotate: 180deg
-}
-
-aside.has-sidebar,
-main.has-sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
-    transition: left .2s ease-in-out;
-}
-
-aside.has-sidebar {
-    left: 0;
-    border-right: 1px solid #fff;
-    min-width: 250px;
-}
-
-main.has-sidebar {
-    left: 250px;
-    right: 0;
-    overflow-y: auto;
-}
-
-aside.is-sidebar-hidden {
-    left: -250px !important;
-    transition: left .2s ease-in-out;
-}
-
-main.is-sidebar-hidden {
-    left: 0 !important;
-    transition: left .2s ease-in-out;
-}
-/* END side navbar */
-
 .loader-container {
     position: relative;
     top: 0;

@@ -17,19 +17,24 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
     inherit HtmxController(logger, htmlTemplate)
 
     member this.Index() =
-        this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/search-section.html")
+        let htmlContent =
+            htmlTemplate
+                .GenerateAntiforgery("Antiforgery", this.HttpContext)
+                .Render("user/search-section.html")
+
+        this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
 
     member this.Search() =
         task {
             if this.Request.IsHtmx() then
                 let query =
-                    { SearchCriteria = this.Request.GetQueryStringValue QueryName.Search |> Option.bind Text.OfString
+                    { SearchCriteria = this.Request.GetFormValue QueryName.Search |> Option.bind Text.OfString
                       ActiveOnly =
-                        this.Request.GetQueryStringValue QueryName.ActiveOnly
+                        this.Request.GetFormValue QueryName.ActiveOnly
                         |> Option.bind (bool.TryParse >> Option.ofPair)
                         |> Option.defaultValue false
                       Page =
-                        this.Request.GetQueryStringValue QueryName.Page
+                        this.Request.GetFormValue QueryName.Page
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
                         |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
