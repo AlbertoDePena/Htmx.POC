@@ -11,16 +11,17 @@ open WebApp.Domain.User
 open WebApp.Domain.Shared
 open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.HtmlMarkup
 
-type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
-    inherit HtmxController(logger, htmlTemplate)
+type UsersController(logger: ILogger<UsersController>, htmlMarkup: IHtmlMarkup, userDatabase: IUserDatabase) =
+    inherit HtmxController(logger, htmlMarkup)
 
     member this.Index() =
         let htmlContent =
-            htmlTemplate
-                .GenerateAntiforgery("Antiforgery", this.HttpContext)
-                .Render("user/search-section.html")
+            htmlMarkup
+                .Load("user/search-section.html")
+                .UseAntiforgery("Antiforgery", this.HttpContext)
+                .Render()
 
         this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
 
@@ -52,16 +53,17 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
 
                     let isActiveClass = if user.IsActive then "tag is-success" else "tag"
 
-                    htmlTemplate
+                    htmlMarkup
+                        .Load("user/search-table-row.html")
                         .Bind("DisplayName", user.DisplayName)
                         .Bind("EmailAddress", user.EmailAddress)
                         .Bind("TypeNameClass", typeNameClass)
                         .Bind("TypeName", user.UserTypeName)
                         .Bind("IsActiveClass", isActiveClass)
                         .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-                        .Render("user/search-table-row.html")
+                        .Render()
 
-                let searchResults = pagedData.Data |> List.map toHtmlContent |> htmlTemplate.Join
+                let searchResults = pagedData.Data |> List.map toHtmlContent |> htmlMarkup.Join
 
                 let searchResultSummary =
                     sprintf
@@ -79,14 +81,15 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: IHtmlTempla
                         "disabled"
 
                 let tableContent =
-                    htmlTemplate
+                    htmlMarkup
+                        .Load("user/search-table.html")
                         .Bind("SearchResults", searchResults)
                         .Bind("SearchResultSummary", searchResultSummary)
                         .Bind("PreviousButtonDisabled", previousButtonDisabled)
                         .Bind("PreviousPage", pagedData.Page - 1)
                         .Bind("NextButtonDisabled", nextButtonDisabled)
                         .Bind("NextPage", pagedData.Page + 1)
-                        .Render("user/search-table.html")
+                        .Render()
 
                 return this.HtmlContent tableContent
             else

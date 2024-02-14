@@ -13,18 +13,19 @@ open WebApp.Domain.Shared
 open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.HtmlMarkup
 
-type DemoController(logger: ILogger<DemoController>, htmlTemplate: IHtmlTemplate) =
-    inherit HtmxController(logger, htmlTemplate)
+type DemoController(logger: ILogger<DemoController>, htmlMarkup: IHtmlMarkup) =
+    inherit HtmxController(logger, htmlMarkup)
 
     let random = Random()
 
     member this.Index() =
         let htmlContent =
-            htmlTemplate
-                .GenerateAntiforgery("Antiforgery", this.HttpContext)
-                .Render("demo.html")
+            htmlMarkup
+                .Load("demo.html")
+                .UseAntiforgery("Antiforgery", this.HttpContext)
+                .Render()
 
         this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
 

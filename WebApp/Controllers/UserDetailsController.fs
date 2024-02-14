@@ -11,10 +11,10 @@ open WebApp.Domain.User
 open WebApp.Domain.Shared
 open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.HtmlMarkup
 
-type UserDetailsController(logger: ILogger<UserDetailsController>, htmlTemplate: IHtmlTemplate, userDatabase: IUserDatabase) =
-    inherit HtmxController(logger, htmlTemplate)
+type UserDetailsController(logger: ILogger<UserDetailsController>, htmlMarkup: IHtmlMarkup, userDatabase: IUserDatabase) =
+    inherit HtmxController(logger, htmlMarkup)
 
     member this.Index() =
         this.HtmlContent(userName = "Alberto De Pena", mainContent = "user/details-section.html")
