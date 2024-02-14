@@ -24,7 +24,7 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: IHtmlMarkup) =
         let htmlContent =
             htmlMarkup
                 .Load("demo.html")
-                .UseAntiforgery("Antiforgery", this.HttpContext)
+                .BindAntiforgery("Antiforgery", this.HttpContext)
                 .Render()
 
         this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)

@@ -3,7 +3,6 @@
 open System
 open System.IO
 open System.Net
-open System.Threading.Tasks
 open System.Text
 open System.Text.RegularExpressions
 
@@ -35,12 +34,12 @@ type HtmlMarkupException(ex: Exception) =
 type IHtmlMarkup =
     /// <exception cref="HtmlMarkupException">The variable name or value is null/empty</exception>
     abstract Bind: Variable * Value -> IHtmlMarkup
+    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    abstract BindAntiforgery: Variable * HttpContext -> IHtmlMarkup
     /// <exception cref="HtmlMarkupException">The variable name or value is null/empty</exception>
     abstract BindRaw: Variable * Value -> IHtmlMarkup
     /// <exception cref="HtmlMarkupException">The file or content is null/empty</exception>
-    abstract Load: FileOrContent -> IHtmlMarkup
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
-    abstract UseAntiforgery: Variable * HttpContext -> IHtmlMarkup
+    abstract Load: FileOrContent -> IHtmlMarkup    
     /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
     abstract Join: CompiledHtml list -> CompiledHtml
     /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
@@ -134,6 +133,18 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
             with ex ->
                 HtmlMarkupException ex |> raise
 
+        member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : IHtmlMarkup =
+            try
+                let token = antiforgery.GetAndStoreTokens(httpContext)
+
+                let fragment =
+                    $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
+
+                buildVariables name fragment false
+                this
+            with ex ->
+                HtmlMarkupException ex |> raise
+
         member this.BindRaw(name: Variable, value: Value) : IHtmlMarkup =
             try
                 buildVariables name value false
@@ -144,18 +155,6 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
         member this.Load(fileOrContent: FileOrContent) : IHtmlMarkup =
             try
                 loadFileOrContent fileOrContent |> compiledHtmlBuilder.Append |> ignore
-                this
-            with ex ->
-                HtmlMarkupException ex |> raise
-
-        member this.UseAntiforgery(name: Variable, httpContext: HttpContext) : IHtmlMarkup =
-            try
-                let token = antiforgery.GetAndStoreTokens(httpContext)
-
-                let fragment =
-                    $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
-
-                buildVariables name fragment false
                 this
             with ex ->
                 HtmlMarkupException ex |> raise

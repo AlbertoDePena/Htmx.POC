@@ -20,7 +20,7 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: IHtmlMarkup, 
         let htmlContent =
             htmlMarkup
                 .Load("user/search-section.html")
-                .UseAntiforgery("Antiforgery", this.HttpContext)
+                .BindAntiforgery("Antiforgery", this.HttpContext)
                 .Render()
 
         this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
