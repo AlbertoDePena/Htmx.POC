@@ -6,7 +6,7 @@ open Microsoft.Extensions.Logging
 open WebApp.Infrastructure.HtmlMarkup
 
 [<AbstractClass>]
-type HtmxController(logger: ILogger, htmlMarkup: IHtmlMarkup) =
+type HtmxController(logger: ILogger, htmlMarkup: HtmlMarkup) =
     inherit Controller()
 
     [<Literal>]
@@ -17,10 +17,9 @@ type HtmxController(logger: ILogger, htmlMarkup: IHtmlMarkup) =
 
     member this.HtmlContent(userName: string, mainContent: string) : IActionResult =
         let content =
-            htmlMarkup
-                .Load("index.html")
-                .Bind("UserName", userName)
-                .Bind("MainContent", mainContent)
-                .Render()
+            htmlMarkup.Render(
+                "index.html",
+                fun binder -> binder.Bind("UserName", userName).Bind("MainContent", mainContent)
+            )
 
         this.HtmlContent content

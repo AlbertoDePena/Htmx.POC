@@ -15,17 +15,17 @@ open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlMarkup
 
-type DemoController(logger: ILogger<DemoController>, htmlMarkup: IHtmlMarkup) =
+type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
     inherit HtmxController(logger, htmlMarkup)
 
     let random = Random()
 
     member this.Index() =
         let htmlContent =
-            htmlMarkup
-                .Load("demo.html")
-                .BindAntiforgery("Antiforgery", this.HttpContext)
-                .Render()
+            htmlMarkup.Render(
+                "demo.html",
+                fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
+            )
 
         this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
 

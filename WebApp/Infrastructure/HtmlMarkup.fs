@@ -22,7 +22,7 @@ type Variable = string
 type Value = obj
 
 /// The key/value pairs to fill the template variables with.
-type Variables = Map<Variable, Value>
+type Bindings = Map<Variable, Value>
 
 /// The compiled HTML as a string.
 type CompiledHtml = string
@@ -31,45 +31,14 @@ type HtmlMarkupException(ex: Exception) =
     inherit Exception(ex.Message, ex)
     new(message: string) = HtmlMarkupException(Exception message)
 
-type IHtmlMarkup =
-    /// <exception cref="HtmlMarkupException">The variable name or value is null/empty</exception>
-    abstract Bind: Variable * Value -> IHtmlMarkup
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
-    abstract BindAntiforgery: Variable * HttpContext -> IHtmlMarkup
-    /// <exception cref="HtmlMarkupException">The variable name or value is null/empty</exception>
-    abstract BindRaw: Variable * Value -> IHtmlMarkup
-    /// <exception cref="HtmlMarkupException">The file or content is null/empty</exception>
-    abstract Load: FileOrContent -> IHtmlMarkup    
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
-    abstract Join: CompiledHtml list -> CompiledHtml
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
-    abstract Render: unit -> CompiledHtml
+[<RequireQualifiedAccess>]
+module internal HtmlContentLoader =
 
-type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
-
-    let mutable variables: Variables = Map.empty
-
-    let compiledHtmlBuilder: StringBuilder = StringBuilder()
-
-    let isFile (fileOrContent: FileOrContent) = fileOrContent.EndsWith(".html")
-
-    let isNonHtml (value: string) = value.StartsWith("<") |> not
-
-    let (|EncodedValue|_|) (value: obj) =
-        let isString = value.GetType() = typeof<String>
-
-        let valueToString = value.ToString()
-
-        if isString && isNonHtml valueToString then
-            valueToString |> WebUtility.HtmlEncode :> obj |> Some
-        else
-            None
-
-    let loadFileOrContent (fileOrContent: FileOrContent) =
+    let loadFileOrContent (environment: IWebHostEnvironment) (cache: IMemoryCache) (fileOrContent: FileOrContent) =
         if isNull fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
-        if isFile fileOrContent then
+        if fileOrContent.EndsWith(".html") then
             let filePath = Path.Combine(environment.WebRootPath, fileOrContent)
 
             if environment.IsDevelopment() then
@@ -84,30 +53,23 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
         else
             fileOrContent
 
-    let bindVariables () =
-        variables
-        |> Map.iter (fun name value ->
-            let pattern = sprintf "${%s}" name
-            let valueToString = value.ToString() |> loadFileOrContent
-            compiledHtmlBuilder.Replace(pattern, valueToString) |> ignore)
+type HtmlBindingCollection(antiforgery: IAntiforgery) =
 
-    let failOnUnboundedVariables () =
-        if environment.IsDevelopment() then
-            let compiledHtml = compiledHtmlBuilder.ToString()
+    let mutable bindings: Bindings = Map.empty
 
-            let unboundedVariables =
-                Regex.Matches(compiledHtml, @"\${\b\w+\b}")
-                |> Seq.collect (fun match' ->
-                    match'.Groups
-                    |> Seq.map (fun group -> group.Value))
+    let (|EncodedValue|_|) (value: Value) : Value option =
+        let isString = value.GetType() = typeof<String>
 
-            let unbounded = String.Join(", ", unboundedVariables)
+        let valueToString = value.ToString()
 
-            if String.IsNullOrWhiteSpace unbounded |> not then
-                sprintf "Found unbounded variables in the HTML content: %s" unbounded
-                |> failwith
+        let isNonHtml = valueToString.StartsWith("<") |> not
 
-    let buildVariables (name: Variable) (value: Value) (encode: bool) =
+        if isString && isNonHtml then
+            valueToString |> WebUtility.HtmlEncode :> obj |> Some
+        else
+            None
+
+    let bindVariables (name: Variable) (value: Value) (encode: bool) : unit =
         if String.IsNullOrWhiteSpace name then
             failwith "The variable cannot be null/empty"
 
@@ -122,67 +84,160 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
             else
                 value
 
-        variables <- variables |> Map.add name sanitizedValue
+        bindings <- bindings |> Map.add name sanitizedValue
 
-    interface IHtmlMarkup with
+    /// <exception cref="HtmlMarkupException"></exception>
+    member this.Bind(name: Variable, value: Value) : HtmlBindingCollection =
+        try
+            bindVariables name value true
+            this
+        with ex ->
+            HtmlMarkupException ex |> raise
 
-        member this.Bind(name: Variable, value: Value) : IHtmlMarkup =
-            try
-                buildVariables name value true
-                this
-            with ex ->
-                HtmlMarkupException ex |> raise
+    /// <exception cref="HtmlMarkupException"></exception>
+    member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : HtmlBindingCollection =
+        try
+            let token = antiforgery.GetAndStoreTokens(httpContext)
 
-        member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : IHtmlMarkup =
-            try
-                let token = antiforgery.GetAndStoreTokens(httpContext)
+            let fragment =
+                $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
 
-                let fragment =
-                    $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
+            bindVariables name fragment false
+            this
+        with ex ->
+            HtmlMarkupException ex |> raise
 
-                buildVariables name fragment false
-                this
-            with ex ->
-                HtmlMarkupException ex |> raise
+    /// <exception cref="HtmlMarkupException"></exception>
+    member this.BindRaw(name: Variable, value: Value) : HtmlBindingCollection =
+        try
+            bindVariables name value false
+            this
+        with ex ->
+            HtmlMarkupException ex |> raise
 
-        member this.BindRaw(name: Variable, value: Value) : IHtmlMarkup =
-            try
-                buildVariables name value false
-                this
-            with ex ->
-                HtmlMarkupException ex |> raise
+    member this.GetBindings() : Bindings = bindings
 
-        member this.Load(fileOrContent: FileOrContent) : IHtmlMarkup =
-            try
-                loadFileOrContent fileOrContent |> compiledHtmlBuilder.Append |> ignore
-                this
-            with ex ->
-                HtmlMarkupException ex |> raise
+    member this.Clear() : unit = bindings <- Map.empty
 
-        member this.Join(items: CompiledHtml list) =
-            try
-                let htmlContentBuilder = StringBuilder()
+type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
-                for item in items do
-                    htmlContentBuilder.AppendLine(item) |> ignore
+    let stringBuilder = StringBuilder()
 
-                htmlContentBuilder.ToString()
-            with ex ->
-                HtmlMarkupException ex |> raise
+    member this.LoadContent(fileOrContent: FileOrContent) : unit =
+        try
+            HtmlContentLoader.loadFileOrContent environment cache fileOrContent
+            |> stringBuilder.Append
+            |> ignore
+        with ex ->
+            HtmlMarkupException ex |> raise
 
-        member this.Render() : CompiledHtml =
-            try
-                bindVariables ()
-                failOnUnboundedVariables ()
+    member this.GetBuilder() : StringBuilder = stringBuilder
 
-                let compiledHtml = compiledHtmlBuilder.ToString()
+    member this.Clear() : unit = stringBuilder.Clear() |> ignore
 
-                variables <- Map.empty
-                compiledHtmlBuilder.Clear() |> ignore
+type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
 
-                compiledHtml
-            with ex ->
-                HtmlMarkupException ex |> raise
+    let bindVariables (stringBuilder: StringBuilder) (bindings: Bindings) =
+        bindings
+        |> Map.iter (fun name value ->
+            let pattern = sprintf "${%s}" name
+            let valueToString = value.ToString()
+            let content = HtmlContentLoader.loadFileOrContent environment cache valueToString
+            stringBuilder.Replace(pattern, content) |> ignore)
+
+    let failOnUnboundedVariables (stringBuilder: StringBuilder) =
+        if environment.IsDevelopment() then
+            let unboundedVariables =
+                Regex.Matches(stringBuilder.ToString(), @"\${\b\w+\b}")
+                |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
+
+            let unbounded = String.Join(", ", unboundedVariables)
+
+            if String.IsNullOrWhiteSpace unbounded |> not then
+                sprintf "Found unbounded variables in the HTML content: %s" unbounded
+                |> failwith
+
+    let render (htmlBuilder: HtmlBuilder) (bindingCollection: HtmlBindingCollection) =
+        let bindings = bindingCollection.GetBindings()
+        let builder = htmlBuilder.GetBuilder()
+
+        bindVariables builder bindings
+        failOnUnboundedVariables builder
+
+        let compiledHtml = builder.ToString()
+
+        bindingCollection.Clear()
+        htmlBuilder.Clear()
+
+        compiledHtml
+
+    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    member this.Render
+        (
+            fileOrContent: FileOrContent,
+            mapper: HtmlBindingCollection -> HtmlBindingCollection
+        ) : CompiledHtml =
+        try
+            let compiledHtml =
+                let htmlBuilder = HtmlBuilder(environment, cache)
+                let bindingCollection = HtmlBindingCollection(antiforgery)
+
+                htmlBuilder.LoadContent fileOrContent
+
+                let bindingCollection = mapper bindingCollection
+
+                render htmlBuilder bindingCollection
+
+            compiledHtml
+        with ex ->
+            HtmlMarkupException ex |> raise
+
+    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    member this.Render
+        (
+            fileOrContent: FileOrContent,
+            items: 'T list,
+            mapper: HtmlBindingCollection -> 'T -> HtmlBindingCollection
+        ) : CompiledHtml =
+        try
+            let compiledHtmls =
+                items
+                |> List.map (fun item ->
+                    let htmlBuilder = HtmlBuilder(environment, cache)
+                    let bindingCollection = HtmlBindingCollection(antiforgery)
+
+                    htmlBuilder.LoadContent fileOrContent
+
+                    let bindingCollection = mapper bindingCollection item
+
+                    render htmlBuilder bindingCollection)
+                |> List.toArray
+
+            String.Join("\n", compiledHtmls)
+        with ex ->
+            HtmlMarkupException ex |> raise
+
+    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    member this.Render
+        (
+            fileOrContent: FileOrContent,
+            item: 'T,
+            mapper: HtmlBindingCollection -> 'T -> HtmlBindingCollection
+        ) : CompiledHtml =
+        try
+            let compiledHtml =
+                let htmlBuilder = HtmlBuilder(environment, cache)
+                let bindingCollection = HtmlBindingCollection(antiforgery)
+
+                htmlBuilder.LoadContent fileOrContent
+
+                let bindingCollection = mapper bindingCollection item
+
+                render htmlBuilder bindingCollection
+
+            compiledHtml
+        with ex ->
+            HtmlMarkupException ex |> raise
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =
@@ -193,4 +248,4 @@ module ServiceCollectionExtensions =
         /// Adds a lightweight HTML markup compiler.
         member this.AddHtmlMarkup() =
             this.AddMemoryCache() |> ignore
-            this.AddTransient<IHtmlMarkup, HtmlMarkup>()
+            this.AddTransient<HtmlMarkup>()

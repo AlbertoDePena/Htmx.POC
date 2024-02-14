@@ -13,7 +13,7 @@ open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlMarkup
 
-type UserDetailsController(logger: ILogger<UserDetailsController>, htmlMarkup: IHtmlMarkup, userDatabase: IUserDatabase) =
+type UserDetailsController(logger: ILogger<UserDetailsController>, htmlMarkup: HtmlMarkup, userDatabase: IUserDatabase) =
     inherit HtmxController(logger, htmlMarkup)
 
     member this.Index() =
