@@ -175,6 +175,24 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
     /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
     member this.Render
         (
+            fileOrContent: FileOrContent
+        ) : CompiledHtml =
+        try
+            let compiledHtml =
+                let htmlBuilder = HtmlBuilder(environment, cache)
+                let bindingCollection = HtmlBindingCollection(antiforgery)
+
+                htmlBuilder.LoadContent fileOrContent
+
+                render htmlBuilder bindingCollection
+
+            compiledHtml
+        with ex ->
+            HtmlMarkupException ex |> raise
+
+    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    member this.Render
+        (
             fileOrContent: FileOrContent,
             mapper: HtmlBindingCollection -> HtmlBindingCollection
         ) : CompiledHtml =
