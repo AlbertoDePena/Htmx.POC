@@ -145,10 +145,10 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
             let content = HtmlContentLoader.loadFileOrContent environment cache valueToString
             stringBuilder.Replace(pattern, content) |> ignore)
 
-    let failOnUnboundedVariables (stringBuilder: StringBuilder) =
+    let failOnUnboundedVariables (compiledHtml: string) =
         if environment.IsDevelopment() then
             let unboundedVariables =
-                Regex.Matches(stringBuilder.ToString(), @"\${\b\w+\b}")
+                Regex.Matches(compiledHtml, @"\${\b\w+\b}")
                 |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
 
             let unbounded = String.Join(", ", unboundedVariables)
@@ -158,13 +158,14 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
                 |> failwith
 
     let render (htmlBuilder: HtmlBuilder) (bindingCollection: HtmlBindingCollection) =
-        let bindings = bindingCollection.GetBindings()
         let builder = htmlBuilder.GetBuilder()
-
+        let bindings = bindingCollection.GetBindings()
+        
         bindVariables builder bindings
-        failOnUnboundedVariables builder
 
         let compiledHtml = builder.ToString()
+
+        failOnUnboundedVariables compiledHtml
 
         bindingCollection.Clear()
         htmlBuilder.Clear()
