@@ -10,6 +10,7 @@
 	<ItemGroup>
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
+		<Compile Include="Infrastructure\DotEnv.fs" />
 		<Compile Include="Infrastructure\Constants.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
 		<Compile Include="Infrastructure\Options.fs" />

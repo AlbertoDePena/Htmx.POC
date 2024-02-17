@@ -12,6 +12,7 @@ bin
 .fake
 .ionide
 .idea
+.env
 
 *.fs.js
 

@@ -6,16 +6,7 @@
       "applicationUrl": "http://localhost:5030",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
-        "Database:ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;",
-        "Application:DefaultLogLevel": "Information",
-        "Application:InfrastructureLogLevel": "Information",
-        "AzureAd:Instance": "https://login.microsoftonline.com/",
-        "AzureAd:Domain": "<domain>.onmicrosoft.com",
-        "AzureAd:TenantId": "af342764-6948-48de-8256-8d615f26c275",
-        "AzureAd:ClientId": "317c3302-0e3a-406e-a985-84f67ccaeca9",
-        "AzureAd:CallbackPath": "/signin-oidc",
-        "AzureAd:SignedOutCallbackPath": "/signout-callback-oidc"
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": ""
       }
     },
     "WebApplicationWatch": {
@@ -28,16 +19,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
-        "Database:ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;",
-        "Application:DefaultLogLevel": "Information",
-        "Application:InfrastructureLogLevel": "Information",
-        "AzureAd:Instance": "https://login.microsoftonline.com/",
-        "AzureAd:Domain": "<domain>.onmicrosoft.com",
-        "AzureAd:TenantId": "af342764-6948-48de-8256-8d615f26c275",
-        "AzureAd:ClientId": "317c3302-0e3a-406e-a985-84f67ccaeca9",
-        "AzureAd:CallbackPath": "/signin-oidc",
-        "AzureAd:SignedOutCallbackPath": "/signout-callback-oidc"
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": ""
       }
     }
   }
