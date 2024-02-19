@@ -45,7 +45,7 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
 
                 let! pagedData = userDatabase.GetPagedData query
 
-                let toHtmlMarkup (binder: HtmlBindingCollection) (user: User) =
+                let toHtmlMarkup (binder: HtmlBindingCollection, user: User) =
                     let typeNameClass =
                         match user.UserTypeName with
                         | UserType.Customer -> "tag is-light is-info"

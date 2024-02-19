@@ -216,7 +216,7 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
         (
             fileOrContent: FileOrContent,
             items: 'T list,
-            mapper: HtmlBindingCollection -> 'T -> HtmlBindingCollection
+            mapper: HtmlBindingCollection * 'T -> HtmlBindingCollection
         ) : CompiledHtml =
         try
             let compiledHtmls =
@@ -227,7 +227,7 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
 
                     htmlBuilder.LoadContent fileOrContent
 
-                    let bindingCollection = mapper bindingCollection item
+                    let bindingCollection = mapper (bindingCollection, item)
 
                     render htmlBuilder bindingCollection)
                 |> List.toArray
@@ -241,7 +241,7 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
         (
             fileOrContent: FileOrContent,
             item: 'T,
-            mapper: HtmlBindingCollection -> 'T -> HtmlBindingCollection
+            mapper: HtmlBindingCollection * 'T -> HtmlBindingCollection
         ) : CompiledHtml =
         try
             let compiledHtml =
@@ -250,7 +250,7 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
 
                 htmlBuilder.LoadContent fileOrContent
 
-                let bindingCollection = mapper bindingCollection item
+                let bindingCollection = mapper (bindingCollection, item)
 
                 render htmlBuilder bindingCollection
 
