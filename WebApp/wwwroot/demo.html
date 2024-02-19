@@ -3,7 +3,7 @@
         Random Number Generator
     </h3>
 
-    <button class="button is-primary block" type="button" hx-get="/Demo/Random">
+    <button class="button is-small is-primary block" type="button" hx-get="/Demo/Random">
         Get
         Random
         Number
@@ -20,9 +20,9 @@
     <div class="box">
         <form hx-post="/Demo/Save">
             ${Antiforgery}
-            <input class="input" placeholder="Enter some text" type="text" />
+            <input class="input is-small" placeholder="Enter some text" type="text" />
             <hr />
-            <button class="button" type="submit">Save</button>
+            <button class="button is-small" type="submit">Save</button>
         </form>
     </div>
 

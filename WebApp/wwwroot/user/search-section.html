@@ -1,6 +1,6 @@
 <section hx-target="#UserSearchTable" hx-swap="outerHTML" hx-push-url="true" hx-indicator=".loader-container">
     <div class="box">
-        <nav class="breadcrumb" aria-label="breadcrumbs">
+        <nav class="breadcrumb is-small" aria-label="breadcrumbs">
             <ul>
                 <li><a href="#">Dashboard</a></li>
                 <li class="is-active"><a href="#" aria-current="page">Users</a></li>
@@ -16,7 +16,7 @@
                     ${Antiforgery}
                     <div class="column">
                         <div class="control">
-                            <input class="input " name="search" type="text"
+                            <input class="input is-small" name="search" type="text"
                                    hx-trigger="keyup changed delay:500ms, search"
                                    hx-post="/Users/Search"
                                    hx-include="#UserSearchForm"
@@ -30,7 +30,7 @@
                                    hx-post="/Users/Search"
                                    hx-include="#UserSearchForm"
                                    hx-vals='{"page": "1"}'
-                                   class="is-clickable ml-2">
+                                   class="is-clickable ml-2 is-small">
                             <label class="is-clickable mx-2 has-text-weight-semibold"
                                    for="ActiveOnly">Active Only</label>
                         </div>
