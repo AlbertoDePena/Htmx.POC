@@ -61,7 +61,21 @@
     </footer>
     <!--scripts-->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="../js/index.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeClass = 'is-active';
+            const navbarBurger = document.getElementById('NavbarBurger');
+
+            if (navbarBurger) {
+                navbarBurger.addEventListener('click', () => {
+                    const mainNavbar = document.getElementById(navbarBurger.dataset.target);
+
+                    navbarBurger.classList.toggle(activeClass);
+                    mainNavbar.classList.toggle(activeClass);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

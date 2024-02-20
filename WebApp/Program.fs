@@ -67,8 +67,12 @@ module Program =
                 builder.Services.AddAntiforgery()
 
                 builder.Services.AddControllersWithViews(fun options ->
-                    let policy = AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()
-                    options.Filters.Add(AuthorizeFilter(policy))
+                    options.Filters.Add(ResponseCacheAttribute(NoStore = true, Location = ResponseCacheLocation.None))
+
+                    options.Filters.Add(
+                        AuthorizeFilter(AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build())
+                    )
+
                     options.Filters.Add(AutoValidateAntiforgeryTokenAttribute()))
 
                 builder.Services
