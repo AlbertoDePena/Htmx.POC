@@ -236,28 +236,6 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
         with ex ->
             HtmlMarkupException ex |> raise
 
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
-    member this.Render
-        (
-            fileOrContent: FileOrContent,
-            item: 'T,
-            mapper: HtmlBindingCollection * 'T -> HtmlBindingCollection
-        ) : CompiledHtml =
-        try
-            let compiledHtml =
-                let htmlBuilder = HtmlBuilder(environment, cache)
-                let bindingCollection = HtmlBindingCollection(antiforgery)
-
-                htmlBuilder.LoadContent fileOrContent
-
-                let bindingCollection = mapper (bindingCollection, item)
-
-                render htmlBuilder bindingCollection
-
-            compiledHtml
-        with ex ->
-            HtmlMarkupException ex |> raise
-
 [<AutoOpen>]
 module ServiceCollectionExtensions =
     open Microsoft.Extensions.DependencyInjection

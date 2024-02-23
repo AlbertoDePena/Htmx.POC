@@ -45,24 +45,26 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
 
                 let! pagedData = userDatabase.GetPagedData query
 
-                let toHtmlMarkup (binder: HtmlBindingCollection, user: User) =
-                    let typeNameClass =
-                        match user.UserTypeName with
-                        | UserType.Customer -> "tag is-light is-info"
-                        | UserType.Employee -> "tag is-light is-success"
-
-                    let isActiveClass = if user.IsActive then "tag is-success" else "tag"
-
-                    binder
-                        .Bind("DisplayName", user.DisplayName)
-                        .Bind("EmailAddress", user.EmailAddress)
-                        .Bind("TypeNameClass", typeNameClass)
-                        .Bind("TypeName", user.UserTypeName)
-                        .Bind("IsActiveClass", isActiveClass)
-                        .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
-
                 let searchResults =
-                    htmlMarkup.Render("user/search-table-row.html", pagedData.Data, toHtmlMarkup)
+                    htmlMarkup.Render(
+                        "user/search-table-row.html",
+                        pagedData.Data,
+                        fun (binder, user) ->
+                            let typeNameClass =
+                                match user.UserTypeName with
+                                | UserType.Customer -> "tag is-light is-info"
+                                | UserType.Employee -> "tag is-light is-success"
+
+                            let isActiveClass = if user.IsActive then "tag is-success" else "tag"
+
+                            binder
+                                .Bind("DisplayName", user.DisplayName)
+                                .Bind("EmailAddress", user.EmailAddress)
+                                .Bind("TypeNameClass", typeNameClass)
+                                .Bind("TypeName", user.UserTypeName)
+                                .Bind("IsActiveClass", isActiveClass)
+                                .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
+                    )
 
                 let searchResultSummary =
                     sprintf
@@ -80,14 +82,17 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
                         "disabled"
 
                 let tableContent =
-                    htmlMarkup.Render("user/search-table.html", fun binder ->
-                        binder
-                            .Bind("SearchResults", searchResults)
-                            .Bind("SearchResultSummary", searchResultSummary)
-                            .Bind("PreviousButtonDisabled", previousButtonDisabled)
-                            .Bind("PreviousPage", pagedData.Page - 1)
-                            .Bind("NextButtonDisabled", nextButtonDisabled)
-                            .Bind("NextPage", pagedData.Page + 1))
+                    htmlMarkup.Render(
+                        "user/search-table.html",
+                        fun binder ->
+                            binder
+                                .Bind("SearchResults", searchResults)
+                                .Bind("SearchResultSummary", searchResultSummary)
+                                .Bind("PreviousButtonDisabled", previousButtonDisabled)
+                                .Bind("PreviousPage", pagedData.Page - 1)
+                                .Bind("NextButtonDisabled", nextButtonDisabled)
+                                .Bind("NextPage", pagedData.Page + 1)
+                    )
 
                 return this.HtmlContent tableContent
             else

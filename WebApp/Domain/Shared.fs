@@ -34,22 +34,40 @@ type EmailAddress =
         else
             None
 
-/// Represents a non null/empty string
+/// <summary>
+/// Represents a non null/empty/white-space string
+/// </summary>
 type Text =
     private
     | Text of string
 
+    /// <summary>Unwrap the Text to it's primitive value</summary>
     member this.Value =
         let (Text value) = this
         value
+    
+    /// <summary>Apply a function to  the Text's primitive value</summary>
+    member this.Apply (f: string -> 'a) =
+        this.Value |> f
 
     override this.ToString() = this.Value
 
+    /// <summary>The Text's default value is the empty string</summary>
+    static member DefaultValue = Text System.String.Empty
+
+    /// <summary>Try to convert a potentially null/empty/white-space string to a Text</summary>
     static member OfString(value: string) =
-        if System.String.IsNullOrEmpty value then
+        if System.String.IsNullOrWhiteSpace value then
             None
         else
             Some(Text value)
+
+    /// <summary>Return the Text's primitive value when Some Text otherwise return null when None</summary>
+    static member ValueOrNull(textOption: Text option) =        
+        match textOption with
+        | None -> String.defaultValue
+        | Some text when System.String.IsNullOrWhiteSpace text.Value -> String.defaultValue
+        | Some text -> text.Value
 
 [<RequireQualifiedAccess>]
 type SortDirection =
