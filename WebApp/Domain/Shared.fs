@@ -10,12 +10,12 @@ module Alias =
     type UniqueId = Guid
 
 [<RequireQualifiedAccess>]
-module String =
+module internal String =
 
     /// The default value of a string is null.
     let defaultValue = null
 
-/// Represents a non null/empty email address
+/// Represents a non null/empty/white-space email address
 type EmailAddress =
     private
     | EmailAddress of string
@@ -27,12 +27,18 @@ type EmailAddress =
     override this.ToString() = this.Value
 
     static member OfString(value: string) =
-        if System.String.IsNullOrEmpty value then
+        if System.String.IsNullOrWhiteSpace value then
             None
         elif System.Text.RegularExpressions.Regex.IsMatch(value, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$") then
             Some(EmailAddress(value.ToLower()))
         else
             None
+
+    static member ValueOrNull(valueOption: string option) =        
+        match valueOption with
+        | None -> String.defaultValue
+        | Some value when System.String.IsNullOrWhiteSpace value -> String.defaultValue
+        | Some value -> value
 
 /// <summary>
 /// Represents a non null/empty/white-space string
