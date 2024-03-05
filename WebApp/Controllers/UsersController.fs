@@ -4,7 +4,6 @@ open System
 
 open FsToolkit.ErrorHandling
 
-open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
 open WebApp.Domain.User
@@ -37,7 +36,7 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
                       Page =
                         this.Request.GetFormValue QueryName.Page
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
-                        |> Option.filter (fun page -> page > 0)
+                        |> Option.filter ((>) 0)
                         |> Option.defaultValue 1
                       PageSize = 20
                       SortBy = None
@@ -57,13 +56,15 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
 
                             let isActiveClass = if user.IsActive then "tag is-success" else "tag"
 
+                            let isActiveText = if user.IsActive then "Yes" else "No"
+
                             binder
                                 .Bind("DisplayName", user.DisplayName)
                                 .Bind("EmailAddress", user.EmailAddress)
                                 .Bind("TypeNameClass", typeNameClass)
                                 .Bind("TypeName", user.UserTypeName)
                                 .Bind("IsActiveClass", isActiveClass)
-                                .Bind("IsActive", (if user.IsActive then "Yes" else "No"))
+                                .Bind("IsActive", isActiveText)
                     )
 
                 let searchResultSummary =
