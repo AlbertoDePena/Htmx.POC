@@ -1,4 +1,4 @@
-# Htmx POC
+# HTMX POC
 
 ## Environment Variables
 
@@ -7,6 +7,7 @@
 
 ```
 Database:ConnectionString ""
+
 Application:DefaultLogLevel "Warning"
 Application:InfrastructureLogLevel "Warning"
 
