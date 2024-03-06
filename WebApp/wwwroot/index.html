@@ -15,14 +15,14 @@
     <link rel="icon shortcut" href="../favicon.ico" type="image/x-icon" />
 </head>
 
-<body class="has-navbar-fixed-top has-footer-fixed-bottom has-background-white-ter" hx-boost="true">
+<body class="has-navbar-fixed-top has-footer-fixed-bottom has-background-white-ter" hx-boost="true" hx-target="#MainContent">
     <!--navbar-->
     <nav class="navbar is-fixed-top is-white is-size-7" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="/">
                 <img title="Bulma Logo" src="https://bulma.io/images/bulma-logo.png">
             </a>            
-            <a id="NavbarBurger" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="MainNavbar">
+            <a id="NavbarBurger" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="#MainNavbar">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -30,7 +30,7 @@
         </div>
         <div id="MainNavbar" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="/Demo">
+                <a class="navbar-item" href="/Demo/MainContent">
                     Demo
                 </a>
                 <a class="navbar-item" href="/Users">

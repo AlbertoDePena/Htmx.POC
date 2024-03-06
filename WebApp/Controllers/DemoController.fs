@@ -20,16 +20,29 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
 
     let random = Random()
 
+    [<HttpGet>]
     member this.Index() =
         let currentUserName = this.HttpContext.User.Identity.Name
 
         let htmlContent =
-            htmlMarkup.Render(
-                "demo.html",
-                fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
-            )
+            htmlMarkup.Render("demo.html", (fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)))
 
         this.HtmlContent(userName = currentUserName, mainContent = htmlContent)
+
+    [<HttpGet>]
+    member this.MainContent() =
+        task {
+            if this.Request.IsHtmxBoosted() then
+                let htmlContent =
+                    htmlMarkup.Render(
+                        "demo.html",
+                        fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
+                    )
+
+                return this.HtmlContent(htmlContent)
+            else
+                return this.Index()
+        }
 
     member this.Random() =
         task {
