@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Expires" content="0" />
-    <meta http-equiv="Pragma" content="no-cache" />    
+    <meta http-equiv="Pragma" content="no-cache" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="htmx-config" content='{"historyEnabled":"false"}'>
     <title>HTMX POC</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
@@ -15,17 +16,14 @@
     <link rel="icon shortcut" href="../favicon.ico" type="image/x-icon" />
 </head>
 
-<body class="has-navbar-fixed-top has-footer-fixed-bottom has-background-white-ter" 
-      hx-boost="true" 
-      hx-target="#MainContent"
-      hx-swap="innerHTML">
+<body class="has-navbar-fixed-top has-footer-fixed-bottom has-background-white-ter">
     <!--navbar-->
     <nav class="navbar is-fixed-top is-white is-size-7" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="/">
                 <img title="Bulma Logo" src="https://bulma.io/images/bulma-logo.png">
             </a>            
-            <a id="NavbarBurger" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="#MainNavbar">
+            <a id="NavbarBurger" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="MainNavbar">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -33,10 +31,10 @@
         </div>
         <div id="MainNavbar" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="/Demo/MainContent">
+                <a class="navbar-item" href="/Demo">
                     Demo
                 </a>
-                <a class="navbar-item" href="/Users/MainContent">
+                <a class="navbar-item" href="/Users">
                     Users
                 </a>
             </div>
@@ -68,12 +66,14 @@
             var navbarBurger = document.getElementById('NavbarBurger');
 
             if (navbarBurger) {
-                navbarBurger.addEventListener('click', () => {
-                    var mainNavbar = document.getElementById(navbarBurger.dataset.target);
+                var mainNavbar = document.getElementById(navbarBurger.dataset.target);
 
-                    navbarBurger.classList.toggle(activeClass);
-                    mainNavbar.classList.toggle(activeClass);
-                });
+                if (mainNavbar) {
+                    navbarBurger.addEventListener('click', () => {                 
+                        navbarBurger.classList.toggle(activeClass);
+                        mainNavbar.classList.toggle(activeClass);
+                    });
+                }                
             }
         });
     </script>

@@ -25,7 +25,6 @@
 		<Compile Include="Controllers\HtmxController.fs" />
 		<Compile Include="Controllers\HealthController.fs" />
 		<Compile Include="Controllers\UsersController.fs" />
-		<Compile Include="Controllers\UserDetailsController.fs" />
 		<Compile Include="Controllers/DemoController.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
