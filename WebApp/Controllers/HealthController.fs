@@ -11,6 +11,7 @@ open Microsoft.AspNetCore.Http
 type HealthController(logger: ILogger<HealthController>, healthCheck: HealthCheckService) =
     inherit Controller()
 
+    [<HttpGet>]
     member this.Index() =
         task {
             let! healthReport = healthCheck.CheckHealthAsync()
@@ -25,6 +26,7 @@ type HealthController(logger: ILogger<HealthController>, healthCheck: HealthChec
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error")
         }
 
+    [<HttpGet>]
     member this.Report() =
         task {
             let! healthReport = healthCheck.CheckHealthAsync()
