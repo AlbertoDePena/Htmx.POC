@@ -36,8 +36,8 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
         task {
             if this.Request.IsHtmx() then
                 let getValue =
-                    if this.Request.Method = "GET" then this.Request.GetQueryStringValue
-                    elif this.Request.Method = "POST" then this.Request.GetFormValue
+                    if this.Request.Method = "GET" then this.Request.TryGetQueryStringValue
+                    elif this.Request.Method = "POST" then this.Request.TryGetFormValue
                     else failwith "Unsupported HTTP method"
 
                 let query =

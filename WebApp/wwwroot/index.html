@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HTMX POC</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
@@ -31,12 +31,10 @@
         <div id="MainNavbar" class="navbar-menu">
             <div class="navbar-start">
                 <a class="navbar-item" href="/Demo">
-                    <span class="material-icons mr-2">home_work</span>
-                    <span>Demo</span>
+                    Demo
                 </a>
                 <a class="navbar-item" href="/Users">
-                    <span class="material-icons mr-2">manage_accounts</span>
-                    <span>Users</span>
+                    Users
                 </a>
             </div>
             <div class="navbar-end">
@@ -62,13 +60,13 @@
     <!--scripts-->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeClass = 'is-active';
-            const navbarBurger = document.getElementById('NavbarBurger');
+        document.addEventListener('DOMContentLoaded', function() {
+            var activeClass = 'is-active';
+            var navbarBurger = document.getElementById('NavbarBurger');
 
             if (navbarBurger) {
                 navbarBurger.addEventListener('click', () => {
-                    const mainNavbar = document.getElementById(navbarBurger.dataset.target);
+                    var mainNavbar = document.getElementById(navbarBurger.dataset.target);
 
                     navbarBurger.classList.toggle(activeClass);
                     mainNavbar.classList.toggle(activeClass);

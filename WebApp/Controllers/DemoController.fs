@@ -21,13 +21,15 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
     let random = Random()
 
     member this.Index() =
+        let currentUserName = this.HttpContext.User.Identity.Name
+
         let htmlContent =
             htmlMarkup.Render(
                 "demo.html",
                 fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
             )
 
-        this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
+        this.HtmlContent(userName = currentUserName, mainContent = htmlContent)
 
     member this.Random() =
         task {

@@ -30,7 +30,7 @@ module SqlDataReaderExtensions =
             }
 
         /// Map the first record available in the result set
-        member this.ReadFirstAsync<'T>(mapper: SqlDataReader -> 'T) : Task<'T option> =
+        member this.TryReadFirstAsync<'T>(mapper: SqlDataReader -> 'T) : Task<'T option> =
             task {
                 let! hasMoreItems = this.ReadAsync()
 
@@ -42,7 +42,7 @@ module SqlDataReaderExtensions =
         /// <summary>
         /// Tries to get the column's value.
         /// </summary>
-        member this.GetString(columnName: string) : string option =
+        member this.TryGetString(columnName: string) : string option =
             let ordinal = this.GetOrdinal(columnName)
 
             match this.IsDBNull ordinal with
