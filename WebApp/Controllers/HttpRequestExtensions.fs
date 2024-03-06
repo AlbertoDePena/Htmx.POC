@@ -25,7 +25,12 @@ module HttpRequestExtensions =
             |> Option.filter (fun value -> value.Contains("Bearer "))
             |> Option.map (fun value -> value.Substring("Bearer ".Length).Trim())
 
-        /// Determines if the current HTTP Request was invoked by Htmx on the client.
+        /// Determines if the current HTTP Request was invoked by HTMX on the client.
         member this.IsHtmx() =
             this.GetHeaderValue "HX-Request"
+            |> Option.exists (String.IsNullOrWhiteSpace >> not)
+
+        /// Determines if the current HTTP Request was invoked by HTMX on the client with the "boosted" attribute.
+        member this.IsHtmxBoosted() =
+            this.GetHeaderValue "HX-Boosted"
             |> Option.exists (String.IsNullOrWhiteSpace >> not)
