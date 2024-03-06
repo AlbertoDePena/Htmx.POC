@@ -4,6 +4,8 @@ open System
 
 open FsToolkit.ErrorHandling
 
+open Microsoft.AspNetCore.Http
+open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
 open WebApp.Domain.User
@@ -15,28 +17,39 @@ open WebApp.Infrastructure.HtmlMarkup
 type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, userDatabase: IUserDatabase) =
     inherit HtmxController(logger, htmlMarkup)
 
+    [<HttpGet>]
     member this.Index() =
+        let currentUserName = this.HttpContext.User.Identity.Name
+
         let htmlContent =
             htmlMarkup.Render(
                 "user/search-section.html",
                 fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
             )
 
-        this.HtmlContent(userName = "Alberto De Pena", mainContent = htmlContent)
+        this.HtmlContent(userName = currentUserName, mainContent = htmlContent)
 
-    member this.Search() =
+    [<HttpGet>]
+    [<HttpPost>]
+    [<ActionName("Search")>]
+    member this.RenderPagedData() =
         task {
             if this.Request.IsHtmx() then
+                let getValue =
+                    if this.Request.Method = "GET" then this.Request.GetQueryStringValue
+                    elif this.Request.Method = "POST" then this.Request.GetFormValue
+                    else failwith "Unsupported HTTP method"
+
                 let query =
-                    { SearchCriteria = this.Request.GetFormValue QueryName.Search |> Option.bind Text.OfString
+                    { SearchCriteria = getValue QueryName.Search |> Option.bind Text.OfString
                       ActiveOnly =
-                        this.Request.GetFormValue QueryName.ActiveOnly
+                        getValue QueryName.ActiveOnly
                         |> Option.bind (bool.TryParse >> Option.ofPair)
                         |> Option.defaultValue false
                       Page =
-                        this.Request.GetFormValue QueryName.Page
+                        getValue QueryName.Page
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
-                        |> Option.filter ((>) 0)
+                        |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
                       PageSize = 20
                       SortBy = None
