@@ -44,6 +44,7 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
                 return this.Index()
         }
 
+    [<HttpGet>]
     member this.Random() =
         task {
             if this.Request.IsHtmx() then
@@ -56,6 +57,7 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
                 return this.Index()
         }
 
+    [<HttpPost>]
     member this.Save() =
         task {
             if this.Request.IsHtmx() then

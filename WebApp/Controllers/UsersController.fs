@@ -30,6 +30,21 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
         this.HtmlContent(userName = currentUserName, mainContent = htmlContent)
 
     [<HttpGet>]
+    member this.MainContent() =
+        task {
+            if this.Request.IsHtmxBoosted() then
+                let htmlContent =
+                    htmlMarkup.Render(
+                        "user/search-section.html",
+                        fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
+                    )
+
+                return this.HtmlContent(htmlContent)
+            else
+                return this.Index()
+        }
+
+    [<HttpGet>]
     [<HttpPost>]
     [<ActionName("Search")>]
     member this.RenderPagedData() =
