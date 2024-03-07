@@ -2,7 +2,7 @@
 
 ## Environment Variables
 
-* Use `:` in `launchSettings.json`
+* Use `:` in `dotnet user-secrets`
 * Use `--` in Azure key vault
 
 ```
