@@ -20,7 +20,6 @@ open Microsoft.Extensions.Configuration
 
 open Serilog
 
-open WebApp.Infrastructure.DotEnv
 open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlMarkup
@@ -43,8 +42,6 @@ module Program =
     let main args =
         try
             try
-                DotEnv.init()
-
                 let builder = WebApplication.CreateBuilder(args)
 
                 builder.Services.AddSqlDatabase()

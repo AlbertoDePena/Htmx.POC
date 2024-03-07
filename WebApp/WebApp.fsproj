@@ -5,13 +5,13 @@
 		<WarnOn>3395;$(WarnOn)</WarnOn>
 		<WarningLevel>5</WarningLevel>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
+	  	<UserSecretsId>580fff13-0798-466c-a310-4fab0231b143</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<None Include=".env" />
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
-		<Compile Include="Infrastructure\DotEnv.fs" />
 		<Compile Include="Infrastructure\Constants.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
 		<Compile Include="Infrastructure\Options.fs" />
