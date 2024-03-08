@@ -1,6 +1,7 @@
 ﻿namespace WebApp.Controllers
 
 open System
+open System.Threading.Tasks
 
 open FsToolkit.ErrorHandling
 
@@ -18,42 +19,33 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
     inherit HtmxController(logger, htmlMarkup)
 
     [<HttpGet>]
-    member this.Index() =
-        let currentUserName = this.HttpContext.User.Identity.Name
-
-        let htmlContent =
-            htmlMarkup.Render(
-                "user/search-section.html",
-                fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
-            )
-
-        this.HtmlContent(userName = currentUserName, mainContent = htmlContent)
-
-    [<HttpGet>]
-    member this.MainContent() =
+    member this.Index() : Task<IActionResult> =
         task {
-            if this.Request.IsHtmxBoosted() then
-                let htmlContent =
-                    htmlMarkup.Render(
-                        "user/search-section.html",
-                        fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
-                    )
+            let htmlContent =
+                htmlMarkup.Render(
+                    "user/search-section.html",
+                    fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
+                )
 
+            if this.Request.IsHtmxBoosted() then
                 return this.HtmlContent(htmlContent)
             else
-                return this.Index()
+                return this.HtmlContent(userName = this.HttpContext.User.Identity.Name, mainContent = htmlContent)
         }
 
     [<HttpGet>]
     [<HttpPost>]
     [<ActionName("Search")>]
-    member this.RenderPagedData() =
+    member this.RenderPagedData() : Task<IActionResult> =
         task {
             if this.Request.IsHtmx() then
                 let getValue =
-                    if this.Request.Method = "GET" then this.Request.TryGetQueryStringValue
-                    elif this.Request.Method = "POST" then this.Request.TryGetFormValue
-                    else failwith "Unsupported HTTP method"
+                    if this.Request.Method = "GET" then
+                        this.Request.TryGetQueryStringValue
+                    elif this.Request.Method = "POST" then
+                        this.Request.TryGetFormValue
+                    else
+                        failwith "Unsupported HTTP method"
 
                 let query =
                     { SearchCriteria = getValue QueryName.Search |> Option.bind Text.OfString
@@ -125,5 +117,5 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
 
                 return this.HtmlContent tableContent
             else
-                return this.Index()
+                return! this.Index()
         }

@@ -21,31 +21,19 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
     let random = Random()
 
     [<HttpGet>]
-    member this.Index() =
-        let currentUserName = this.HttpContext.User.Identity.Name
-
-        let htmlContent =
-            htmlMarkup.Render("demo.html", (fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)))
-
-        this.HtmlContent(userName = currentUserName, mainContent = htmlContent)
-
-    [<HttpGet>]
-    member this.MainContent() =
+    member this.Index() : Task<IActionResult> =
         task {
-            if this.Request.IsHtmxBoosted() then
-                let htmlContent =
-                    htmlMarkup.Render(
-                        "demo.html",
-                        fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
-                    )
+            let htmlContent =
+                htmlMarkup.Render("demo.html", (fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)))
 
+            if this.Request.IsHtmxBoosted() then
                 return this.HtmlContent(htmlContent)
             else
-                return this.Index()
+                return this.HtmlContent(userName = this.HttpContext.User.Identity.Name, mainContent = htmlContent)
         }
 
     [<HttpGet>]
-    member this.Random() =
+    member this.Random() : Task<IActionResult> =
         task {
             if this.Request.IsHtmx() then
                 do! Task.Delay(3000)
@@ -54,15 +42,14 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
 
                 return this.HtmlContent(randomNumber.ToString())
             else
-                return this.Index()
+                return! this.Index()
         }
 
     [<HttpPost>]
-    member this.Save() =
+    member this.Save() : Task<IActionResult> =
         task {
             if this.Request.IsHtmx() then
-
                 return this.HtmlContent("Saved!")
             else
-                return this.Index()
+                return! this.Index()
         }
