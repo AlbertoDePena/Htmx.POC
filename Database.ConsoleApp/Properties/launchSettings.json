@@ -1,10 +1,7 @@
 {
   "profiles": {
     "Database.ConsoleApp": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "DB_CONNECTION_STRING": "Server=(LocalDb)\\MSSQLLocalDB;Initial Catalog=HtmxDatabaseAlt;Trusted_Connection=True;"
-      }
+      "commandName": "Project"
     }
   }
 }

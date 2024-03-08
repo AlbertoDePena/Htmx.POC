@@ -6,7 +6,8 @@
 		<WarnOn>3395;$(WarnOn)</WarnOn>
 		<WarningLevel>5</WarningLevel>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
+	    <UserSecretsId>425baa1a-6d4b-40e1-8104-f0d5ea0758d7</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<Content Include="Properties\launchSettings.json" />
@@ -14,6 +15,8 @@
 	
 	<ItemGroup>
 		<PackageReference Include="dbup-sqlserver" Version="5.0.40" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

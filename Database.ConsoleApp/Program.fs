@@ -2,6 +2,7 @@
 
 open System
 open System.Reflection
+open Microsoft.Extensions.Configuration
 open DbUp
 open DbUp.Helpers
 
@@ -10,6 +11,8 @@ type Directory =
     | Migration
     | StoredProcedures
     | Views
+
+type Application() = class end
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -40,9 +43,11 @@ module Program =
             raise result.Error
 
     [<EntryPoint>]
-    let main _ =
-        let dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+    let main _ =        
+        let configuration = ConfigurationBuilder().AddUserSecrets<Application>().Build()
 
+        let dbConnectionString = configuration["Database:ConnectionString"]
+        
         if String.IsNullOrWhiteSpace(dbConnectionString) then
             failwith "Database connection string is required"
         else
