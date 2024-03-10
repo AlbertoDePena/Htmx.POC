@@ -123,6 +123,7 @@ type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let stringBuilder = StringBuilder()
 
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.LoadContent(fileOrContent: FileOrContent) : unit =
         try
             HtmlContentLoader.loadFileOrContent environment cache fileOrContent
@@ -172,7 +173,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
 
         htmlContent
 
-    /// <exception cref="HtmlTemplateException">HTML template rendering error</exception>
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.Render
         (
             fileOrContent: FileOrContent
@@ -190,7 +191,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
         with ex ->
             HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlTemplateException">HTML template rendering error</exception>
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.Render
         (
             fileOrContent: FileOrContent,
@@ -211,7 +212,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
         with ex ->
             HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlTemplateException">HTML template rendering error</exception>
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.Render
         (
             fileOrContent: FileOrContent,
