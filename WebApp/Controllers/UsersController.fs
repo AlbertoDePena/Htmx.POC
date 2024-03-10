@@ -13,16 +13,16 @@ open WebApp.Domain.User
 open WebApp.Domain.Shared
 open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlMarkup
+open WebApp.Infrastructure.HtmlTemplate
 
-type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, userDatabase: IUserDatabase) =
-    inherit HtmxController(logger, htmlMarkup)
+type UsersController(logger: ILogger<UsersController>, htmlTemplate: HtmlTemplate, userDatabase: IUserDatabase) =
+    inherit HtmxController(logger, htmlTemplate)
 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
             let htmlContent =
-                htmlMarkup.Render(
+                htmlTemplate.Render(
                     "user/search-section.html",
                     fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
                 )
@@ -65,7 +65,7 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
                 let! pagedData = userDatabase.GetPagedData query
 
                 let searchResults =
-                    htmlMarkup.Render(
+                    htmlTemplate.Render(
                         "user/search-table-row.html",
                         pagedData.Data,
                         fun (binder, user) ->
@@ -103,7 +103,7 @@ type UsersController(logger: ILogger<UsersController>, htmlMarkup: HtmlMarkup, u
                         "disabled"
 
                 let tableContent =
-                    htmlMarkup.Render(
+                    htmlTemplate.Render(
                         "user/search-table.html",
                         fun binder ->
                             binder

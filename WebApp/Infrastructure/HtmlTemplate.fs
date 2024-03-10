@@ -1,4 +1,4 @@
-﻿namespace WebApp.Infrastructure.HtmlMarkup
+﻿namespace WebApp.Infrastructure.HtmlTemplate
 
 open System
 open System.IO
@@ -27,12 +27,12 @@ type Bindings = Map<Variable, Value>
 /// The compiled HTML as a string.
 type CompiledHtml = string
 
-type HtmlMarkupException(ex: Exception) =
+type HtmlTemplateException(ex: Exception) =
     inherit Exception(ex.Message, ex)
-    new(message: string) = HtmlMarkupException(Exception message)
+    new(message: string) = HtmlTemplateException(Exception message)
 
 [<RequireQualifiedAccess>]
-module internal HtmlContentLoader =
+module private HtmlContentLoader =
 
     let loadFileOrContent (environment: IWebHostEnvironment) (cache: IMemoryCache) (fileOrContent: FileOrContent) =
         if isNull fileOrContent then
@@ -86,15 +86,15 @@ type HtmlBindingCollection(antiforgery: IAntiforgery) =
 
         bindings <- bindings |> Map.add name sanitizedValue
 
-    /// <exception cref="HtmlMarkupException"></exception>
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.Bind(name: Variable, value: Value) : HtmlBindingCollection =
         try
             bindVariables name value true
             this
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlMarkupException"></exception>
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : HtmlBindingCollection =
         try
             let token = antiforgery.GetAndStoreTokens(httpContext)
@@ -105,15 +105,15 @@ type HtmlBindingCollection(antiforgery: IAntiforgery) =
             bindVariables name fragment false
             this
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlMarkupException"></exception>
+    /// <exception cref="HtmlTemplateException"></exception>
     member this.BindRaw(name: Variable, value: Value) : HtmlBindingCollection =
         try
             bindVariables name value false
             this
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
     member this.GetBindings() : Bindings = bindings
 
@@ -129,13 +129,13 @@ type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
             |> stringBuilder.Append
             |> ignore
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
     member this.GetBuilder() : StringBuilder = stringBuilder
 
     member this.Clear() : unit = stringBuilder.Clear() |> ignore
 
-type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
+type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
 
     let bindVariables (stringBuilder: StringBuilder) (bindings: Bindings) =
         bindings
@@ -172,7 +172,7 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
 
         compiledHtml
 
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     member this.Render
         (
             fileOrContent: FileOrContent
@@ -188,9 +188,9 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
 
             compiledHtml
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     member this.Render
         (
             fileOrContent: FileOrContent,
@@ -209,9 +209,9 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
 
             compiledHtml
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlMarkupException">HTML markup compilation error</exception>
+    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
     member this.Render
         (
             fileOrContent: FileOrContent,
@@ -234,7 +234,7 @@ type HtmlMarkup(environment: IWebHostEnvironment, cache: IMemoryCache, antiforge
 
             String.Join("\n", compiledHtmls)
         with ex ->
-            HtmlMarkupException ex |> raise
+            HtmlTemplateException ex |> raise
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =
@@ -242,7 +242,7 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
 
-        /// Adds a lightweight HTML markup compiler.
-        member this.AddHtmlMarkup() =
+        /// Adds a lightweight HTML template compiler.
+        member this.AddHtmlTemplate() =
             this.AddMemoryCache() |> ignore
-            this.AddTransient<HtmlMarkup>()
+            this.AddTransient<HtmlTemplate>()

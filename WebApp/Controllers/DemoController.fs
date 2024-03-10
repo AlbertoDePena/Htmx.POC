@@ -13,10 +13,10 @@ open WebApp.Domain.Shared
 open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlMarkup
+open WebApp.Infrastructure.HtmlTemplate
 
-type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
-    inherit HtmxController(logger, htmlMarkup)
+type DemoController(logger: ILogger<DemoController>, htmlTemplate: HtmlTemplate) =
+    inherit HtmxController(logger, htmlTemplate)
 
     let random = Random()
 
@@ -24,7 +24,7 @@ type DemoController(logger: ILogger<DemoController>, htmlMarkup: HtmlMarkup) =
     member this.Index() : Task<IActionResult> =
         task {
             let htmlContent =
-                htmlMarkup.Render("demo.html", (fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)))
+                htmlTemplate.Render("demo.html", (fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)))
 
             if this.Request.IsHtmxBoosted() then
                 return this.HtmlContent(htmlContent)

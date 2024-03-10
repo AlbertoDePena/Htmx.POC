@@ -3,10 +3,10 @@
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApp.Infrastructure.HtmlMarkup
+open WebApp.Infrastructure.HtmlTemplate
 
 [<AbstractClass>]
-type HtmxController(logger: ILogger, htmlMarkup: HtmlMarkup) =
+type HtmxController(logger: ILogger, htmlTemplate: HtmlTemplate) =
     inherit Controller()
 
     [<Literal>]
@@ -17,7 +17,7 @@ type HtmxController(logger: ILogger, htmlMarkup: HtmlMarkup) =
 
     member this.HtmlContent(userName: string, mainContent: string) : IActionResult =
         let content =
-            htmlMarkup.Render(
+            htmlTemplate.Render(
                 "index.html",
                 fun binder -> binder.Bind("UserName", userName).Bind("MainContent", mainContent)
             )
