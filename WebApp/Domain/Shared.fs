@@ -1,16 +1,7 @@
 ﻿namespace WebApp.Domain.Shared
 
-[<AutoOpen>]
-module Alias =
-    open System
-
-    type BigNumber = Int64
-    type Money = Decimal
-    type Number = Int32
-    type UniqueId = Guid
-
 [<RequireQualifiedAccess>]
-module internal String =
+module String =
 
     /// The default value of a string is null.
     let defaultValue = null
@@ -52,7 +43,7 @@ type Text =
         let (Text value) = this
         value
     
-    /// <summary>Apply a function to  the Text's primitive value</summary>
+    /// <summary>Apply a function to the Text's primitive value</summary>
     member this.Apply (f: string -> 'a) =
         this.Value |> f
 
@@ -92,6 +83,15 @@ type SortDirection =
         | "Ascending" -> Some SortDirection.Ascending
         | "Descending" -> Some SortDirection.Descending
         | _ -> None
+
+[<AutoOpen>]
+module Alias =
+    open System
+
+    type BigNumber = Int64
+    type Money = Decimal
+    type Number = Int32
+    type UniqueId = Guid
 
 type Query =
     { SearchCriteria: Text option
