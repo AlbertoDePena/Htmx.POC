@@ -12,17 +12,17 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Caching.Memory
 
-/// Can be either a plain HTML string or a path to an HTML file.
+/// Can be either a plain HTML string or a path to a HTML file.
 type FileOrContent = string
 
-/// The HTML template defines variables with the following syntax: ${VariableName}.
-type Variable = string
+/// The HTML template defines binding names with the following syntax: ${BindingName}.
+type BindingName = string
 
-/// The content to fill the variable with. It can be either a primitive type or a HTML fragment.
-type Value = obj
+/// The content to replace the binding name with. It can be either a primitive type or a HTML fragment.
+type BindingValue = obj
 
-/// The key/value pairs to fill the template variables with.
-type BindingPairs = Map<Variable, Value>
+/// An alias for the binding name/binding value map.
+type BindingPairs = Map<BindingName, BindingValue>
 
 /// The HTML content as a string.
 type HtmlContent = string
@@ -57,60 +57,52 @@ type BindingCollection(antiforgery: IAntiforgery) =
 
     let mutable bindings: BindingPairs = Map.empty
 
-    let (|EncodedValue|_|) (value: Value) : Value option =
+    let buildBindings (name: BindingName) (value: BindingValue) (encode: bool) : unit =
+        if String.IsNullOrWhiteSpace name then
+            failwith "The binding name cannot be null/empty/white-space"
+
+        if isNull value then
+            failwith "The binding value cannot be null"
+
         let isString = value.GetType() = typeof<String>
 
         let valueToString = value.ToString()
 
-        let isNonHtml = valueToString.StartsWith("<") |> not
-
-        if isString && isNonHtml then
-            valueToString |> WebUtility.HtmlEncode :> obj |> Some
-        else
-            None
-
-    let bindVariables (name: Variable) (value: Value) (encode: bool) : unit =
-        if String.IsNullOrWhiteSpace name then
-            failwith "The variable cannot be null/empty"
-
-        if isNull value then
-            failwith "The value cannot be null"
+        let isHtml = valueToString.StartsWith("<")
 
         let sanitizedValue =
-            if encode then
-                match value with
-                | EncodedValue encodedValue -> encodedValue
-                | _ -> value
+            if encode && isString && (not isHtml) then
+                valueToString |> WebUtility.HtmlEncode :> obj
             else
                 value
 
         bindings <- bindings |> Map.add name sanitizedValue
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.Bind(name: Variable, value: Value) : BindingCollection =
+    member this.Bind(name: BindingName, value: BindingValue) : BindingCollection =
         try
-            bindVariables name value true
+            buildBindings name value true
             this
         with ex ->
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : BindingCollection =
+    member this.BindAntiforgery(name: BindingName, httpContext: HttpContext) : BindingCollection =
         try
             let token = antiforgery.GetAndStoreTokens(httpContext)
 
             let fragment =
                 $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
 
-            bindVariables name fragment false
+            buildBindings name fragment false
             this
         with ex ->
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindRaw(name: Variable, value: Value) : BindingCollection =
+    member this.BindRaw(name: BindingName, value: BindingValue) : BindingCollection =
         try
-            bindVariables name value false
+            buildBindings name value false
             this
         with ex ->
             HtmlTemplateException ex |> raise
