@@ -134,9 +134,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
         bindings
         |> Map.iter (fun name value ->
             let pattern = sprintf "${%s}" name
-            let valueToString = value.ToString()
-            let content = HtmlContentLoader.loadFileOrContent environment cache valueToString
-            stringBuilder.Replace(pattern, content) |> ignore)
+            stringBuilder.Replace(pattern, value.ToString()) |> ignore)
 
     let failOnUnboundedVariables (htmlContent: string) : unit =
         if environment.IsDevelopment() then
