@@ -15,17 +15,17 @@ open Microsoft.Extensions.Caching.Memory
 /// Can be either a plain HTML string or a path to an HTML file.
 type FileOrContent = string
 
-/// Variables are defined in the HTML template with the following syntax: ${VariableName}
+/// The HTML template defines variables with the following syntax: ${VariableName}.
 type Variable = string
 
 /// The content to fill the variable with. It can be either a primitive type or a HTML fragment.
 type Value = obj
 
 /// The key/value pairs to fill the template variables with.
-type Bindings = Map<Variable, Value>
+type BindingPairs = Map<Variable, Value>
 
-/// The compiled HTML as a string.
-type CompiledHtml = string
+/// The HTML content as a string.
+type HtmlContent = string
 
 type HtmlTemplateException(ex: Exception) =
     inherit Exception(ex.Message, ex)
@@ -53,9 +53,9 @@ module private HtmlContentLoader =
         else
             fileOrContent
 
-type HtmlBindingCollection(antiforgery: IAntiforgery) =
+type BindingCollection(antiforgery: IAntiforgery) =
 
-    let mutable bindings: Bindings = Map.empty
+    let mutable bindings: BindingPairs = Map.empty
 
     let (|EncodedValue|_|) (value: Value) : Value option =
         let isString = value.GetType() = typeof<String>
@@ -87,7 +87,7 @@ type HtmlBindingCollection(antiforgery: IAntiforgery) =
         bindings <- bindings |> Map.add name sanitizedValue
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.Bind(name: Variable, value: Value) : HtmlBindingCollection =
+    member this.Bind(name: Variable, value: Value) : BindingCollection =
         try
             bindVariables name value true
             this
@@ -95,7 +95,7 @@ type HtmlBindingCollection(antiforgery: IAntiforgery) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : HtmlBindingCollection =
+    member this.BindAntiforgery(name: Variable, httpContext: HttpContext) : BindingCollection =
         try
             let token = antiforgery.GetAndStoreTokens(httpContext)
 
@@ -108,14 +108,14 @@ type HtmlBindingCollection(antiforgery: IAntiforgery) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindRaw(name: Variable, value: Value) : HtmlBindingCollection =
+    member this.BindRaw(name: Variable, value: Value) : BindingCollection =
         try
             bindVariables name value false
             this
         with ex ->
             HtmlTemplateException ex |> raise
 
-    member this.GetBindings() : Bindings = bindings
+    member this.GetBindings() : BindingPairs = bindings
 
     member this.Clear() : unit = bindings <- Map.empty
 
@@ -137,7 +137,7 @@ type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
 type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
 
-    let bindVariables (stringBuilder: StringBuilder) (bindings: Bindings) =
+    let bindVariables (stringBuilder: StringBuilder) (bindings: BindingPairs) : unit =
         bindings
         |> Map.iter (fun name value ->
             let pattern = sprintf "${%s}" name
@@ -145,61 +145,61 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
             let content = HtmlContentLoader.loadFileOrContent environment cache valueToString
             stringBuilder.Replace(pattern, content) |> ignore)
 
-    let failOnUnboundedVariables (compiledHtml: string) =
+    let failOnUnboundedVariables (htmlContent: string) : unit =
         if environment.IsDevelopment() then
             let unboundedVariables =
-                Regex.Matches(compiledHtml, @"\${\b\w+\b}")
+                Regex.Matches(htmlContent, @"\${\b\w+\b}")
                 |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
 
             let unbounded = String.Join(", ", unboundedVariables)
 
             if String.IsNullOrWhiteSpace unbounded |> not then
-                sprintf "Found unbounded variables in the HTML content: %s" unbounded
+                sprintf "The HTML content has unbounded variables: %s" unbounded
                 |> failwith
 
-    let render (htmlBuilder: HtmlBuilder) (bindingCollection: HtmlBindingCollection) =
+    let render (htmlBuilder: HtmlBuilder) (bindingCollection: BindingCollection) : HtmlContent =
         let builder = htmlBuilder.GetBuilder()
         let bindings = bindingCollection.GetBindings()
         
         bindVariables builder bindings
 
-        let compiledHtml = builder.ToString()
+        let htmlContent = builder.ToString()
 
-        failOnUnboundedVariables compiledHtml
+        failOnUnboundedVariables htmlContent
 
         bindingCollection.Clear()
         htmlBuilder.Clear()
 
-        compiledHtml
+        htmlContent
 
-    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
+    /// <exception cref="HtmlTemplateException">HTML template rendering error</exception>
     member this.Render
         (
             fileOrContent: FileOrContent
-        ) : CompiledHtml =
+        ) : HtmlContent =
         try
-            let compiledHtml =
+            let htmlContent =
                 let htmlBuilder = HtmlBuilder(environment, cache)
-                let bindingCollection = HtmlBindingCollection(antiforgery)
+                let bindingCollection = BindingCollection(antiforgery)
 
                 htmlBuilder.LoadContent fileOrContent
 
                 render htmlBuilder bindingCollection
 
-            compiledHtml
+            htmlContent
         with ex ->
             HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
+    /// <exception cref="HtmlTemplateException">HTML template rendering error</exception>
     member this.Render
         (
             fileOrContent: FileOrContent,
-            mapper: HtmlBindingCollection -> HtmlBindingCollection
-        ) : CompiledHtml =
+            mapper: BindingCollection -> BindingCollection
+        ) : HtmlContent =
         try
-            let compiledHtml =
+            let htmlContent =
                 let htmlBuilder = HtmlBuilder(environment, cache)
-                let bindingCollection = HtmlBindingCollection(antiforgery)
+                let bindingCollection = BindingCollection(antiforgery)
 
                 htmlBuilder.LoadContent fileOrContent
 
@@ -207,23 +207,23 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
 
                 render htmlBuilder bindingCollection
 
-            compiledHtml
+            htmlContent
         with ex ->
             HtmlTemplateException ex |> raise
 
-    /// <exception cref="HtmlTemplateException">HTML template compilation error</exception>
+    /// <exception cref="HtmlTemplateException">HTML template rendering error</exception>
     member this.Render
         (
             fileOrContent: FileOrContent,
             items: 'T list,
-            mapper: HtmlBindingCollection * 'T -> HtmlBindingCollection
-        ) : CompiledHtml =
+            mapper: BindingCollection * 'T -> BindingCollection
+        ) : HtmlContent =
         try
-            let compiledHtmls =
+            let htmlContents =
                 items
                 |> List.map (fun item ->
                     let htmlBuilder = HtmlBuilder(environment, cache)
-                    let bindingCollection = HtmlBindingCollection(antiforgery)
+                    let bindingCollection = BindingCollection(antiforgery)
 
                     htmlBuilder.LoadContent fileOrContent
 
@@ -232,7 +232,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
                     render htmlBuilder bindingCollection)
                 |> List.toArray
 
-            String.Join("\n", compiledHtmls)
+            String.Join("\n", htmlContents)
         with ex ->
             HtmlTemplateException ex |> raise
 
@@ -242,7 +242,7 @@ module ServiceCollectionExtensions =
 
     type IServiceCollection with
 
-        /// Adds a lightweight HTML template compiler.
+        /// Adds a lightweight HTML template renderer.
         member this.AddHtmlTemplate() =
             this.AddMemoryCache() |> ignore
             this.AddTransient<HtmlTemplate>()
