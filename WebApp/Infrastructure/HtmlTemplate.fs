@@ -6,7 +6,6 @@ open System.Net
 open System.Text
 open System.Text.RegularExpressions
 
-open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
@@ -26,6 +25,8 @@ type BindingPairs = Map<BindingName, BindingValue>
 
 /// The HTML content as a string.
 type HtmlContent = string
+
+type AntiforgeryToken = { FormFieldName: string; RequestToken: string }
 
 type HtmlTemplateException(ex: Exception) =
     inherit Exception(ex.Message, ex)
@@ -53,7 +54,7 @@ module private HtmlContentLoader =
         else
             fileOrContent
 
-type BindingCollection(antiforgery: IAntiforgery) =
+type BindingCollection() =
 
     let mutable bindings: BindingPairs = Map.empty
 
@@ -87,14 +88,14 @@ type BindingCollection(antiforgery: IAntiforgery) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindAntiforgery(name: BindingName, httpContext: HttpContext) : BindingCollection =
+    member this.BindAntiforgery(generateAntiforgeyToken: unit -> AntiforgeryToken) : BindingCollection =
         try
-            let token = antiforgery.GetAndStoreTokens(httpContext)
+            let token = generateAntiforgeyToken ()
 
             let fragment =
                 $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
 
-            buildBindings name fragment false
+            buildBindings "Antiforgery" fragment false
             this
         with ex ->
             HtmlTemplateException ex |> raise
@@ -128,7 +129,7 @@ type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     member this.Clear() : unit = stringBuilder.Clear() |> ignore
 
-type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antiforgery: IAntiforgery) =
+type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     let bindVariables (stringBuilder: StringBuilder) (bindings: BindingPairs) : unit =
         bindings
@@ -171,7 +172,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
         try
             let htmlContent =
                 let htmlBuilder = HtmlBuilder(environment, cache)
-                let bindingCollection = BindingCollection(antiforgery)
+                let bindingCollection = BindingCollection()
 
                 htmlBuilder.LoadContent fileOrContent
 
@@ -190,7 +191,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
         try
             let htmlContent =
                 let htmlBuilder = HtmlBuilder(environment, cache)
-                let bindingCollection = BindingCollection(antiforgery)
+                let bindingCollection = BindingCollection()
 
                 htmlBuilder.LoadContent fileOrContent
 
@@ -214,7 +215,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache, antifor
                 items
                 |> List.map (fun item ->
                     let htmlBuilder = HtmlBuilder(environment, cache)
-                    let bindingCollection = BindingCollection(antiforgery)
+                    let bindingCollection = BindingCollection()
 
                     htmlBuilder.LoadContent fileOrContent
 

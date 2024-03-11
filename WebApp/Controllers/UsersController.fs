@@ -5,6 +5,7 @@ open System.Threading.Tasks
 
 open FsToolkit.ErrorHandling
 
+open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
@@ -15,7 +16,7 @@ open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlTemplate
 
-type UsersController(logger: ILogger<UsersController>, htmlTemplate: HtmlTemplate, userDatabase: IUserDatabase) =
+type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery, htmlTemplate: HtmlTemplate, userDatabase: IUserDatabase) =
     inherit HtmxController(logger, htmlTemplate)
 
     [<HttpGet>]
@@ -24,7 +25,12 @@ type UsersController(logger: ILogger<UsersController>, htmlTemplate: HtmlTemplat
             let htmlContent =
                 htmlTemplate.Render(
                     "user/search-section.html",
-                    fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)
+                    (fun binder ->
+                        binder.BindAntiforgery(fun () ->
+                            let token = antiforgery.GetAndStoreTokens(this.HttpContext)
+
+                            { FormFieldName = token.FormFieldName
+                              RequestToken = token.RequestToken }))
                 )
 
             if this.Request.IsHtmxBoosted() then

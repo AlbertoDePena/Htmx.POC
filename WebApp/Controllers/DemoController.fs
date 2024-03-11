@@ -5,6 +5,7 @@ open System.Threading.Tasks
 
 open FsToolkit.ErrorHandling
 
+open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
@@ -15,7 +16,7 @@ open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlTemplate
 
-type DemoController(logger: ILogger<DemoController>, htmlTemplate: HtmlTemplate) =
+type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery, htmlTemplate: HtmlTemplate) =
     inherit HtmxController(logger, htmlTemplate)
 
     let random = Random()
@@ -24,7 +25,15 @@ type DemoController(logger: ILogger<DemoController>, htmlTemplate: HtmlTemplate)
     member this.Index() : Task<IActionResult> =
         task {
             let htmlContent =
-                htmlTemplate.Render("demo.html", (fun binder -> binder.BindAntiforgery("Antiforgery", this.HttpContext)))
+                htmlTemplate.Render(
+                    "demo.html",
+                    (fun binder ->
+                        binder.BindAntiforgery(fun () ->
+                            let token = antiforgery.GetAndStoreTokens(this.HttpContext)
+
+                            { FormFieldName = token.FormFieldName
+                              RequestToken = token.RequestToken }))
+                )
 
             if this.Request.IsHtmxBoosted() then
                 return this.HtmlContent(htmlContent)
