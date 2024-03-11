@@ -9,7 +9,6 @@ open System.Text.RegularExpressions
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.Caching.Memory
 
 /// Can be either a plain HTML string or a path to a HTML file.
 type FileOrContent = string
@@ -35,22 +34,12 @@ type HtmlTemplateException(ex: Exception) =
 [<RequireQualifiedAccess>]
 module private HtmlContentLoader =
 
-    let loadFileOrContent (environment: IWebHostEnvironment) (cache: IMemoryCache) (fileOrContent: FileOrContent) =
+    let loadFileOrContent (environment: IWebHostEnvironment) (fileOrContent: FileOrContent) =
         if isNull fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
         if fileOrContent.EndsWith(".html") then
-            let filePath = Path.Combine(environment.WebRootPath, fileOrContent)
-
-            if environment.IsDevelopment() then
-                filePath |> File.ReadAllText
-            else
-                match cache.TryGetValue<string>(filePath) with
-                | true, fileContent -> fileContent
-                | _ ->
-                    let fileContent = filePath |> File.ReadAllText
-                    cache.Set(filePath, fileContent) |> ignore
-                    fileContent
+            Path.Combine(environment.WebRootPath, fileOrContent) |> File.ReadAllText
         else
             fileOrContent
 
@@ -112,14 +101,14 @@ type BindingCollection() =
 
     member this.Clear() : unit = bindings <- Map.empty
 
-type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
+type HtmlBuilder(environment: IWebHostEnvironment) =
 
     let stringBuilder = StringBuilder()
 
     /// <exception cref="HtmlTemplateException"></exception>
     member this.LoadContent(fileOrContent: FileOrContent) : unit =
         try
-            HtmlContentLoader.loadFileOrContent environment cache fileOrContent
+            HtmlContentLoader.loadFileOrContent environment fileOrContent
             |> stringBuilder.Append
             |> ignore
         with ex ->
@@ -129,7 +118,7 @@ type HtmlBuilder(environment: IWebHostEnvironment, cache: IMemoryCache) =
 
     member this.Clear() : unit = stringBuilder.Clear() |> ignore
 
-type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
+type HtmlTemplate(environment: IWebHostEnvironment) =
 
     let bindVariables (stringBuilder: StringBuilder) (bindings: BindingPairs) : unit =
         bindings
@@ -171,7 +160,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         ) : HtmlContent =
         try
             let htmlContent =
-                let htmlBuilder = HtmlBuilder(environment, cache)
+                let htmlBuilder = HtmlBuilder(environment)
                 let bindingCollection = BindingCollection()
 
                 htmlBuilder.LoadContent fileOrContent
@@ -190,7 +179,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
         ) : HtmlContent =
         try
             let htmlContent =
-                let htmlBuilder = HtmlBuilder(environment, cache)
+                let htmlBuilder = HtmlBuilder(environment)
                 let bindingCollection = BindingCollection()
 
                 htmlBuilder.LoadContent fileOrContent
@@ -214,7 +203,7 @@ type HtmlTemplate(environment: IWebHostEnvironment, cache: IMemoryCache) =
             let htmlContents =
                 items
                 |> List.map (fun item ->
-                    let htmlBuilder = HtmlBuilder(environment, cache)
+                    let htmlBuilder = HtmlBuilder(environment)
                     let bindingCollection = BindingCollection()
 
                     htmlBuilder.LoadContent fileOrContent
@@ -236,5 +225,4 @@ module ServiceCollectionExtensions =
 
         /// Adds a lightweight HTML template renderer.
         member this.AddHtmlTemplate() =
-            this.AddMemoryCache() |> ignore
             this.AddTransient<HtmlTemplate>()
