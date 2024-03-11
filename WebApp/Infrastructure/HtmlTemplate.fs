@@ -6,10 +6,6 @@ open System.Net
 open System.Text
 open System.Text.RegularExpressions
 
-open Microsoft.AspNetCore.Http
-open Microsoft.AspNetCore.Hosting
-open Microsoft.Extensions.Hosting
-
 /// Can be either a plain HTML string or a path to a HTML file.
 type FileOrContent = string
 
@@ -25,7 +21,9 @@ type BindingPairs = Map<BindingName, BindingValue>
 /// The HTML content as a string.
 type HtmlContent = string
 
-type AntiforgeryToken = { FormFieldName: string; RequestToken: string }
+type AntiforgeryToken =
+    { FormFieldName: string
+      RequestToken: string }
 
 type HtmlTemplateException(ex: Exception) =
     inherit Exception(ex.Message, ex)
@@ -34,12 +32,15 @@ type HtmlTemplateException(ex: Exception) =
 [<RequireQualifiedAccess>]
 module private HtmlContentLoader =
 
-    let loadFileOrContent (environment: IWebHostEnvironment) (fileOrContent: FileOrContent) =
+    let loadFileOrContent (templateDirectory: string) (fileOrContent: FileOrContent) =
+        if isNull templateDirectory then
+            nameof templateDirectory |> sprintf "%s cannot be null" |> failwith
+
         if isNull fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
         if fileOrContent.EndsWith(".html") then
-            Path.Combine(environment.WebRootPath, fileOrContent) |> File.ReadAllText
+            Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
         else
             fileOrContent
 
@@ -101,14 +102,14 @@ type BindingCollection() =
 
     member this.Clear() : unit = bindings <- Map.empty
 
-type HtmlBuilder(environment: IWebHostEnvironment) =
+type HtmlBuilder() =
 
     let stringBuilder = StringBuilder()
 
     /// <exception cref="HtmlTemplateException"></exception>
     member this.LoadContent(fileOrContent: FileOrContent) : unit =
         try
-            HtmlContentLoader.loadFileOrContent environment fileOrContent
+            HtmlContentLoader.loadFileOrContent fileOrContent
             |> stringBuilder.Append
             |> ignore
         with ex ->
@@ -118,7 +119,7 @@ type HtmlBuilder(environment: IWebHostEnvironment) =
 
     member this.Clear() : unit = stringBuilder.Clear() |> ignore
 
-type HtmlTemplate(environment: IWebHostEnvironment) =
+type HtmlTemplate() =
 
     let bindVariables (stringBuilder: StringBuilder) (bindings: BindingPairs) : unit =
         bindings
@@ -127,21 +128,19 @@ type HtmlTemplate(environment: IWebHostEnvironment) =
             stringBuilder.Replace(pattern, value.ToString()) |> ignore)
 
     let failOnUnboundedVariables (htmlContent: string) : unit =
-        if environment.IsDevelopment() then
-            let unboundedVariables =
-                Regex.Matches(htmlContent, @"\${\b\w+\b}")
-                |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
+        let unboundedVariables =
+            Regex.Matches(htmlContent, @"\${\b\w+\b}")
+            |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
 
-            let unbounded = String.Join(", ", unboundedVariables)
+        let unbounded = String.Join(", ", unboundedVariables)
 
-            if String.IsNullOrWhiteSpace unbounded |> not then
-                sprintf "The HTML content has unbounded variables: %s" unbounded
-                |> failwith
+        if String.IsNullOrWhiteSpace unbounded |> not then
+            sprintf "The HTML content has unbounded variables: %s" unbounded |> failwith
 
     let render (htmlBuilder: HtmlBuilder) (bindingCollection: BindingCollection) : HtmlContent =
         let builder = htmlBuilder.GetBuilder()
         let bindings = bindingCollection.GetBindings()
-        
+
         bindVariables builder bindings
 
         let htmlContent = builder.ToString()
@@ -154,13 +153,10 @@ type HtmlTemplate(environment: IWebHostEnvironment) =
         htmlContent
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.Render
-        (
-            fileOrContent: FileOrContent
-        ) : HtmlContent =
+    member this.Render(fileOrContent: FileOrContent) : HtmlContent =
         try
             let htmlContent =
-                let htmlBuilder = HtmlBuilder(environment)
+                let htmlBuilder = HtmlBuilder()
                 let bindingCollection = BindingCollection()
 
                 htmlBuilder.LoadContent fileOrContent
@@ -172,14 +168,10 @@ type HtmlTemplate(environment: IWebHostEnvironment) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.Render
-        (
-            fileOrContent: FileOrContent,
-            mapper: BindingCollection -> BindingCollection
-        ) : HtmlContent =
+    member this.Render(fileOrContent: FileOrContent, mapper: BindingCollection -> BindingCollection) : HtmlContent =
         try
             let htmlContent =
-                let htmlBuilder = HtmlBuilder(environment)
+                let htmlBuilder = HtmlBuilder()
                 let bindingCollection = BindingCollection()
 
                 htmlBuilder.LoadContent fileOrContent
@@ -203,7 +195,7 @@ type HtmlTemplate(environment: IWebHostEnvironment) =
             let htmlContents =
                 items
                 |> List.map (fun item ->
-                    let htmlBuilder = HtmlBuilder(environment)
+                    let htmlBuilder = HtmlBuilder()
                     let bindingCollection = BindingCollection()
 
                     htmlBuilder.LoadContent fileOrContent
@@ -224,5 +216,4 @@ module ServiceCollectionExtensions =
     type IServiceCollection with
 
         /// Adds a lightweight HTML template renderer.
-        member this.AddHtmlTemplate() =
-            this.AddTransient<HtmlTemplate>()
+        member this.AddHtmlTemplate() = this.AddTransient<HtmlTemplate>()
