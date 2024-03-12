@@ -45,5 +45,8 @@ module DemoView =
             """
 
         match props.HtmxRequest with
-        | Htmx.Request.FullPage userName -> IndexView.renderPage userName mainContent
+        | Htmx.Request.FullPage userName ->
+            IndexView.renderPage
+                { UserName = userName
+                  MainContent = mainContent }
         | Htmx.Request.MainContent -> mainContent

@@ -3,7 +3,11 @@
 [<RequireQualifiedAccess>]
 module IndexView =
 
-    let renderPage (userName: string) (mainContent: string) : string =
+    type PageProps =
+        { UserName: string
+          MainContent: string }
+
+    let renderPage (props: PageProps) : string =
         $"""
         <!DOCTYPE html>
         <html lang="en">
@@ -49,7 +53,7 @@ module IndexView =
                     </div>
                     <div class="navbar-end">
                         <div class="navbar-item has-dropdown is-hoverable">
-                            <a class="navbar-link  has-text-link has-text-weight-semibold">{userName}</a>
+                            <a class="navbar-link  has-text-link has-text-weight-semibold">{props.UserName}</a>
                             <div class="navbar-dropdown">
                                 <a class="navbar-item " href="#/logout">
                                     Log Out
@@ -61,7 +65,7 @@ module IndexView =
             </nav> 
             <!--main-->
             <main id="MainContent" class="container-fluid p-5 is-size-7">
-                {mainContent}
+                {props.MainContent}
             </main>
             <!--footer-->
             <footer class="footer is-fixed-bottom has-background-white is-size-7">
