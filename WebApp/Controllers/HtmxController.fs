@@ -6,20 +6,21 @@ open Microsoft.Extensions.Logging
 open WebApp.Infrastructure.HtmlTemplate
 
 [<AbstractClass>]
-type HtmxController(logger: ILogger, htmlTemplate: HtmlTemplate) =
+type HtmxController(logger: ILogger, templateLoader: HtmlTemplateLoader) =
     inherit Controller()
 
     [<Literal>]
     let HtmlContentType = "text/html; charset=UTF-8"
 
-    member this.HtmlContent(content: string) : IActionResult =
-        this.Content(content, HtmlContentType) :> IActionResult
+    member this.HtmlContent(htmlContent: string) : IActionResult =
+        this.Content(htmlContent, HtmlContentType) :> IActionResult
 
     member this.HtmlContent(userName: string, mainContent: string) : IActionResult =
-        let content =
-            htmlTemplate.Render(
-                "index.html",
-                fun binder -> binder.Bind("UserName", userName).Bind("MainContent", mainContent)
-            )
+        let htmlContent =
+            templateLoader
+                .Load("index.html")
+                .Bind("UserName", userName)
+                .Bind("MainContent", mainContent)
+                .Render()
 
-        this.HtmlContent content
+        this.HtmlContent htmlContent

@@ -9,14 +9,11 @@ open System.Text.RegularExpressions
 /// Can be either a plain HTML string or a path to a HTML file.
 type FileOrContent = string
 
-/// The HTML template defines binding names with the following syntax: ${BindingName}.
-type BindingName = string
+/// The HTML template defines keys with the following syntax: ${Key}.
+type Key = string
 
-/// The content to replace the binding name with. It can be either a primitive type or a HTML fragment.
-type BindingValue = obj
-
-/// An alias for the binding name/binding value map.
-type BindingPairs = Map<BindingName, BindingValue>
+/// The content to replace the ${Key} with.
+type Value = obj
 
 /// The HTML content as a string.
 type HtmlContent = string
@@ -29,191 +26,116 @@ type HtmlTemplateException(ex: Exception) =
     inherit Exception(ex.Message, ex)
     new(message: string) = HtmlTemplateException(Exception message)
 
-[<RequireQualifiedAccess>]
-module private HtmlContentLoader =
+type HtmlTemplate(htmlContent: string) =
 
-    let loadFileOrContent (templateDirectory: string) (fileOrContent: FileOrContent) =
+    let mutable bindings: Map<string, string> = Map.empty
+
+    let createBinding (key: Key) (value: Value) (encodeValue: bool) : unit =
+        if String.IsNullOrWhiteSpace key then
+            failwith "The key cannot be null/empty/white-space"
+
+        if isNull value then
+            failwith "The value cannot be null"
+
+        let isString = value.GetType() = typeof<String>
+
+        let valueAsString = value.ToString()
+
+        let isHtml = valueAsString.StartsWith("<")
+
+        let sanitizedValue =
+            if encodeValue && isString && (not isHtml) then
+                valueAsString |> WebUtility.HtmlEncode
+            else
+                valueAsString
+
+        bindings <- bindings |> Map.add key sanitizedValue
+
+    let buildHtmlContent () : string =
+        let stringBuilder = StringBuilder(htmlContent)
+
+        bindings
+        |> Map.iter (fun name value ->
+            let pattern = sprintf "${%s}" name
+            stringBuilder.Replace(pattern, value) |> ignore)
+
+        bindings <- Map.empty
+        stringBuilder.ToString()
+
+    let failOnUnboundedValues (htmlContent: string) : unit =
+        let unboundedValues =
+            Regex.Matches(htmlContent, @"\${\b\w+\b}")
+            |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
+            |> fun values -> String.Join(", ", values)
+
+        if String.IsNullOrWhiteSpace unboundedValues |> not then
+            sprintf "The HTML content has unbounded values: %s" unboundedValues |> failwith
+
+    /// <exception cref="HtmlTemplateException"></exception>
+    member this.BindAntiforgery(generateAntiforgeryToken: unit -> AntiforgeryToken) : HtmlTemplate =
+        try
+            let token = generateAntiforgeryToken ()
+
+            let value =
+                $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
+
+            createBinding "Antiforgery" value false
+            this
+        with ex ->
+            HtmlTemplateException ex |> raise
+
+    /// <exception cref="HtmlTemplateException"></exception>
+    member this.BindRaw(key: Key, value: Value) : HtmlTemplate =
+        try
+            createBinding key value false
+            this
+        with ex ->
+            HtmlTemplateException ex |> raise
+
+    /// <exception cref="HtmlTemplateException"></exception>
+    member this.Bind(key: Key, value: Value) : HtmlTemplate =
+        try
+            createBinding key value true
+            this
+        with ex ->
+            HtmlTemplateException ex |> raise
+
+    /// <exception cref="HtmlTemplateException"></exception>
+    member this.Render() : HtmlContent =
+        try
+            let htmlContent = buildHtmlContent ()
+
+            failOnUnboundedValues htmlContent
+
+            htmlContent
+        with ex ->
+            HtmlTemplateException ex |> raise
+
+type HtmlTemplateLoader(templateDirectory: string) =
+
+    member this.Load(fileOrContent: FileOrContent) : HtmlTemplate =
         if isNull templateDirectory then
             nameof templateDirectory |> sprintf "%s cannot be null" |> failwith
 
         if isNull fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
-        if fileOrContent.EndsWith(".html") then
-            Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
-        else
-            fileOrContent
-
-type BindingCollection() =
-
-    let mutable bindings: BindingPairs = Map.empty
-
-    let buildBindings (name: BindingName) (value: BindingValue) (encode: bool) : unit =
-        if String.IsNullOrWhiteSpace name then
-            failwith "The binding name cannot be null/empty/white-space"
-
-        if isNull value then
-            failwith "The binding value cannot be null"
-
-        let isString = value.GetType() = typeof<String>
-
-        let valueToString = value.ToString()
-
-        let isHtml = valueToString.StartsWith("<")
-
-        let sanitizedValue =
-            if encode && isString && (not isHtml) then
-                valueToString |> WebUtility.HtmlEncode :> obj
+        let htmlContent =
+            if fileOrContent.EndsWith(".html") then
+                Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
             else
-                value
+                fileOrContent
 
-        bindings <- bindings |> Map.add name sanitizedValue
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.Bind(name: BindingName, value: BindingValue) : BindingCollection =
-        try
-            buildBindings name value true
-            this
-        with ex ->
-            HtmlTemplateException ex |> raise
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindAntiforgery(generateAntiforgeyToken: unit -> AntiforgeryToken) : BindingCollection =
-        try
-            let token = generateAntiforgeyToken ()
-
-            let fragment =
-                $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
-
-            buildBindings "Antiforgery" fragment false
-            this
-        with ex ->
-            HtmlTemplateException ex |> raise
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindRaw(name: BindingName, value: BindingValue) : BindingCollection =
-        try
-            buildBindings name value false
-            this
-        with ex ->
-            HtmlTemplateException ex |> raise
-
-    member this.GetBindings() : BindingPairs = bindings
-
-    member this.Clear() : unit = bindings <- Map.empty
-
-type HtmlBuilder() =
-
-    let stringBuilder = StringBuilder()
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.LoadContent(fileOrContent: FileOrContent) : unit =
-        try
-            HtmlContentLoader.loadFileOrContent fileOrContent
-            |> stringBuilder.Append
-            |> ignore
-        with ex ->
-            HtmlTemplateException ex |> raise
-
-    member this.GetBuilder() : StringBuilder = stringBuilder
-
-    member this.Clear() : unit = stringBuilder.Clear() |> ignore
-
-type HtmlTemplate() =
-
-    let bindVariables (stringBuilder: StringBuilder) (bindings: BindingPairs) : unit =
-        bindings
-        |> Map.iter (fun name value ->
-            let pattern = sprintf "${%s}" name
-            stringBuilder.Replace(pattern, value.ToString()) |> ignore)
-
-    let failOnUnboundedVariables (htmlContent: string) : unit =
-        let unboundedVariables =
-            Regex.Matches(htmlContent, @"\${\b\w+\b}")
-            |> Seq.collect (fun match' -> match'.Groups |> Seq.map (fun group -> group.Value))
-
-        let unbounded = String.Join(", ", unboundedVariables)
-
-        if String.IsNullOrWhiteSpace unbounded |> not then
-            sprintf "The HTML content has unbounded variables: %s" unbounded |> failwith
-
-    let render (htmlBuilder: HtmlBuilder) (bindingCollection: BindingCollection) : HtmlContent =
-        let builder = htmlBuilder.GetBuilder()
-        let bindings = bindingCollection.GetBindings()
-
-        bindVariables builder bindings
-
-        let htmlContent = builder.ToString()
-
-        failOnUnboundedVariables htmlContent
-
-        bindingCollection.Clear()
-        htmlBuilder.Clear()
-
-        htmlContent
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.Render(fileOrContent: FileOrContent) : HtmlContent =
-        try
-            let htmlContent =
-                let htmlBuilder = HtmlBuilder()
-                let bindingCollection = BindingCollection()
-
-                htmlBuilder.LoadContent fileOrContent
-
-                render htmlBuilder bindingCollection
-
-            htmlContent
-        with ex ->
-            HtmlTemplateException ex |> raise
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.Render(fileOrContent: FileOrContent, mapper: BindingCollection -> BindingCollection) : HtmlContent =
-        try
-            let htmlContent =
-                let htmlBuilder = HtmlBuilder()
-                let bindingCollection = BindingCollection()
-
-                htmlBuilder.LoadContent fileOrContent
-
-                let bindingCollection = mapper bindingCollection
-
-                render htmlBuilder bindingCollection
-
-            htmlContent
-        with ex ->
-            HtmlTemplateException ex |> raise
-
-    /// <exception cref="HtmlTemplateException"></exception>
-    member this.Render
-        (
-            fileOrContent: FileOrContent,
-            items: 'T list,
-            mapper: BindingCollection * 'T -> BindingCollection
-        ) : HtmlContent =
-        try
-            let htmlContents =
-                items
-                |> List.map (fun item ->
-                    let htmlBuilder = HtmlBuilder()
-                    let bindingCollection = BindingCollection()
-
-                    htmlBuilder.LoadContent fileOrContent
-
-                    let bindingCollection = mapper (bindingCollection, item)
-
-                    render htmlBuilder bindingCollection)
-                |> List.toArray
-
-            String.Join("\n", htmlContents)
-        with ex ->
-            HtmlTemplateException ex |> raise
+        HtmlTemplate(htmlContent)
 
 [<AutoOpen>]
 module ServiceCollectionExtensions =
     open Microsoft.Extensions.DependencyInjection
+    open Microsoft.AspNetCore.Hosting
 
     type IServiceCollection with
 
         /// Adds a lightweight HTML template renderer.
-        member this.AddHtmlTemplate() = this.AddTransient<HtmlTemplate>()
+        member this.AddHtmlTemplate() =
+            this.AddTransient<HtmlTemplateLoader>(fun services ->
+                HtmlTemplateLoader(services.GetRequiredService<IWebHostEnvironment>().WebRootPath))

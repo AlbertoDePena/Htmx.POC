@@ -16,22 +16,27 @@ open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlTemplate
 
-type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery, htmlTemplate: HtmlTemplate, userDatabase: IUserDatabase) =
-    inherit HtmxController(logger, htmlTemplate)
+type UsersController
+    (
+        logger: ILogger<UsersController>,
+        antiforgery: IAntiforgery,
+        templateLoader: HtmlTemplateLoader,
+        userDatabase: IUserDatabase
+    ) =
+    inherit HtmxController(logger, templateLoader)
 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
             let htmlContent =
-                htmlTemplate.Render(
-                    "user/search-section.html",
-                    (fun binder ->
-                        binder.BindAntiforgery(fun () ->
-                            let token = antiforgery.GetAndStoreTokens(this.HttpContext)
+                templateLoader
+                    .Load("user/search-section.html")
+                    .BindAntiforgery(fun () ->
+                        let token = antiforgery.GetAndStoreTokens(this.HttpContext)
 
-                            { FormFieldName = token.FormFieldName
-                              RequestToken = token.RequestToken }))
-                )
+                        { FormFieldName = token.FormFieldName
+                          RequestToken = token.RequestToken })
+                    .Render()
 
             if this.Request.IsHtmxBoosted() then
                 return this.HtmlContent(htmlContent)
@@ -71,27 +76,27 @@ type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery
                 let! pagedData = userDatabase.GetPagedData query
 
                 let searchResults =
-                    htmlTemplate.Render(
-                        "user/search-table-row.html",
-                        pagedData.Data,
-                        fun (binder, user) ->
-                            let typeNameClass =
-                                match user.UserTypeName with
-                                | UserType.Customer -> "tag is-light is-info"
-                                | UserType.Employee -> "tag is-light is-success"
+                    pagedData.Data
+                    |> List.map (fun user ->
+                        let typeNameClass =
+                            match user.UserTypeName with
+                            | UserType.Customer -> "tag is-light is-info"
+                            | UserType.Employee -> "tag is-light is-success"
 
-                            let isActiveClass = if user.IsActive then "tag is-success" else "tag"
+                        let isActiveClass = if user.IsActive then "tag is-success" else "tag"
 
-                            let isActiveText = if user.IsActive then "Yes" else "No"
+                        let isActiveText = if user.IsActive then "Yes" else "No"
 
-                            binder
-                                .Bind("DisplayName", user.DisplayName)
-                                .Bind("EmailAddress", user.EmailAddress)
-                                .Bind("TypeNameClass", typeNameClass)
-                                .Bind("TypeName", user.UserTypeName)
-                                .Bind("IsActiveClass", isActiveClass)
-                                .Bind("IsActive", isActiveText)
-                    )
+                        templateLoader
+                            .Load("user/search-table-row.html")
+                            .Bind("DisplayName", user.DisplayName)
+                            .Bind("EmailAddress", user.EmailAddress)
+                            .Bind("TypeNameClass", typeNameClass)
+                            .Bind("TypeName", user.UserTypeName)
+                            .Bind("IsActiveClass", isActiveClass)
+                            .Bind("IsActive", isActiveText)
+                            .Render())
+                    |> fun htmlContents -> String.Join("\n", htmlContents)
 
                 let searchResultSummary =
                     sprintf
@@ -109,17 +114,15 @@ type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery
                         "disabled"
 
                 let tableContent =
-                    htmlTemplate.Render(
-                        "user/search-table.html",
-                        fun binder ->
-                            binder
-                                .Bind("SearchResults", searchResults)
-                                .Bind("SearchResultSummary", searchResultSummary)
-                                .Bind("PreviousButtonDisabled", previousButtonDisabled)
-                                .Bind("PreviousPage", pagedData.Page - 1)
-                                .Bind("NextButtonDisabled", nextButtonDisabled)
-                                .Bind("NextPage", pagedData.Page + 1)
-                    )
+                    templateLoader
+                        .Load("user/search-table.html")
+                        .Bind("SearchResults", searchResults)
+                        .Bind("SearchResultSummary", searchResultSummary)
+                        .Bind("PreviousButtonDisabled", previousButtonDisabled)
+                        .Bind("PreviousPage", pagedData.Page - 1)
+                        .Bind("NextButtonDisabled", nextButtonDisabled)
+                        .Bind("NextPage", pagedData.Page + 1)
+                        .Render()
 
                 return this.HtmlContent tableContent
             else
