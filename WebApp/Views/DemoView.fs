@@ -3,6 +3,14 @@
 [<RequireQualifiedAccess>]
 module DemoView =
 
+    [<RequireQualifiedAccess>]
+    type ElementId =
+        | RandomNumberOutput
+
+        override this.ToString() =
+            match this with
+            | RandomNumberOutput -> "RandomNumberOutput"
+
     [<NoEquality>]
     [<NoComparison>]
     type MainProps =
@@ -12,7 +20,7 @@ module DemoView =
     let renderMain (props: MainProps) : string =
         let mainContent =
             $"""
-            <div hx-target="#RandomNumberOutput" hx-swap="innerHTML" hx-indicator=".loader-container">
+            <div hx-target="#{ElementId.RandomNumberOutput}" hx-swap="innerHTML" hx-indicator=".loader-container">
                 <h3 class="title is-size-1">
                     Random Number Generator
                 </h3>
@@ -21,7 +29,7 @@ module DemoView =
                     Get Random Number
                 </button>
 
-                <h2 id="RandomNumberOutput" class="title is-size-2">
+                <h2 id="{ElementId.RandomNumberOutput}" class="title is-size-2">
                     N/A
                 </h2>
 

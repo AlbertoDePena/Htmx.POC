@@ -5,6 +5,16 @@ module UserView =
     open WebApp.Domain.Shared
     open WebApp.Domain.User
 
+    [<RequireQualifiedAccess>]
+    type ElementId =
+        | UserSearchTable
+        | UserSearchForm
+
+        override this.ToString() =
+            match this with
+            | UserSearchTable -> "UserSearchTable"
+            | UserSearchForm -> "UserSearchForm"
+
     [<NoEquality>]
     [<NoComparison>]
     type MainProps =
@@ -14,7 +24,7 @@ module UserView =
     let renderMain (props: MainProps) : string =
         let mainContent =
             $"""
-            <section hx-target="#UserSearchTable" hx-swap="outerHTML" hx-indicator=".loader-container">
+            <section hx-target="#{ElementId.UserSearchTable}" hx-swap="outerHTML" hx-indicator=".loader-container">
                 <div class="box">
                     <nav class="breadcrumb is-small" aria-label="breadcrumbs">
                         <ul>
@@ -26,7 +36,7 @@ module UserView =
                 <div class="box">
                     <div class="columns">
                         <div class="column">
-                            <form id="UserSearchForm" class="columns"
+                            <form id="{ElementId.UserSearchForm}" class="columns"
                                   hx-trigger="load"
                                   hx-post="/Users/Search">
                                 {Html.antiforgery props.GetAntiforgeryToken}
@@ -35,7 +45,7 @@ module UserView =
                                         <input class="input is-small" name="search" type="text"
                                                hx-trigger="keyup changed delay:500ms, search"
                                                hx-post="/Users/Search"
-                                               hx-include="#UserSearchForm"
+                                               hx-include="#{ElementId.UserSearchForm}"
                                                hx-vals='{{"page": "1"}}'
                                                placeholder="Begin typing to search users...">
                                     </div>
@@ -44,7 +54,7 @@ module UserView =
                                     <div class="is-flex is-align-items-center">
                                         <input id="ActiveOnly" name="active-only" type="checkbox" value="true"
                                                hx-post="/Users/Search"
-                                               hx-include="#UserSearchForm"
+                                               hx-include="#{ElementId.UserSearchForm}"
                                                hx-vals='{{"page": "1"}}'
                                                class="is-clickable ml-2 is-small">
                                         <label class="is-clickable mx-2 has-text-weight-semibold"
@@ -57,7 +67,7 @@ module UserView =
                 </div>
                 <div class="box">
                     <div class="table-container table-has-fixed-header">
-                        <table id="UserSearchTable" class="table is-narrow is-hoverable is-fullwidth">
+                        <table id="{ElementId.UserSearchTable}" class="table is-narrow is-hoverable is-fullwidth">
                             <thead>
                                 <tr>
                                     <th class="p-2" scope="col">Display Name</th>
@@ -118,7 +128,7 @@ module UserView =
             """
 
         $"""
-        <table id="UserSearchTable" class="table is-narrow is-hoverable is-fullwidth">
+        <table id="{ElementId.UserSearchTable}" class="table is-narrow is-hoverable is-fullwidth">
             <thead>
                 <tr>
                     <th colspan="4" class="pb-6">
@@ -128,14 +138,14 @@ module UserView =
                             <div class="is-flex is-justify-content-right">
                                 <button class="button is-small" type="button" {HtmlAttribute.disabled (not props.PagedData.HasPreviousPage)}
                                         hx-post="/Users/Search"
-                                        hx-include="#UserSearchForm"
+                                        hx-include="#{ElementId.UserSearchForm}"
                                         hx-vals='{{"page": "{props.PagedData.Page - 1}"}}'>
                                     <span class="material-icons ">navigate_before</span>
                                     <span class="is-sr-only">Previous</span>
                                 </button>
                                 <button class="button is-small mx-1" type="button" {HtmlAttribute.disabled (not props.PagedData.HasNextPage)}
                                         hx-post="/Users/Search"
-                                        hx-include="#UserSearchForm"
+                                        hx-include="#{ElementId.UserSearchForm}"
                                         hx-vals='{{"page": "{props.PagedData.Page + 1}"}}'>
                                     <span class="material-icons ">navigate_next</span>
                                     <span class="is-sr-only">Next</span>

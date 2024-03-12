@@ -1,7 +1,7 @@
 ﻿namespace WebApp.Infrastructure.Constants
 
 [<RequireQualifiedAccess>]
-module QueryName =
+module FieldName =
 
     [<Literal>]
     let Search = "search"

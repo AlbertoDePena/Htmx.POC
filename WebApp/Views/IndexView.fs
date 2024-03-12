@@ -2,6 +2,18 @@
 
 [<RequireQualifiedAccess>]
 module IndexView =
+    
+    [<RequireQualifiedAccess>]
+    type ElementId =
+        | NavbarBurger
+        | MainContent
+        | MainNavbar
+
+        override this.ToString() =
+            match this with
+            | NavbarBurger -> "NavbarBurger"
+            | MainContent -> "MainContent"
+            | MainNavbar -> "MainNavbar"
 
     type PageProps =
         { UserName: string
@@ -28,7 +40,7 @@ module IndexView =
 
         <body class="has-navbar-fixed-top has-footer-fixed-bottom has-background-white-ter" 
               hx-boost="true"
-              hx-target="#MainContent"
+              hx-target="#{ElementId.MainContent}"
               hx-swap="innerHTML">
             <!--navbar-->
             <nav class="navbar is-fixed-top is-white is-size-7" role="navigation" aria-label="main navigation">
@@ -36,13 +48,13 @@ module IndexView =
                     <a class="navbar-item" href="/">
                         <img title="Bulma Logo" src="https://bulma.io/images/bulma-logo.png">
                     </a>            
-                    <a id="NavbarBurger" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="MainNavbar">
+                    <a id="{ElementId.NavbarBurger}" aria-expanded="false" aria-label="menu" class="navbar-burger" role="button" data-target="{ElementId.MainNavbar}">
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                     </a>
                 </div>
-                <div id="MainNavbar" class="navbar-menu">
+                <div id="{ElementId.MainNavbar}" class="navbar-menu">
                     <div class="navbar-start">
                         <a class="navbar-item" href="/Demo">
                             Demo
@@ -64,7 +76,7 @@ module IndexView =
                 </div>
             </nav> 
             <!--main-->
-            <main id="MainContent" class="container-fluid p-5 is-size-7">
+            <main id="{ElementId.MainContent}" class="container-fluid p-5 is-size-7">
                 {props.MainContent}
             </main>
             <!--footer-->

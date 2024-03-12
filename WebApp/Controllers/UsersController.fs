@@ -44,13 +44,13 @@ type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery
                         failwith "Unsupported HTTP method"
 
                 let query =
-                    { SearchCriteria = getValue QueryName.Search |> Option.bind Text.OfString
+                    { SearchCriteria = getValue FieldName.Search |> Option.bind Text.OfString
                       ActiveOnly =
-                        getValue QueryName.ActiveOnly
+                        getValue FieldName.ActiveOnly
                         |> Option.bind (bool.TryParse >> Option.ofPair)
                         |> Option.defaultValue false
                       Page =
-                        getValue QueryName.Page
+                        getValue FieldName.Page
                         |> Option.bind (Int32.TryParse >> Option.ofPair)
                         |> Option.filter (fun page -> page > 0)
                         |> Option.defaultValue 1
