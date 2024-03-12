@@ -23,7 +23,7 @@ type UsersController
         templateLoader: HtmlTemplateLoader,
         userDatabase: IUserDatabase
     ) =
-    inherit HtmxController(logger, templateLoader)
+    inherit HtmxController(logger, antiforgery, templateLoader)
 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
@@ -31,11 +31,7 @@ type UsersController
             let htmlContent =
                 templateLoader
                     .Load("user/search-section.html")
-                    .BindAntiforgery(fun () ->
-                        let token = antiforgery.GetAndStoreTokens(this.HttpContext)
-
-                        { FormFieldName = token.FormFieldName
-                          RequestToken = token.RequestToken })
+                    .BindAntiforgery(this.GetAntiforgeryToken)
                     .Render()
 
             if this.Request.IsHtmxBoosted() then

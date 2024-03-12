@@ -17,7 +17,7 @@ open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.HtmlTemplate
 
 type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery, templateLoader: HtmlTemplateLoader) =
-    inherit HtmxController(logger, templateLoader)
+    inherit HtmxController(logger, antiforgery, templateLoader)
 
     let random = Random()
 
@@ -27,11 +27,7 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery, 
             let htmlContent =
                 templateLoader
                     .Load("demo.html")
-                    .BindAntiforgery(fun () ->
-                        let token = antiforgery.GetAndStoreTokens(this.HttpContext)
-
-                        { FormFieldName = token.FormFieldName
-                          RequestToken = token.RequestToken })
+                    .BindAntiforgery(this.GetAntiforgeryToken)
                     .Render()
 
             if this.Request.IsHtmxBoosted() then

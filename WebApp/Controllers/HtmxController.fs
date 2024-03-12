@@ -1,12 +1,13 @@
 ﻿namespace WebApp.Controllers
 
+open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
 open WebApp.Infrastructure.HtmlTemplate
 
 [<AbstractClass>]
-type HtmxController(logger: ILogger, templateLoader: HtmlTemplateLoader) =
+type HtmxController(logger: ILogger, antiforgery: IAntiforgery, templateLoader: HtmlTemplateLoader) =
     inherit Controller()
 
     [<Literal>]
@@ -24,3 +25,9 @@ type HtmxController(logger: ILogger, templateLoader: HtmlTemplateLoader) =
                 .Render()
 
         this.HtmlContent htmlContent
+
+    member this.GetAntiforgeryToken() : AntiforgeryToken =
+        let token = antiforgery.GetAndStoreTokens(this.HttpContext)
+
+        { FormFieldName = token.FormFieldName
+          RequestToken = token.RequestToken }
