@@ -91,17 +91,6 @@ module UserView =
                 props.PagedData.Page
                 props.PagedData.TotalPages
 
-        let previousPage = props.PagedData.Page - 1
-        let previousButtonDisabled = if props.PagedData.Page > 1 then "" else "disabled"
-
-        let nextPage = props.PagedData.Page + 1
-
-        let nextButtonDisabled =
-            if (props.PagedData.Page * props.PagedData.PageSize) < props.PagedData.TotalCount then
-                ""
-            else
-                "disabled"
-
         let userTableRow (user: User) =
             let typeNameClass =
                 match user.UserTypeName with
@@ -134,17 +123,17 @@ module UserView =
                             <div>{searchResultSummary}</div>
 
                             <div class="is-flex is-justify-content-right">
-                                <button class="button is-small" type="button" {previousButtonDisabled}
+                                <button class="button is-small" type="button" {HtmlAttribute.disabled (not props.PagedData.HasPreviousPage)}
                                         hx-post="/Users/Search"
                                         hx-include="#UserSearchForm"
-                                        hx-vals='{{"page": "{previousPage}"}}'>
+                                        hx-vals='{{"page": "{props.PagedData.Page - 1}"}}'>
                                     <span class="material-icons ">navigate_before</span>
                                     <span class="is-sr-only">Previous</span>
                                 </button>
-                                <button class="button is-small mx-1" type="button" {nextButtonDisabled}
+                                <button class="button is-small mx-1" type="button" {HtmlAttribute.disabled (not props.PagedData.HasNextPage)}
                                         hx-post="/Users/Search"
                                         hx-include="#UserSearchForm"
-                                        hx-vals='{{"page": "{nextPage}"}}'>
+                                        hx-vals='{{"page": "{props.PagedData.Page + 1}"}}'>
                                     <span class="material-icons ">navigate_next</span>
                                     <span class="is-sr-only">Next</span>
                                 </button>

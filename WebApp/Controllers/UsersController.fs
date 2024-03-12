@@ -21,7 +21,7 @@ type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery
     member this.Index() : Task<IActionResult> =
         task {
             let props: UserView.MainProps =
-                { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.HttpContext.User.Identity.Name)
+                { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.GetUserName())
                   GetAntiforgeryToken = this.GetAntiforgeryToken }
 
             let htmlContent = UserView.renderMain props

@@ -104,3 +104,9 @@ type PagedData<'T> =
                 pageCount + 1
 
         totalPages
+
+    member this.HasPreviousPage =
+        this.Page > 1
+
+    member this.HasNextPage =
+        (this.Page * this.PageSize) < this.TotalCount

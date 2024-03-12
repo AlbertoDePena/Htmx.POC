@@ -28,3 +28,21 @@ module Html =
 
     let formatDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
         dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)
+
+[<RequireQualifiedAccess>]
+module HtmlAttribute =
+
+    let disabled (value: bool) : string =
+        match value with
+        | true -> "disabled"
+        | false -> ""
+
+    let readonly (value: bool) : string =
+        match value with
+        | true -> "readonly"
+        | false -> ""
+
+    let required (value: bool) : string =
+        match value with
+        | true -> "required"
+        | false -> ""

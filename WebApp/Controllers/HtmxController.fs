@@ -20,3 +20,6 @@ type HtmxController(antiforgery: IAntiforgery) =
 
         { FormFieldName = token.FormFieldName
           RequestToken = token.RequestToken }
+
+    member this.GetUserName(): string =
+        this.HttpContext.User.Identity.Name
