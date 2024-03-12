@@ -9,7 +9,7 @@ module UserView =
     [<NoComparison>]
     type MainProps =
         { HtmxRequest: Htmx.Request
-          GenerateAntiforgeryToken: unit -> Html.AntiforgeryToken }
+          GetAntiforgeryToken: unit -> Html.AntiforgeryToken }
 
     let renderMain (props: MainProps) : string =
         let mainContent =
@@ -29,7 +29,7 @@ module UserView =
                             <form id="UserSearchForm" class="columns"
                                   hx-trigger="load"
                                   hx-post="/Users/Search">
-                                {Html.antiforgery props.GenerateAntiforgeryToken}
+                                {Html.antiforgery props.GetAntiforgeryToken}
                                 <div class="column">
                                     <div class="control">
                                         <input class="input is-small" name="search" type="text"
@@ -102,32 +102,28 @@ module UserView =
             else
                 "disabled"
 
-        let tableBodyContent =
-            Html.forEach
-                props.PagedData.Data
-                (fun user ->
-                    let typeNameClass =
-                        match user.UserTypeName with
-                        | UserType.Customer -> "tag is-light is-info"
-                        | UserType.Employee -> "tag is-light is-success"
+        let userTableRow (user: User) =
+            let typeNameClass =
+                match user.UserTypeName with
+                | UserType.Customer -> "tag is-light is-info"
+                | UserType.Employee -> "tag is-light is-success"
 
-                    let isActiveClass = if user.IsActive then "tag is-success" else "tag"
+            let isActiveClass = if user.IsActive then "tag is-success" else "tag"
 
-                    let isActiveText = if user.IsActive then "Yes" else "No"
+            let isActiveText = if user.IsActive then "Yes" else "No"
 
-                    $"""
-                    <tr class="is-clickable">
-                        <td class="p-2">{Html.encodeText user.DisplayName}</td>
-                        <td class="p-2">{Html.encodeText user.EmailAddress}</td>
-                        <td class="p-2">
-                            <span class="{typeNameClass}">{user.UserTypeName}</span>
-                        </td>
-                        <td class="p-2">
-                            <span class="{isActiveClass}">{isActiveText}</span>
-                        </td>
-                    </tr>
-                    """)
-                ""
+            $"""
+            <tr class="is-clickable">
+                <td class="p-2">{Html.encodeText user.DisplayName}</td>
+                <td class="p-2">{Html.encodeText user.EmailAddress}</td>
+                <td class="p-2">
+                    <span class="{typeNameClass}">{user.UserTypeName}</span>
+                </td>
+                <td class="p-2">
+                    <span class="{isActiveClass}">{isActiveText}</span>
+                </td>
+            </tr>
+            """
 
         $"""
         <table id="UserSearchTable" class="table is-narrow is-hoverable is-fullwidth">
@@ -169,7 +165,7 @@ module UserView =
                 </tr>
             </thead>
             <tbody>
-                {tableBodyContent}
+                {Html.forEach props.PagedData.Data userTableRow ""}
             </tbody>
         </table>
         """

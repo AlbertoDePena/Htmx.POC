@@ -22,7 +22,7 @@ type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery
         task {
             let props: UserView.MainProps =
                 { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.HttpContext.User.Identity.Name)
-                  GenerateAntiforgeryToken = this.GetAntiforgeryToken }
+                  GetAntiforgeryToken = this.GetAntiforgeryToken }
 
             let htmlContent = UserView.renderMain props
 

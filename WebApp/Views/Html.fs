@@ -11,8 +11,8 @@ module Html =
         { FormFieldName: string
           RequestToken: string }
 
-    let antiforgery (generateAntiforgeryToken: unit -> AntiforgeryToken) : string =
-        let token = generateAntiforgeryToken ()
+    let antiforgery (getAntiforgeryToken: unit -> AntiforgeryToken) : string =
+        let token = getAntiforgeryToken ()
 
         $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
 

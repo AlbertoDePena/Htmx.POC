@@ -19,7 +19,7 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
         task {
             let props: DemoView.MainProps =
                 { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.HttpContext.User.Identity.Name)
-                  GenerateAntiforgeryToken = this.GetAntiforgeryToken }
+                  GetAntiforgeryToken = this.GetAntiforgeryToken }
 
             let htmlContent = DemoView.renderMain props
 

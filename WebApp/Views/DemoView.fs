@@ -7,7 +7,7 @@ module DemoView =
     [<NoComparison>]
     type MainProps =
         { HtmxRequest: Htmx.Request
-          GenerateAntiforgeryToken: unit -> Html.AntiforgeryToken }
+          GetAntiforgeryToken: unit -> Html.AntiforgeryToken }
 
     let renderMain (props: MainProps) : string =
         let mainContent =
@@ -31,7 +31,7 @@ module DemoView =
 
                 <div class="box">
                     <form hx-post="/Demo/Save">
-                        {Html.antiforgery props.GenerateAntiforgeryToken}
+                        {Html.antiforgery props.GetAntiforgeryToken}
                         <input class="input is-small" placeholder="Enter some text" type="text" />
                         <hr />
                         <button class="button is-small" type="submit">Save</button>
