@@ -103,30 +103,31 @@ module UserView =
                 "disabled"
 
         let tableBodyContent =
-            props.PagedData.Data
-            |> List.map (fun user ->
-                let typeNameClass =
-                    match user.UserTypeName with
-                    | UserType.Customer -> "tag is-light is-info"
-                    | UserType.Employee -> "tag is-light is-success"
+            Html.forEach
+                props.PagedData.Data
+                (fun user ->
+                    let typeNameClass =
+                        match user.UserTypeName with
+                        | UserType.Customer -> "tag is-light is-info"
+                        | UserType.Employee -> "tag is-light is-success"
 
-                let isActiveClass = if user.IsActive then "tag is-success" else "tag"
+                    let isActiveClass = if user.IsActive then "tag is-success" else "tag"
 
-                let isActiveText = if user.IsActive then "Yes" else "No"
+                    let isActiveText = if user.IsActive then "Yes" else "No"
 
-                $"""
-                <tr class="is-clickable">
-                    <td class="p-2">{user.DisplayName}</td>
-                    <td class="p-2">{user.EmailAddress}</td>
-                    <td class="p-2">
-                        <span class="{typeNameClass}">{user.UserTypeName}</span>
-                    </td>
-                    <td class="p-2">
-                        <span class="{isActiveClass}">{isActiveText}</span>
-                    </td>
-                </tr>
-                """)
-            |> String.concat ""
+                    $"""
+                    <tr class="is-clickable">
+                        <td class="p-2">{Html.encodeText user.DisplayName}</td>
+                        <td class="p-2">{Html.encodeText user.EmailAddress}</td>
+                        <td class="p-2">
+                            <span class="{typeNameClass}">{user.UserTypeName}</span>
+                        </td>
+                        <td class="p-2">
+                            <span class="{isActiveClass}">{isActiveText}</span>
+                        </td>
+                    </tr>
+                    """)
+                ""
 
         $"""
         <table id="UserSearchTable" class="table is-narrow is-hoverable is-fullwidth">

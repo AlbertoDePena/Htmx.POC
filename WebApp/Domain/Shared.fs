@@ -6,31 +6,6 @@ module String =
     /// The default value of a string is null.
     let defaultValue = null
 
-/// Represents a non null/empty/white-space email address
-type EmailAddress =
-    private
-    | EmailAddress of string
-
-    member this.Value =
-        let (EmailAddress value) = this
-        value
-
-    override this.ToString() = this.Value
-
-    static member OfString(value: string) =
-        if System.String.IsNullOrWhiteSpace value then
-            None
-        elif System.Text.RegularExpressions.Regex.IsMatch(value, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$") then
-            Some(EmailAddress(value.ToLower()))
-        else
-            None
-
-    static member ValueOrNull(valueOption: string option) =        
-        match valueOption with
-        | None -> String.defaultValue
-        | Some value when System.String.IsNullOrWhiteSpace value -> String.defaultValue
-        | Some value -> value
-
 /// <summary>
 /// Represents a non null/empty/white-space string
 /// </summary>
@@ -58,6 +33,15 @@ type Text =
             None
         else
             Some(Text value)
+
+    /// <summary>Try to convert a potentially null/empty/white-space email string to a Text</summary>
+    static member OfEmailString(value: string) =
+        if System.String.IsNullOrWhiteSpace value then
+            None
+        elif System.Text.RegularExpressions.Regex.IsMatch(value, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$") then
+            Some(Text(value.ToLower()))
+        else
+            None
 
     /// <summary>Return the Text's primitive value when Some Text otherwise return null when None</summary>
     static member ValueOrNull(textOption: Text option) =        
@@ -88,7 +72,8 @@ type SortDirection =
 module Alias =
     open System
 
-    type BigNumber = Int64
+    type BigNumber = Int64    
+    type EmailAddress = Text
     type Money = Decimal
     type Number = Int32
     type UniqueId = Guid
