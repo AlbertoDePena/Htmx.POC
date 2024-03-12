@@ -2,12 +2,11 @@
 
 open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc
-open Microsoft.Extensions.Logging
 
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Views
 
 [<AbstractClass>]
-type HtmxController(logger: ILogger, antiforgery: IAntiforgery, templateLoader: HtmlTemplateLoader) =
+type HtmxController(antiforgery: IAntiforgery) =
     inherit Controller()
 
     [<Literal>]
@@ -16,17 +15,7 @@ type HtmxController(logger: ILogger, antiforgery: IAntiforgery, templateLoader: 
     member this.HtmlContent(htmlContent: string) : IActionResult =
         this.Content(htmlContent, HtmlContentType) :> IActionResult
 
-    member this.HtmlContent(userName: string, mainContent: string) : IActionResult =
-        let htmlContent =
-            templateLoader
-                .Load("index.html")
-                .Bind("UserName", userName)
-                .Bind("MainContent", mainContent)
-                .Render()
-
-        this.HtmlContent htmlContent
-
-    member this.GetAntiforgeryToken() : AntiforgeryToken =
+    member this.GetAntiforgeryToken() : Html.AntiforgeryToken =
         let token = antiforgery.GetAndStoreTokens(this.HttpContext)
 
         { FormFieldName = token.FormFieldName

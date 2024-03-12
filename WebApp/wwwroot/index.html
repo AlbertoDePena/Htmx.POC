@@ -62,25 +62,7 @@
     </footer>
     <!--scripts-->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            htmx.config.historyEnabled = false;
-
-            var activeClass = 'is-active';
-            var navbarBurger = document.getElementById('NavbarBurger');
-
-            if (navbarBurger) {
-                var mainNavbar = document.getElementById(navbarBurger.dataset.target);
-
-                if (mainNavbar) {
-                    navbarBurger.addEventListener('click', () => {                 
-                        navbarBurger.classList.toggle(activeClass);
-                        mainNavbar.classList.toggle(activeClass);
-                    });
-                }                
-            }
-        });
-    </script>
+    <script src="/js/index.js"></script>
 </body>
 
 </html>

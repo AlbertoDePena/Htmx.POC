@@ -8,7 +8,6 @@ open Microsoft.AspNetCore.Authentication.OpenIdConnect
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authorization
 open Microsoft.AspNetCore.Mvc
-open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc.Authorization
 open Microsoft.AspNetCore.CookiePolicy
 open Microsoft.ApplicationInsights
@@ -22,7 +21,6 @@ open Serilog
 
 open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlTemplate
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Options
@@ -46,7 +44,6 @@ module Program =
 
                 builder.Services.AddSqlDatabase()
                 builder.Services.AddUserDatabase()
-                builder.Services.AddHtmlTemplate()
 
                 builder.Services.Configure<CookiePolicyOptions>(
                     Action<CookiePolicyOptions>(fun options ->

@@ -6,38 +6,27 @@ open System.Threading.Tasks
 open FsToolkit.ErrorHandling
 
 open Microsoft.AspNetCore.Antiforgery
-open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApp.Domain.User
 open WebApp.Domain.Shared
 open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Views
 
-type UsersController
-    (
-        logger: ILogger<UsersController>,
-        antiforgery: IAntiforgery,
-        templateLoader: HtmlTemplateLoader,
-        userDatabase: IUserDatabase
-    ) =
-    inherit HtmxController(logger, antiforgery, templateLoader)
+type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery, userDatabase: IUserDatabase) =
+    inherit HtmxController(antiforgery)
 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
-            let htmlContent =
-                templateLoader
-                    .Load("user/search-section.html")
-                    .BindAntiforgery(this.GetAntiforgeryToken)
-                    .Render()
+            let props: UserView.MainProps =
+                { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.HttpContext.User.Identity.Name)
+                  GenerateAntiforgeryToken = this.GetAntiforgeryToken }
 
-            if this.Request.IsHtmxBoosted() then
-                return this.HtmlContent(htmlContent)
-            else
-                return this.HtmlContent(userName = this.HttpContext.User.Identity.Name, mainContent = htmlContent)
+            let htmlContent = UserView.renderMain props
+
+            return this.HtmlContent(htmlContent)
         }
 
     [<HttpGet>]
@@ -71,56 +60,11 @@ type UsersController
 
                 let! pagedData = userDatabase.GetPagedData query
 
-                let searchResults =
-                    pagedData.Data
-                    |> List.map (fun user ->
-                        let typeNameClass =
-                            match user.UserTypeName with
-                            | UserType.Customer -> "tag is-light is-info"
-                            | UserType.Employee -> "tag is-light is-success"
+                let props: UserView.TableProps = { PagedData = pagedData }
 
-                        let isActiveClass = if user.IsActive then "tag is-success" else "tag"
+                let htmlContent = UserView.renderTable props
 
-                        let isActiveText = if user.IsActive then "Yes" else "No"
-
-                        templateLoader
-                            .Load("user/search-table-row.html")
-                            .Bind("DisplayName", user.DisplayName)
-                            .Bind("EmailAddress", user.EmailAddress)
-                            .Bind("TypeNameClass", typeNameClass)
-                            .Bind("TypeName", user.UserTypeName)
-                            .Bind("IsActiveClass", isActiveClass)
-                            .Bind("IsActive", isActiveText)
-                            .Render())
-                    |> fun htmlContents -> String.Join("\n", htmlContents)
-
-                let searchResultSummary =
-                    sprintf
-                        "%i users found | showing page %i of %i"
-                        pagedData.TotalCount
-                        pagedData.Page
-                        pagedData.TotalPages
-
-                let previousButtonDisabled = if pagedData.Page > 1 then String.Empty else "disabled"
-
-                let nextButtonDisabled =
-                    if (pagedData.Page * pagedData.PageSize) < pagedData.TotalCount then
-                        String.Empty
-                    else
-                        "disabled"
-
-                let tableContent =
-                    templateLoader
-                        .Load("user/search-table.html")
-                        .Bind("SearchResults", searchResults)
-                        .Bind("SearchResultSummary", searchResultSummary)
-                        .Bind("PreviousButtonDisabled", previousButtonDisabled)
-                        .Bind("PreviousPage", pagedData.Page - 1)
-                        .Bind("NextButtonDisabled", nextButtonDisabled)
-                        .Bind("NextPage", pagedData.Page + 1)
-                        .Render()
-
-                return this.HtmlContent tableContent
+                return this.HtmlContent htmlContent
             else
                 return! this.Index()
         }

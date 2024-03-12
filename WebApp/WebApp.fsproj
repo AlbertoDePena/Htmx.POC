@@ -8,7 +8,7 @@
 	  	<UserSecretsId>580fff13-0798-466c-a310-4fab0231b143</UserSecretsId>
   </PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup>		
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
 		<Compile Include="Infrastructure\Constants.fs" />
@@ -16,10 +16,14 @@
 		<Compile Include="Infrastructure\Options.fs" />
 		<Compile Include="Infrastructure\Database.fs" />
 		<Compile Include="Infrastructure\UserDatabase.fs" />
-		<Compile Include="Infrastructure\HtmlTemplate.fs" />
 		<Compile Include="Infrastructure\ErrorHandlerMiddleware.fs" />
 		<Compile Include="Infrastructure\Telemetry.fs" />
 		<Compile Include="Infrastructure\Serilog.fs" />
+		<Compile Include="Views\Htmx.fs" />
+		<Compile Include="Views\Html.fs" />
+		<Compile Include="Views\IndexView.fs" />
+		<Compile Include="Views\DemoView.fs" />
+		<Compile Include="Views\UserView.fs" />
 		<Compile Include="Controllers\HttpRequestExtensions.fs" />
 		<Compile Include="Controllers\HtmxController.fs" />
 		<Compile Include="Controllers\HealthController.fs" />

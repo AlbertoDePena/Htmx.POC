@@ -3,37 +3,27 @@ namespace WebApp.Controllers
 open System
 open System.Threading.Tasks
 
-open FsToolkit.ErrorHandling
-
 open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApp.Domain.User
-open WebApp.Domain.Shared
-open WebApp.Infrastructure.Constants
-open WebApp.Infrastructure.Database
-open WebApp.Infrastructure.UserDatabase
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Views
 
-type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery, templateLoader: HtmlTemplateLoader) =
-    inherit HtmxController(logger, antiforgery, templateLoader)
+type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) =
+    inherit HtmxController(antiforgery)
 
     let random = Random()
 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
-            let htmlContent =
-                templateLoader
-                    .Load("demo.html")
-                    .BindAntiforgery(this.GetAntiforgeryToken)
-                    .Render()
+            let props: DemoView.MainProps =
+                { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.HttpContext.User.Identity.Name)
+                  GenerateAntiforgeryToken = this.GetAntiforgeryToken }
 
-            if this.Request.IsHtmxBoosted() then
-                return this.HtmlContent(htmlContent)
-            else
-                return this.HtmlContent(userName = this.HttpContext.User.Identity.Name, mainContent = htmlContent)
+            let htmlContent = DemoView.renderMain props
+
+            return this.HtmlContent(htmlContent)
         }
 
     [<HttpGet>]
