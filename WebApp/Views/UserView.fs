@@ -17,9 +17,7 @@ module UserView =
 
     [<NoEquality>]
     [<NoComparison>]
-    type MainProps =
-        { HtmxRequest: Htmx.Request
-          GetAntiforgeryToken: unit -> Html.AntiforgeryToken }
+    type MainProps = { Shared: Html.SharedProps }
 
     let renderMain (props: MainProps) : string =
         let mainContent =
@@ -39,7 +37,7 @@ module UserView =
                             <form id="{ElementId.UserSearchForm}" class="columns"
                                   hx-trigger="load"
                                   hx-post="/Users/Search">
-                                {Html.antiforgery props.GetAntiforgeryToken}
+                                {Html.antiforgery props.Shared.GetAntiforgeryToken}
                                 <div class="column">
                                     <div class="control">
                                         <input class="input is-small" name="search" type="text"
@@ -85,12 +83,12 @@ module UserView =
             </section>
             """
 
-        match props.HtmxRequest with
-        | Htmx.Request.FullPage userName ->
+        match props.Shared.IsHtmxBoosted with
+        | true -> mainContent
+        | false ->
             IndexView.renderPage
-                { UserName = userName
+                { UserName = props.Shared.UserName
                   MainContent = mainContent }
-        | Htmx.Request.MainContent -> mainContent
 
     [<NoEquality>]
     [<NoComparison>]

@@ -13,9 +13,7 @@ module DemoView =
 
     [<NoEquality>]
     [<NoComparison>]
-    type MainProps =
-        { HtmxRequest: Htmx.Request
-          GetAntiforgeryToken: unit -> Html.AntiforgeryToken }
+    type MainProps = { Shared: Html.SharedProps }
 
     let renderMain (props: MainProps) : string =
         let mainContent =
@@ -39,7 +37,7 @@ module DemoView =
 
                 <div class="box">
                     <form hx-post="/Demo/Save">
-                        {Html.antiforgery props.GetAntiforgeryToken}
+                        {Html.antiforgery props.Shared.GetAntiforgeryToken}
                         <input class="input is-small" placeholder="Enter some text" type="text" />
                         <hr />
                         <button class="button is-small" type="submit">Save</button>
@@ -52,9 +50,9 @@ module DemoView =
             </div>
             """
 
-        match props.HtmxRequest with
-        | Htmx.Request.FullPage userName ->
+        match props.Shared.IsHtmxBoosted with
+        | true -> mainContent
+        | false ->
             IndexView.renderPage
-                { UserName = userName
+                { UserName = props.Shared.UserName
                   MainContent = mainContent }
-        | Htmx.Request.MainContent -> mainContent

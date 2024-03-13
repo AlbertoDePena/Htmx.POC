@@ -20,9 +20,7 @@ type UsersController(logger: ILogger<UsersController>, antiforgery: IAntiforgery
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
-            let props: UserView.MainProps =
-                { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.GetUserName())
-                  GetAntiforgeryToken = this.GetAntiforgeryToken }
+            let props: UserView.MainProps = { Shared = this.GetSharedProps() }
 
             let htmlContent = UserView.renderMain props
 

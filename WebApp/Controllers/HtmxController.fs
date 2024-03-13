@@ -21,5 +21,9 @@ type HtmxController(antiforgery: IAntiforgery) =
         { FormFieldName = token.FormFieldName
           RequestToken = token.RequestToken }
 
-    member this.GetUserName(): string =
-        this.HttpContext.User.Identity.Name
+    member this.GetUserName() : string = this.HttpContext.User.Identity.Name
+
+    member this.GetSharedProps() : Html.SharedProps =
+        { IsHtmxBoosted = this.Request.IsHtmxBoosted()
+          UserName = this.GetUserName()
+          GetAntiforgeryToken = this.GetAntiforgeryToken }

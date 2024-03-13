@@ -11,6 +11,13 @@ module Html =
         { FormFieldName: string
           RequestToken: string }
 
+    [<NoEquality>]
+    [<NoComparison>]
+    type SharedProps =
+        { IsHtmxBoosted: bool
+          UserName: string
+          GetAntiforgeryToken: unit -> AntiforgeryToken }
+
     let antiforgery (getAntiforgeryToken: unit -> AntiforgeryToken) : string =
         let token = getAntiforgeryToken ()
 

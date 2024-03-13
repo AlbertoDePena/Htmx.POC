@@ -19,7 +19,6 @@
 		<Compile Include="Infrastructure\ErrorHandlerMiddleware.fs" />
 		<Compile Include="Infrastructure\Telemetry.fs" />
 		<Compile Include="Infrastructure\Serilog.fs" />
-		<Compile Include="Views\Htmx.fs" />
 		<Compile Include="Views\Html.fs" />
 		<Compile Include="Views\IndexView.fs" />
 		<Compile Include="Views\DemoView.fs" />

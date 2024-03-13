@@ -17,9 +17,7 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
-            let props: DemoView.MainProps =
-                { HtmxRequest = Htmx.Request.Create(this.Request.IsHtmxBoosted(), this.GetUserName())
-                  GetAntiforgeryToken = this.GetAntiforgeryToken }
+            let props: DemoView.MainProps = { Shared = this.GetSharedProps() }
 
             let htmlContent = DemoView.renderMain props
 
