@@ -47,6 +47,12 @@ module DemoView =
                 <div class="loader-container">
                     <div class="loader"></div>
                 </div>
+
+                <div class="box" id="chartjs-container">
+                    <button class="button is-small is-primary block" type="button" hx-get="/Demo/Chart" hx-target="#chartjs-container">
+                        Load ChartJs
+                    </button>
+                </div>
             </div>
             """
 

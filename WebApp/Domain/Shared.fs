@@ -76,13 +76,13 @@ type Query =
       SortBy: Text option
       SortDirection: SortDirection option }
 
-type PagedData<'T> =
+type PagedData<'a> =
     { Page: Number
       PageSize: Number
       TotalCount: Number
       SortBy: Text option
       SortDirection: SortDirection option
-      Data: 'T list }
+      Data: 'a list }
 
     member this.TotalPages =
         let pageCount = this.TotalCount / this.PageSize

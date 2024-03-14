@@ -45,3 +45,19 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
             else
                 return! this.Index()
         }
+
+    [<HttpGet>]
+    member this.Chart() : Task<IActionResult> =
+        task {
+            //<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            if this.Request.IsHtmx() then
+                let htmlContent = 
+                    """
+                    <div>
+                      <canvas id="myChart"></canvas>
+                    </div>
+                    """
+                return this.HtmlContent(htmlContent)
+            else
+                return! this.Index()
+        }

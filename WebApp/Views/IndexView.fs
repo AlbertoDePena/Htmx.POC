@@ -85,6 +85,7 @@ module IndexView =
             </footer>
             <!--scripts-->
             <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script src="/js/index.js"></script>
         </body>
 
