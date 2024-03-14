@@ -14,6 +14,7 @@
 		<Compile Include="Infrastructure\Constants.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
 		<Compile Include="Infrastructure\Options.fs" />
+		<Compile Include="Infrastructure\HtmlTemplateLoader.fs" />
 		<Compile Include="Infrastructure\Database.fs" />
 		<Compile Include="Infrastructure\UserDatabase.fs" />
 		<Compile Include="Infrastructure\ErrorHandlerMiddleware.fs" />

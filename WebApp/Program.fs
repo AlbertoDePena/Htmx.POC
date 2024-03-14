@@ -25,6 +25,7 @@ open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
+open WebApp.Infrastructure.HtmlTemplate
 
 #nowarn "20"
 
@@ -44,6 +45,7 @@ module Program =
 
                 builder.Services.AddSqlDatabase()
                 builder.Services.AddUserDatabase()
+                builder.Services.AddHtmlTemplate()
 
                 builder.Services.Configure<CookiePolicyOptions>(
                     Action<CookiePolicyOptions>(fun options ->
