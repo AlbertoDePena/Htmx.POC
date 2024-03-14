@@ -25,14 +25,16 @@ module UserRepository =
                         param =
                             {| SearchCriteria =
                                 query.SearchCriteria
-                                |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue)
+                                |> Option.either (fun text -> text.Value) (fun () -> String.defaultValue)
                                ActiveOnly = query.ActiveOnly
                                Page = query.Page
                                PageSize = query.PageSize
-                               SortBy = query.SortBy |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue)
+                               SortBy =
+                                query.SortBy
+                                |> Option.either (fun text -> text.Value) (fun () -> String.defaultValue)
                                SortDirection =
                                 query.SortDirection
-                                |> Option.map (fun x -> x.Value)
+                                |> Option.map (fun du -> du.Value)
                                 |> Option.defaultValue String.defaultValue |},
                         commandType = CommandType.StoredProcedure
                     )

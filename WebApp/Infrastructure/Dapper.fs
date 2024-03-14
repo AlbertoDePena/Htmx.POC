@@ -40,7 +40,8 @@ module Dapper =
     type private TextOptionHandler() =
         inherit SqlMapper.TypeHandler<option<Text>>()
 
-        override _.SetValue(param, value) = param.Value <- Text.ValueOrNull value
+        override _.SetValue(param, value) =
+            param.Value <- (value |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue))
 
         override _.Parse value = value :?> string |> Text.OfString
 

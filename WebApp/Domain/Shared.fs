@@ -24,9 +24,6 @@ type Text =
 
     override this.ToString() = this.Value
 
-    /// <summary>The Text's default value is the empty string</summary>
-    static member DefaultValue = Text System.String.Empty
-
     /// <summary>Try to convert a potentially null/empty/white-space string to a Text</summary>
     static member OfString(value: string) =
         if System.String.IsNullOrWhiteSpace value then
@@ -42,13 +39,6 @@ type Text =
             Some(Text(value.ToLower()))
         else
             None
-
-    /// <summary>Return the Text's primitive value when Some Text otherwise return null when None</summary>
-    static member ValueOrNull(textOption: Text option) =        
-        match textOption with
-        | None -> String.defaultValue
-        | Some text when System.String.IsNullOrWhiteSpace text.Value -> String.defaultValue
-        | Some text -> text.Value
 
 [<RequireQualifiedAccess>]
 type SortDirection =
