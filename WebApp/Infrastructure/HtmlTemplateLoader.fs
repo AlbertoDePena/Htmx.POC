@@ -82,9 +82,9 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             sprintf "The HTML content has unbounded values: %s" unboundedValues |> failwith
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindAntiforgery(generateAntiforgeryToken: unit -> AntiforgeryToken) : HtmlTemplate =
+    member this.BindAntiforgery(getAntiforgeryToken: unit -> AntiforgeryToken) : HtmlTemplate =
         try
-            let token = generateAntiforgeryToken ()
+            let token = getAntiforgeryToken ()
 
             let value =
                 $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""

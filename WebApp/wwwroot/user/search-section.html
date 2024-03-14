@@ -1,0 +1,59 @@
+<section hx-target="#${UserSearchTableElementId}" hx-swap="outerHTML" hx-indicator=".loader-container">
+    <div class="box">
+        <nav class="breadcrumb is-small" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li class="is-active"><a href="#" aria-current="page">Users</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="box">
+        <div class="columns">
+            <div class="column">
+                <form id="${UserSearchFormElementId}" class="columns"
+                      hx-trigger="load"
+                      hx-post="/Users/Search">
+                    ${Antiforgery}
+                    <div class="column">
+                        <div class="control">
+                            <input class="input is-small" name="search" type="text"
+                                   hx-trigger="keyup changed delay:500ms, search"
+                                   hx-post="/Users/Search"
+                                   hx-include="#${UserSearchFormElementId}"
+                                   hx-vals='{{"page": "1"}}'
+                                   placeholder="Begin typing to search users...">
+                        </div>
+                    </div>
+                    <div class="column is-narrow">
+                        <div class="is-flex is-align-items-center">
+                            <input id="ActiveOnly" name="active-only" type="checkbox" value="true"
+                                   hx-post="/Users/Search"
+                                   hx-include="#${UserSearchFormElementId}"
+                                   hx-vals='{{"page": "1"}}'
+                                   class="is-clickable ml-2 is-small">
+                            <label class="is-clickable mx-2 has-text-weight-semibold"
+                                   for="ActiveOnly">Active Only</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="table-container table-has-fixed-header">
+            <table id="${UserSearchTableElementId}" class="table is-narrow is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th class="p-2" scope="col">Display Name</th>
+                        <th class="p-2" scope="col">Email Address</th>
+                        <th class="p-2" scope="col">Type</th>
+                        <th class="p-2" scope="col">Active</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="loader-container">
+        <div class="loader"></div>
+    </div>
+</section>

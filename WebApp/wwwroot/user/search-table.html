@@ -1,0 +1,53 @@
+<table id="${UserSearchTableElementId}" class="table is-narrow is-hoverable is-fullwidth">
+    <thead>
+        <tr>
+            <th colspan="4" class="pb-6">
+                <div class="is-flex is-justify-content-space-between is-align-items-center">
+                    <div>${SearchResultSummary}</div>
+
+                    <div class="is-flex is-justify-content-right">
+                        <button class="button is-small" type="button" ${PreviousPageDisabled}
+                                hx-post="/Users/Search"
+                                hx-include="#${UserSearchFormElementId}"
+                                hx-vals='{"page": "${PreviousPage}"}'>
+                            <span class="material-icons ">navigate_before</span>
+                            <span class="is-sr-only">Previous</span>
+                        </button>
+                        <button class="button is-small mx-1" type="button" ${NextPageDisabled}
+                                hx-post="/Users/Search"
+                                hx-include="#${UserSearchFormElementId}"
+                                hx-vals='{"page": "${NextPage}"}'>
+                            <span class="material-icons ">navigate_next</span>
+                            <span class="is-sr-only">Next</span>
+                        </button>
+                        <button class="button is-small"
+                                type="button">
+                            <span class="material-icons ">add</span>
+                            <span class="is-sr-only">New User</span>
+                        </button>
+                    </div>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th class="p-2" scope="col">Display Name</th>
+            <th class="p-2" scope="col">Email Address</th>
+            <th class="p-2" scope="col">Type</th>
+            <th class="p-2" scope="col">Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${list User}
+        <tr class="is-clickable">
+            <td class="p-2">${User.DisplayName}</td>
+            <td class="p-2">${User.EmailAddress}</td>
+            <td class="p-2">
+                <span class="${User.TypeNameClass}">${User.UserTypeName}</span>
+            </td>
+            <td class="p-2">
+                <span class="${User.IsActiveClass}">${User.IsActiveText}</span>
+            </td>
+        </tr>
+        ${end User}
+    </tbody>
+</table>
