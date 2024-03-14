@@ -177,15 +177,3 @@ type HtmlTemplateLoader(templateDirectory: string) =
                 fileOrContent
 
         HtmlTemplate(htmlContent, "")
-
-[<AutoOpen>]
-module ServiceCollectionExtensions =
-    open Microsoft.Extensions.DependencyInjection
-    open Microsoft.AspNetCore.Hosting
-
-    type IServiceCollection with
-
-        /// Adds a lightweight HTML template renderer.
-        member this.AddHtmlTemplate() =
-            this.AddTransient<HtmlTemplateLoader>(fun services ->
-                HtmlTemplateLoader(services.GetRequiredService<IWebHostEnvironment>().WebRootPath))

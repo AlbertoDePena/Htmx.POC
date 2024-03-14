@@ -8,18 +8,19 @@
 	  	<UserSecretsId>580fff13-0798-466c-a310-4fab0231b143</UserSecretsId>
   </PropertyGroup>
 
-	<ItemGroup>		
+	<ItemGroup>					
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
 		<Compile Include="Infrastructure\Constants.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
 		<Compile Include="Infrastructure\Options.fs" />
 		<Compile Include="Infrastructure\HtmlTemplateLoader.fs" />
-		<Compile Include="Infrastructure\Database.fs" />
-		<Compile Include="Infrastructure\UserDatabase.fs" />
 		<Compile Include="Infrastructure\ErrorHandlerMiddleware.fs" />
+		<Compile Include="Infrastructure\Database.fs" />
+		<Compile Include="Infrastructure\Dapper.fs" />
 		<Compile Include="Infrastructure\Telemetry.fs" />
 		<Compile Include="Infrastructure\Serilog.fs" />
+		<Compile Include="Data\UserRepository.fs" />
 		<Compile Include="Views\Html.fs" />
 		<Compile Include="Views\IndexView.fs" />
 		<Compile Include="Views\DemoView.fs" />
@@ -34,6 +35,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.15.1" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />		
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />		

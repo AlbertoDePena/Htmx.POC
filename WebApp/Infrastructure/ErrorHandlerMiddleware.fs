@@ -37,8 +37,8 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
 
                 return! context.Response.WriteAsJsonAsync({| message = AuthorizationErrorMessage |})
 
-            | :? DatabaseException as ex ->
-                logger.LogError(DatabaseException.EventId, ex, ex.Message)
+            | :? DataAccessException as ex ->
+                logger.LogError(DataAccessException.EventId, ex, ex.Message)
 
                 context.Response.StatusCode <- HttpStatusCode.InternalServerError |> int
 

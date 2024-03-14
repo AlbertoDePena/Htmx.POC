@@ -62,6 +62,7 @@ type UserPermission =
         | "Export Search Results" -> Some UserPermission.ExportSearchResults
         | _ -> None
 
+[<CLIMutable>]
 type User =
     { UserId: UniqueId
       EmailAddress: Text
@@ -70,6 +71,7 @@ type User =
       UserTypeName: UserType
       IsActive: bool }
 
+[<CLIMutable>]
 type UserDetails =
     { User: User
       Permissions: UserPermission list

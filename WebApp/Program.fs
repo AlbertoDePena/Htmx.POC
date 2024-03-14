@@ -7,10 +7,12 @@ open Microsoft.Identity.Web
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authorization
+open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Mvc.Authorization
 open Microsoft.AspNetCore.CookiePolicy
 open Microsoft.ApplicationInsights
+open Microsoft.ApplicationInsights.Extensibility
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
@@ -19,13 +21,12 @@ open Microsoft.Extensions.Configuration
 
 open Serilog
 
-open WebApp.Infrastructure.Database
-open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
 open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.Dapper
 
 #nowarn "20"
 
@@ -41,18 +42,24 @@ module Program =
     let main args =
         try
             try
+                Dapper.registerTypeHandlers ()
+
                 let builder = WebApplication.CreateBuilder(args)
 
-                builder.Services.AddSqlDatabase()
-                builder.Services.AddUserDatabase()
-                builder.Services.AddHtmlTemplate()
+                builder.Services
+                    .AddOptions<DatabaseOptions>()
+                    .Configure<IConfiguration>(fun settings configuration ->
+                        configuration.GetSection("Database").Bind(settings))
+
+                builder.Services.AddTransient<HtmlTemplateLoader>(fun services ->
+                    HtmlTemplateLoader(services.GetRequiredService<IWebHostEnvironment>().WebRootPath))
 
                 builder.Services.Configure<CookiePolicyOptions>(
                     Action<CookiePolicyOptions>(fun options ->
                         options.Secure <- CookieSecurePolicy.Always
                         options.HttpOnly <- HttpOnlyPolicy.Always
                         options.MinimumSameSitePolicy <- SameSiteMode.Lax
-                        options.CheckConsentNeeded <- (fun context -> true)                        
+                        options.CheckConsentNeeded <- (fun context -> true)
                         options.HandleSameSiteCookieCompatibility() |> ignore)
                 )
 
@@ -71,9 +78,12 @@ module Program =
 
                     options.Filters.Add(AutoValidateAntiforgeryTokenAttribute()))
 
+                builder.Services.AddApplicationInsightsTelemetry()
+
                 builder.Services
-                    .AddApplicationInsightsTelemetry()
-                    .AddCustomTelemetryInitializers()
+                    .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
+                    .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
+                    .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
 
                 builder.Host.UseSerilog(
                     Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
@@ -85,7 +95,8 @@ module Program =
                     .AddHealthChecks()
                     .AddSqlServer(
                         connectionStringFactory =
-                            (fun services -> services.GetRequiredService<IOptions<Database>>().Value.ConnectionString),
+                            (fun services ->
+                                services.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString),
                         name = "HTMX POC Database"
                     )
 

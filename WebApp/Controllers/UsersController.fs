@@ -8,19 +8,22 @@ open FsToolkit.ErrorHandling
 open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Options
 
 open WebApp.Domain.Shared
 open WebApp.Domain.User
 open WebApp.Infrastructure.Constants
-open WebApp.Infrastructure.UserDatabase
+open WebApp.Infrastructure.Database
 open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Infrastructure.Options
+open WebApp.Data
 open WebApp.Views
 
 type UsersController
     (
         logger: ILogger<UsersController>,
+        databaseOptions: IOptions<DatabaseOptions>,
         antiforgery: IAntiforgery,
-        userDatabase: IUserDatabase,
         templateLoader: HtmlTemplateLoader
     ) =
     inherit HtmxController(antiforgery)
@@ -97,7 +100,10 @@ type UsersController
                       SortBy = None
                       SortDirection = None }
 
-                let! pagedData = userDatabase.GetPagedData query
+                let! pagedData =
+                    UserRepository.getPagedData
+                        (fun () -> DbConnection.create databaseOptions.Value.ConnectionString)
+                        query
 
                 let props: UserView.TableProps = { PagedData = pagedData }
 
@@ -137,7 +143,10 @@ type UsersController
                       SortBy = None
                       SortDirection = None }
 
-                let! pagedData = userDatabase.GetPagedData query
+                let! pagedData =
+                    UserRepository.getPagedData
+                        (fun () -> DbConnection.create databaseOptions.Value.ConnectionString)
+                        query
 
                 let searchResultSummary =
                     sprintf

@@ -15,11 +15,11 @@ type AuthorizationException(ex: Exception) =
 
     static member EventId = EventId(10001, "AuthorizationError")
 
-type DatabaseException(ex: Exception) =
+type DataAccessException(ex: Exception) =
     inherit Exception(ex.Message, ex)
-    new(message: string) = DatabaseException(Exception message)
+    new(message: string) = DataAccessException(Exception message)
 
-    static member EventId = EventId(10002, "DatabaseError")
+    static member EventId = EventId(10002, "DataAccessError")
 
 type ServerException(ex: Exception) =
     inherit Exception(ex.Message, ex)

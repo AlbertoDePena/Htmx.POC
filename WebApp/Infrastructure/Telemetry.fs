@@ -36,16 +36,3 @@ type AuthenticatedUserInitializer(httpContextAccessor: IHttpContextAccessor) =
                 && httpContextAccessor.HttpContext.User.Identity.IsAuthenticated
             then
                 telemetry.Context.User.AuthenticatedUserId <- httpContextAccessor.HttpContext.User.Identity.Name
-
-[<AutoOpen>]
-module ServiceCollectionExtensions =
-    open Microsoft.Extensions.DependencyInjection
-
-    type IServiceCollection with
-
-        /// Adds custom telemetry initializers
-        member this.AddCustomTelemetryInitializers() =
-            this
-                .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
-                .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
-                .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
