@@ -7,43 +7,30 @@ module Dapper =
     open Dapper
     open WebApp.Domain.Shared
     open WebApp.Domain.User
-    open FsToolkit.ErrorHandling
 
-    type private UserTypeHandler() =
-        inherit SqlMapper.TypeHandler<UserType>()
+    type private StringContainerHandler<'T>(ofString: string -> 'T option, getValue: 'T -> string) =
+        inherit SqlMapper.TypeHandler<'T>()
 
-        override _.SetValue(param, value) = param.Value <- value.Value
+        let typeName = typeof<'T>.Name
 
-        override _.Parse value =
-            value :?> string
-            |> UserType.OfString
-            |> Option.defaultWith (fun () -> failwith "The UserType cannot be null/empty/white-space")
-
-    type private UserTypeOptionHandler() =
-        inherit SqlMapper.TypeHandler<option<UserType>>()
-
-        override _.SetValue(param, value) =
-            param.Value <- (value |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue))
-
-        override _.Parse value = value :?> string |> UserType.OfString
-
-    type private TextHandler() =
-        inherit SqlMapper.TypeHandler<Text>()
-
-        override _.SetValue(param, value) = param.Value <- value.Value
+        override _.SetValue(param, value) = param.Value <- getValue value
 
         override _.Parse value =
             value :?> string
-            |> Text.OfString
-            |> Option.defaultWith (fun () -> failwith "The Text cannot be null/empty/white-space")
+            |> ofString
+            |> Option.defaultWith (fun () ->
+                failwithf "The data structure %s does not support the value %O" typeName value)
 
-    type private TextOptionHandler() =
-        inherit SqlMapper.TypeHandler<option<Text>>()
+    type private StringContainerOptionHandler<'T>(ofString: string -> 'T option, getValue: 'T -> string) =
+        inherit SqlMapper.TypeHandler<option<'T>>()
 
         override _.SetValue(param, value) =
-            param.Value <- (value |> Option.either (fun x -> x.Value) (fun () -> String.defaultValue))
+            param.Value <-
+                (match value with
+                 | Some t -> getValue t
+                 | None -> String.defaultValue)
 
-        override _.Parse value = value :?> string |> Text.OfString
+        override _.Parse value = value :?> string |> ofString
 
     type private OptionHandler<'T>() =
         inherit SqlMapper.TypeHandler<option<'T>>()
@@ -51,7 +38,7 @@ module Dapper =
         override _.SetValue(param, value) =
             let valueOrNull =
                 match value with
-                | Some x -> box x
+                | Some t -> box t
                 | None -> null
 
             param.Value <- valueOrNull
@@ -64,7 +51,9 @@ module Dapper =
 
     let private singleton =
         lazy
-            (SqlMapper.AddTypeHandler(OptionHandler<Guid>())
+            (
+             // primitive type wrapped in an option
+             SqlMapper.AddTypeHandler(OptionHandler<Guid>())
              SqlMapper.AddTypeHandler(OptionHandler<byte>())
              SqlMapper.AddTypeHandler(OptionHandler<int16>())
              SqlMapper.AddTypeHandler(OptionHandler<int>())
@@ -81,10 +70,16 @@ module Dapper =
              SqlMapper.AddTypeHandler(OptionHandler<DateTimeOffset>())
              SqlMapper.AddTypeHandler(OptionHandler<bool>())
              SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
-             SqlMapper.AddTypeHandler(TextHandler())
-             SqlMapper.AddTypeHandler(TextOptionHandler())
-             SqlMapper.AddTypeHandler(UserTypeHandler())
-             SqlMapper.AddTypeHandler(UserTypeOptionHandler()))
+             // string wrapped in a container
+             SqlMapper.AddTypeHandler(StringContainerHandler(Text.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerHandler(UserType.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerHandler(UserPermission.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerHandler(UserGroup.OfString, (fun x -> x.Value)))
+             // string wrapped in an optional container
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserType.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserPermission.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserGroup.OfString, (fun x -> x.Value))))
 
     /// Register Dapper type handlers
     let registerTypeHandlers () = singleton.Force()
