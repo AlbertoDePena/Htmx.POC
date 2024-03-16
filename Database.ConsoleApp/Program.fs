@@ -17,7 +17,8 @@ type Application() = class end
 [<RequireQualifiedAccess>]
 module Program =
 
-    let exitCode = 0
+    [<Literal>]
+    let ExitCode = 0
 
     let update dbConnectionString directory =
         let builder =
@@ -57,4 +58,4 @@ module Program =
             for directory in directories do
                 update dbConnectionString directory
 
-        exitCode
+        ExitCode

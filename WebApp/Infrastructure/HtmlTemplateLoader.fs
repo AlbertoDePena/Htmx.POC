@@ -47,8 +47,6 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
 
         let valueAsString = value.ToString()
 
-        let isHtml = valueAsString.StartsWith("<")
-
         let sanitizedKey =
             if String.IsNullOrWhiteSpace identifier then
                 key
@@ -56,7 +54,7 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
                 sprintf "%s.%s" identifier key
 
         let sanitizedValue =
-            if encodeValue && isString && (not isHtml) then
+            if encodeValue && isString then
                 valueAsString |> WebUtility.HtmlEncode
             else
                 valueAsString
