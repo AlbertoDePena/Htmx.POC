@@ -19,7 +19,7 @@ module Dapper =
             value :?> string
             |> ofString
             |> Option.defaultWith (fun () ->
-                failwithf "The data structure %s does not support the value %O" typeName value)
+                failwithf "The value %O cannot be parsed into a %s" value typeName)
 
     type private StringContainerOptionHandler<'T>(ofString: string -> 'T option, getValue: 'T -> string) =
         inherit SqlMapper.TypeHandler<option<'T>>()
