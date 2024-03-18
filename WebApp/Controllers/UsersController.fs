@@ -44,7 +44,7 @@ type UsersController
 
             let mainContent =
                 Html.load "templates/search-section.html"
-                |> Html.withAntiforgery getAntiforgeryToken
+                |> Html.csrf getAntiforgeryToken
                 |> Html.replace "UserSearchTableElementId" "UserSearchTable"
                 |> Html.replace "UserSearchFormElementId" "UserSearchForm"
                 |> Html.render
@@ -176,7 +176,7 @@ type UsersController
 
                 let htmlContent =
                     Html.load "templates/search-table.html"
-                    |> Html.withAntiforgery getAntiforgeryToken
+                    |> Html.csrf getAntiforgeryToken
                     |> Html.replace "UserSearchTableElementId" "UserSearchTable"
                     |> Html.replace "UserSearchFormElementId" "UserSearchForm"
                     |> Html.replace "SearchResultSummary" searchResultSummary

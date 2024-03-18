@@ -182,7 +182,7 @@ module Html =
 
         HtmlTemplate(htmlContent, "")
 
-    let withAntiforgery getToken (template: HtmlTemplate) = template.WithAntiforgery(getToken)
+    let csrf getToken (template: HtmlTemplate) = template.WithAntiforgery(getToken)
 
     let replace key value (template: HtmlTemplate) = template.Replace(key, value)
 
