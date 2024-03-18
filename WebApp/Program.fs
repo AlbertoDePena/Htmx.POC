@@ -7,7 +7,6 @@ open Microsoft.Identity.Web
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authorization
-open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Mvc.Authorization
 open Microsoft.AspNetCore.CookiePolicy
@@ -25,7 +24,6 @@ open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
-open WebApp.Infrastructure.HtmlTemplate
 open WebApp.Infrastructure.Dapper
 
 #nowarn "20"
@@ -50,9 +48,6 @@ module Program =
                     .AddOptions<DatabaseOptions>()
                     .Configure<IConfiguration>(fun settings configuration ->
                         configuration.GetSection("Database").Bind(settings))
-
-                builder.Services.AddTransient<HtmlTemplateLoader>(fun services ->
-                    HtmlTemplateLoader(services.GetRequiredService<IWebHostEnvironment>().WebRootPath))
 
                 builder.Services.Configure<CookiePolicyOptions>(
                     Action<CookiePolicyOptions>(fun options ->

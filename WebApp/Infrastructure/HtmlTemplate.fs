@@ -80,7 +80,7 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             sprintf "The HTML content has unbounded values: %s" unboundedValues |> failwith
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindAntiforgery(getAntiforgeryToken: unit -> AntiforgeryToken) : HtmlTemplate =
+    member this.WithAntiforgery(getAntiforgeryToken: unit -> AntiforgeryToken) : HtmlTemplate =
         try
             let token = getAntiforgeryToken ()
 
@@ -93,7 +93,7 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.BindRaw(key: Key, value: Value) : HtmlTemplate =
+    member this.ReplaceRaw(key: Key, value: Value) : HtmlTemplate =
         try
             createBinding key value false
             this
@@ -101,7 +101,7 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.Bind(key: Key, value: Value) : HtmlTemplate =
+    member this.Replace(key: Key, value: Value) : HtmlTemplate =
         try
             createBinding key value true
             this
@@ -109,7 +109,12 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             HtmlTemplateException ex |> raise
 
     /// <exception cref="HtmlTemplateException"></exception>
-    member this.Bind(identifier: Identifier, items: 'a list, mapping: ('a * HtmlTemplate) -> HtmlTemplate) : HtmlTemplate =
+    member this.Replace
+        (
+            identifier: Identifier,
+            items: 'a list,
+            mapping: ('a * HtmlTemplate) -> HtmlTemplate
+        ) : HtmlTemplate =
         try
             if String.IsNullOrWhiteSpace identifier then
                 failwith "The identifier cannot be null/empty/white-space"
@@ -159,19 +164,31 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
         with ex ->
             HtmlTemplateException ex |> raise
 
-type HtmlTemplateLoader(templateDirectory: string) =
+[<RequireQualifiedAccess>]
+module Html =
 
-    member this.Load(fileOrContent: FileOrContent) : HtmlTemplate =
-        if isNull templateDirectory then
-            nameof templateDirectory |> sprintf "%s cannot be null" |> failwith
+    let private currentDirectory =
+        Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly().Location)
 
+    let load (fileOrContent: FileOrContent) =
         if isNull fileOrContent then
             nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
         let htmlContent =
             if fileOrContent.EndsWith(".html") then
-                Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
+                Path.Combine(currentDirectory, fileOrContent) |> File.ReadAllText
             else
                 fileOrContent
 
         HtmlTemplate(htmlContent, "")
+
+    let withAntiforgery getToken (template: HtmlTemplate) = template.WithAntiforgery(getToken)
+
+    let replace key value (template: HtmlTemplate) = template.Replace(key, value)
+
+    let replaceRaw key value (template: HtmlTemplate) = template.ReplaceRaw(key, value)
+
+    let replaceList identifier items mapping (template: HtmlTemplate) =
+        template.Replace(identifier, items, (fun (x, y) -> mapping x y))
+
+    let render (template: HtmlTemplate) = template.Render()

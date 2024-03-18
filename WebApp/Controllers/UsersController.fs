@@ -20,12 +20,7 @@ open WebApp.Data
 open WebApp.Views
 
 type UsersController
-    (
-        logger: ILogger<UsersController>,
-        databaseOptions: IOptions<DatabaseOptions>,
-        antiforgery: IAntiforgery,
-        templateLoader: HtmlTemplateLoader
-    ) =
+    (logger: ILogger<UsersController>, databaseOptions: IOptions<DatabaseOptions>, antiforgery: IAntiforgery) =
     inherit HtmxController(antiforgery)
 
     [<HttpGet>]
@@ -48,25 +43,25 @@ type UsersController
                   RequestToken = token.RequestToken }
 
             let mainContent =
-                templateLoader
-                    .Load("user/search-section.html")
-                    .BindAntiforgery(getAntiforgeryToken)
-                    .Bind("UserSearchTableElementId", "UserSearchTable")
-                    .Bind("UserSearchFormElementId", "UserSearchForm")
-                    .Render()
+                Html.load "templates/search-section.html"
+                |> Html.withAntiforgery getAntiforgeryToken
+                |> Html.replace "UserSearchTableElementId" "UserSearchTable"
+                |> Html.replace "UserSearchFormElementId" "UserSearchForm"
+                |> Html.render
 
             if this.Request.IsHtmxBoosted() then
                 return this.HtmlContent(mainContent)
             else
+                let userName = this.GetUserName()
+
                 let indexContent =
-                    templateLoader
-                        .Load("index.html")
-                        .Bind("NavbarBurgerElementId", "NavbarBurger")
-                        .Bind("MainNavbarElementId", "MainNavbar")
-                        .Bind("MainContentElementId", "MainContent")
-                        .Bind("UserName", this.GetUserName())
-                        .Bind("MainContent", mainContent)
-                        .Render()
+                    Html.load "templates/index.html"
+                    |> Html.replace "NavbarBurgerElementId" "NavbarBurger"
+                    |> Html.replace "MainNavbarElementId" "MainNavbar"
+                    |> Html.replace "MainContentElementId" "MainContent"
+                    |> Html.replace "UserName" userName
+                    |> Html.replace "MainContent" mainContent
+                    |> Html.render
 
                 return this.HtmlContent(indexContent)
         }
@@ -161,7 +156,7 @@ type UsersController
                     { FormFieldName = token.FormFieldName
                       RequestToken = token.RequestToken }
 
-                let userTableContent (user: User, template: HtmlTemplate) =
+                let userTableContent (user: User) (template: HtmlTemplate) =
                     let typeNameClass =
                         match user.UserTypeName with
                         | UserType.Customer -> "tag is-light is-info"
@@ -172,26 +167,25 @@ type UsersController
                     let isActiveText = if user.IsActive then "Yes" else "No"
 
                     template
-                        .Bind("DisplayName", user.DisplayName)
-                        .Bind("EmailAddress", user.EmailAddress)
-                        .Bind("TypeNameClass", typeNameClass)
-                        .Bind("UserTypeName", user.UserTypeName)
-                        .Bind("IsActiveClass", isActiveClass)
-                        .Bind("IsActiveText", isActiveText)
+                    |> Html.replace "DisplayName" user.DisplayName
+                    |> Html.replace "EmailAddress" user.EmailAddress
+                    |> Html.replace "TypeNameClass" typeNameClass
+                    |> Html.replace "UserTypeName" user.UserTypeName
+                    |> Html.replace "IsActiveClass" isActiveClass
+                    |> Html.replace "IsActiveText" isActiveText
 
                 let htmlContent =
-                    templateLoader
-                        .Load("user/search-table.html")
-                        .BindAntiforgery(getAntiforgeryToken)
-                        .Bind("UserSearchTableElementId", "UserSearchTable")
-                        .Bind("UserSearchFormElementId", "UserSearchForm")
-                        .Bind("SearchResultSummary", searchResultSummary)
-                        .Bind("PreviousPageDisabled", HtmlAttribute.disabled (not pagedData.HasPreviousPage))
-                        .Bind("NextPageDisabled", HtmlAttribute.disabled (not pagedData.HasNextPage))
-                        .Bind("PreviousPage", pagedData.Page - 1)
-                        .Bind("NextPage", pagedData.Page + 1)
-                        .Bind("User", pagedData.Data, userTableContent)
-                        .Render()
+                    Html.load "templates/search-table.html"
+                    |> Html.withAntiforgery getAntiforgeryToken
+                    |> Html.replace "UserSearchTableElementId" "UserSearchTable"
+                    |> Html.replace "UserSearchFormElementId" "UserSearchForm"
+                    |> Html.replace "SearchResultSummary" searchResultSummary
+                    |> Html.replace "PreviousPageDisabled" (HtmlAttribute.disabled (not pagedData.HasPreviousPage))
+                    |> Html.replace "NextPageDisabled" (HtmlAttribute.disabled (not pagedData.HasNextPage))
+                    |> Html.replace "PreviousPage" (pagedData.Page - 1)
+                    |> Html.replace "NextPage" (pagedData.Page + 1)
+                    |> Html.replaceList "User" pagedData.Data userTableContent
+                    |> Html.render
 
                 return this.HtmlContent htmlContent
             else
