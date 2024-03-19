@@ -138,8 +138,8 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             let htmlContents =
                 items
                 |> List.map (fun item ->
-                    let templateWithKey = HtmlTemplate(templateList, identifier)
-                    let itemTemplate = mapping (item, templateWithKey)
+                    let templateWithIdentifier = HtmlTemplate(templateList, identifier)
+                    let itemTemplate = mapping (item, templateWithIdentifier)
                     itemTemplate.Render())
                 |> String.concat ""
 
