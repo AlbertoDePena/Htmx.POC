@@ -1,11 +1,11 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     htmx.config.historyEnabled = false;
 
-    var activeClass = 'is-active';
-    var navbarBurger = document.getElementById('NavbarBurger');
+    const activeClass = 'is-active';
+    const navbarBurger = document.getElementById('NavbarBurger');
 
     if (navbarBurger) {
-        var mainNavbar = document.getElementById(navbarBurger.dataset.target);
+        const mainNavbar = document.getElementById(navbarBurger.dataset.target);
 
         if (mainNavbar) {
             navbarBurger.addEventListener('click', () => {
@@ -13,35 +13,5 @@ document.addEventListener('DOMContentLoaded', function () {
                 mainNavbar.classList.toggle(activeClass);
             });
         }
-    }
-
-    htmx.onLoad(function (target) {
-        console.log('ADP TEST: ', target);
-
-        const ctx = document.getElementById('myChart');
-
-        if (ctx) {
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                    datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }    
-    });
-
-
-    
+    }    
 });

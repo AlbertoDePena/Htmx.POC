@@ -80,3 +80,9 @@ tbody tr td {
 .loader-container.htmx-request {
     display: flex;
 }
+
+.chartjs-container {
+    width: 100% !important;
+    max-height: 300px !important;
+    min-height: 300px !important;
+}

@@ -84,7 +84,7 @@ module IndexView =
                 <p class="has-text-centered">This is a test</p>
             </footer>
             <!--scripts-->
-            <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+            <script src="https://unpkg.com/htmx.org@1.9.11"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script src="/js/index.js"></script>
         </body>

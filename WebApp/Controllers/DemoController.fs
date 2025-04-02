@@ -21,18 +21,18 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
 
             let htmlContent = DemoView.renderMain props
 
-            return this.HtmlContent(htmlContent)
+            return this.HtmlContent htmlContent
         }
 
     [<HttpGet>]
     member this.Random() : Task<IActionResult> =
         task {
             if this.Request.IsHtmx() then
-                do! Task.Delay(3000)
+                do! Task.Delay 3000
 
                 let randomNumber = random.NextDouble()
 
-                return this.HtmlContent(randomNumber.ToString())
+                return this.HtmlContent (randomNumber.ToString())
             else
                 return! this.Index()
         }
@@ -41,7 +41,7 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
     member this.Save() : Task<IActionResult> =
         task {
             if this.Request.IsHtmx() then
-                return this.HtmlContent("Saved!")
+                return this.HtmlContent "Saved!"
             else
                 return! this.Index()
         }
@@ -49,15 +49,40 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
     [<HttpGet>]
     member this.Chart() : Task<IActionResult> =
         task {
-            //<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             if this.Request.IsHtmx() then
+                do! Task.Delay 1000
+
+                let randomNumbers = 
+                    [1..3] 
+                    |> List.map (fun _ -> random.Next(1, 10))
+                    |> System.Text.Json.JsonSerializer.Serialize
+
                 let htmlContent = 
+                    $"""                    
+                    <canvas id="myChart"></canvas>                
+                    <script>                        
+                        new Chart(document.getElementById('myChart'), {{
+                            type: 'bar',
+                            data: {{
+                                labels: ['Number 1', 'Number 2', 'Number 3'], 
+                                datasets: [{{
+                                    label: 'Random Numbers',
+                                    data: {randomNumbers},
+                                    borderWidth: 1
+                                }}]
+                            }},
+                            options: {{
+                                maintainAspectRatio: false,
+                                scales: {{
+                                    y: {{
+                                        beginAtZero: true
+                                    }}
+                                }}
+                            }}
+                        }});
+                    </script>
                     """
-                    <div>
-                      <canvas id="myChart"></canvas>
-                    </div>
-                    """
-                return this.HtmlContent(htmlContent)
+                return this.HtmlContent htmlContent
             else
                 return! this.Index()
         }
