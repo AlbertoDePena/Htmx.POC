@@ -15,13 +15,12 @@ module UserView =
             | UserSearchTable -> "UserSearchTable"
             | UserSearchForm -> "UserSearchForm"
 
-    [<NoEquality>]
-    [<NoComparison>]
-    type MainProps = { Shared: Html.SharedProps }
+    type MainProps =
+        { FormFieldName: string
+          RequestToken: string }
 
     let renderMain (props: MainProps) : string =
-        let mainContent =
-            $"""
+        $"""
             <section hx-target="#{ElementId.UserSearchTable}" hx-swap="outerHTML" hx-indicator=".loader-container">
                 <div class="box">
                     <nav class="breadcrumb is-small" aria-label="breadcrumbs">
@@ -37,7 +36,7 @@ module UserView =
                             <form id="{ElementId.UserSearchForm}" class="columns"
                                   hx-trigger="load"
                                   hx-post="/Users/Search">
-                                {Html.antiforgery props.Shared.GetAntiforgeryToken}
+                                {Html.antiforgery props.FormFieldName props.RequestToken}
                                 <div class="column">
                                     <div class="control">
                                         <input class="input is-small" name="search" type="text"
@@ -83,13 +82,6 @@ module UserView =
             </section>
             """
 
-        match props.Shared.IsHtmxBoosted with
-        | true -> mainContent
-        | false ->
-            IndexView.renderPage
-                { UserName = props.Shared.UserName
-                  MainContent = mainContent }
-
     [<NoEquality>]
     [<NoComparison>]
     type TableProps = { PagedData: PagedData<User> }
@@ -114,8 +106,8 @@ module UserView =
 
             $"""
             <tr class="is-clickable">
-                <td class="p-2">{Html.encodeText user.DisplayName}</td>
-                <td class="p-2">{Html.encodeText user.EmailAddress}</td>
+                <td class="p-2">{Html.encode user.DisplayName.Value}</td>
+                <td class="p-2">{Html.encode user.EmailAddress.Value}</td>
                 <td class="p-2">
                     <span class="{typeNameClass}">{user.UserTypeName}</span>
                 </td>
@@ -134,14 +126,14 @@ module UserView =
                             <div>{searchResultSummary}</div>
 
                             <div class="is-flex is-justify-content-right">
-                                <button class="button is-small" type="button" {HtmlAttribute.disabled (not props.PagedData.HasPreviousPage)}
+                                <button class="button is-small" type="button" {Html.disabled (not props.PagedData.HasPreviousPage)}
                                         hx-post="/Users/Search"
                                         hx-include="#{ElementId.UserSearchForm}"
                                         hx-vals='{{"page": "{props.PagedData.Page - 1}"}}'>
                                     <span class="material-icons ">navigate_before</span>
                                     <span class="is-sr-only">Previous</span>
                                 </button>
-                                <button class="button is-small mx-1" type="button" {HtmlAttribute.disabled (not props.PagedData.HasNextPage)}
+                                <button class="button is-small mx-1" type="button" {Html.disabled (not props.PagedData.HasNextPage)}
                                         hx-post="/Users/Search"
                                         hx-include="#{ElementId.UserSearchForm}"
                                         hx-vals='{{"page": "{props.PagedData.Page + 1}"}}'>

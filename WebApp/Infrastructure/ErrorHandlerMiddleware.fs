@@ -21,7 +21,7 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
     member this.Invoke(context: HttpContext) =
         task {
             try
-                do! next.Invoke(context)
+                do! next.Invoke context
             with
             | :? AuthenticationException as ex ->
                 logger.LogDebug(AuthenticationException.EventId, ex, ex.Message)
@@ -51,13 +51,3 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
 
                 return! context.Response.WriteAsJsonAsync({| message = ServerErrorMessage |})
         }
-
-[<AutoOpen>]
-module ServiceCollectionExtensions =
-    open Microsoft.AspNetCore.Builder
-
-    type IApplicationBuilder with
-
-        /// Adds custom error handler middleware.
-        member this.UseCustomErrorHandler() =
-            this.UseMiddleware<ErrorHandlerMiddleware>()

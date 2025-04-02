@@ -109,7 +109,7 @@ module Program =
                 if builder.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage()
                 else
-                    app.UseCustomErrorHandler()
+                    app.UseMiddleware<ErrorHandlerMiddleware>()
                     app.UseHsts()
 
                 app.UseHttpsRedirection()

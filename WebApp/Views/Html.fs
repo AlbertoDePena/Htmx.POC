@@ -7,37 +7,8 @@ open System.Net
 [<RequireQualifiedAccess>]
 module Html =
 
-    type AntiforgeryToken =
-        { FormFieldName: string
-          RequestToken: string }
-
-    [<NoEquality>]
-    [<NoComparison>]
-    type SharedProps =
-        { IsHtmxBoosted: bool
-          UserName: string
-          GetAntiforgeryToken: unit -> AntiforgeryToken }
-
-    let antiforgery (getAntiforgeryToken: unit -> AntiforgeryToken) : string =
-        let token = getAntiforgeryToken ()
-
-        $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
-
-    let encodeString (value: string) : string = WebUtility.HtmlEncode value
-
-    let encodeText (text: WebApp.Domain.Shared.Text) : string = encodeString text.Value
-
-    let forEach<'a> (items: 'a list) (mapping: 'a -> string) (separator: string) : string =
-        items |> List.map mapping |> String.concat separator
-
-    let formatDateTime (dataTime: DateTime) : string =
-        dataTime.ToString("o", CultureInfo.InvariantCulture)
-
-    let formatDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
-        dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)
-
-[<RequireQualifiedAccess>]
-module HtmlAttribute =
+    [<Literal>]
+    let NonBreakingSpace = "&nbsp;"
 
     let disabled (value: bool) : string =
         match value with
@@ -53,3 +24,20 @@ module HtmlAttribute =
         match value with
         | true -> "required"
         | false -> ""
+
+    let antiforgery (formFieldName: string) (requestToken: string) : string =
+        $"""<input name="{formFieldName}" type="hidden" value="{requestToken}">"""
+
+    let encode (value: string) : string = WebUtility.HtmlEncode value
+
+    let forEach<'a> (items: 'a list) (mapping: 'a -> string) (separator: string) : string =
+        items |> List.map mapping |> String.concat separator
+
+    let formatDate (date: DateOnly) : string =
+        date.ToString("o", CultureInfo.InvariantCulture)
+
+    let formatDateTime (dateTime: DateTime) : string =
+        dateTime.ToString("o", CultureInfo.InvariantCulture)
+
+    let formatDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
+        dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)

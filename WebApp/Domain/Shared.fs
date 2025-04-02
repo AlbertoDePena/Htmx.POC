@@ -7,38 +7,44 @@ module String =
     let defaultValue = null
 
 /// <summary>
+/// Represents a valid email address
+/// </summary>
+type EmailAddress =
+    private
+    | EmailAddress of string
+
+    member this.Value =
+        let (EmailAddress value) = this
+        value
+    
+    override this.ToString() = this.Value
+    
+    static member OfString(value: string) =
+        if System.String.IsNullOrWhiteSpace value then
+            None
+        elif System.Text.RegularExpressions.Regex.IsMatch(value, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$") then
+            Some(EmailAddress(value.ToLower()))
+        else
+            None
+
+/// <summary>
 /// Represents a non null/empty/white-space string
 /// </summary>
 type Text =
     private
     | Text of string
 
-    /// <summary>Unwrap the Text to it's primitive value</summary>
     member this.Value =
         let (Text value) = this
         value
     
-    /// <summary>Apply a function to the Text's primitive value</summary>
-    member this.Apply (f: string -> 'a) =
-        this.Value |> f
-
     override this.ToString() = this.Value
 
-    /// <summary>Try to convert a potentially null/empty/white-space string to a Text</summary>
     static member OfString(value: string) =
         if System.String.IsNullOrWhiteSpace value then
             None
         else
             Some(Text value)
-
-    /// <summary>Try to convert a potentially null/empty/white-space email string to a Text</summary>
-    static member OfEmailString(value: string) =
-        if System.String.IsNullOrWhiteSpace value then
-            None
-        elif System.Text.RegularExpressions.Regex.IsMatch(value, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$") then
-            Some(Text(value.ToLower()))
-        else
-            None
 
 [<RequireQualifiedAccess>]
 type SortDirection =
@@ -88,7 +94,7 @@ type PagedData<'a> =
         let pageCount = this.TotalCount / this.PageSize
 
         let totalPages =
-            if (this.TotalCount % this.PageSize) = 0 then
+            if this.TotalCount % this.PageSize = 0 then
                 pageCount
             else
                 pageCount + 1
@@ -99,4 +105,4 @@ type PagedData<'a> =
         this.Page > 1
 
     member this.HasNextPage =
-        (this.Page * this.PageSize) < this.TotalCount
+        this.Page * this.PageSize < this.TotalCount

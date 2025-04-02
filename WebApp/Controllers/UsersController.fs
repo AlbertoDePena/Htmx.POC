@@ -26,11 +26,15 @@ type UsersController
     [<HttpGet>]
     member this.IndexAlt() : Task<IActionResult> =
         task {
-            let props: UserView.MainProps = { Shared = this.GetSharedProps() }
+            let antiforgeryToken = this.GetAntiforgeryToken()
+            let props: UserView.MainProps = { FormFieldName = antiforgeryToken.FormFieldName; RequestToken = antiforgeryToken.RequestToken }
 
-            let htmlContent = UserView.renderMain props
+            let mainContent = UserView.renderMain props
 
-            return this.HtmlContent(htmlContent)
+            let pageProps: IndexView.PageProps = { PageName = "Users"; UserName = "John Doe"; MainContent = mainContent }
+            let htmlContent = IndexView.renderPage pageProps
+
+            return this.HtmlContent htmlContent
         }
 
     [<HttpGet>]
@@ -180,8 +184,8 @@ type UsersController
                     |> Html.replace "UserSearchTableElementId" "UserSearchTable"
                     |> Html.replace "UserSearchFormElementId" "UserSearchForm"
                     |> Html.replace "SearchResultSummary" searchResultSummary
-                    |> Html.replace "PreviousPageDisabled" (HtmlAttribute.disabled (not pagedData.HasPreviousPage))
-                    |> Html.replace "NextPageDisabled" (HtmlAttribute.disabled (not pagedData.HasNextPage))
+                    |> Html.replace "PreviousPageDisabled" (Html.disabled (not pagedData.HasPreviousPage))
+                    |> Html.replace "NextPageDisabled" (Html.disabled (not pagedData.HasNextPage))
                     |> Html.replace "PreviousPage" (pagedData.Page - 1)
                     |> Html.replace "NextPage" (pagedData.Page + 1)
                     |> Html.replaceList "User" pagedData.Data userTableContent

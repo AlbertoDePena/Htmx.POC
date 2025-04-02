@@ -17,9 +17,13 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
     [<HttpGet>]
     member this.Index() : Task<IActionResult> =
         task {
-            let props: DemoView.MainProps = { Shared = this.GetSharedProps() }
+            let antiforgeryToken = this.GetAntiforgeryToken()
+            let props: DemoView.MainProps = { FormFieldName = antiforgeryToken.FormFieldName; RequestToken = antiforgeryToken.RequestToken }
 
-            let htmlContent = DemoView.renderMain props
+            let mainContent = DemoView.renderMain props
+
+            let pageProps: IndexView.PageProps = { PageName = "Demo"; UserName = "John Doe"; MainContent = mainContent }
+            let htmlContent = IndexView.renderPage pageProps
 
             return this.HtmlContent htmlContent
         }

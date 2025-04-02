@@ -65,7 +65,7 @@ type UserPermission =
 [<CLIMutable>]
 type User =
     { UserId: UniqueId
-      EmailAddress: Text
+      EmailAddress: EmailAddress
       DisplayName: Text
       UserTypeId: UniqueId
       UserTypeName: UserType

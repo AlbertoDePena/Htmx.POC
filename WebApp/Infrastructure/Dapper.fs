@@ -26,11 +26,27 @@ module Dapper =
 
         override _.SetValue(param, value) =
             param.Value <-
-                (match value with
+                match value with
                  | Some t -> getValue t
-                 | None -> String.defaultValue)
+                 | None -> String.defaultValue
 
         override _.Parse value = value :?> string |> ofString
+
+    type private EmptyStringHandler() =
+        inherit SqlMapper.TypeHandler<string>()
+
+        override _.SetValue(param, value) =
+            param.Value <-
+                if String.IsNullOrWhiteSpace value then
+                     String.defaultValue
+                 else
+                     value
+
+        override _.Parse value =
+            if isNull value || value = box DBNull.Value then
+                String.defaultValue
+            else
+                value.ToString()
 
     type private OptionHandler<'T>() =
         inherit SqlMapper.TypeHandler<option<'T>>()
@@ -70,13 +86,16 @@ module Dapper =
              SqlMapper.AddTypeHandler(OptionHandler<DateTimeOffset>())
              SqlMapper.AddTypeHandler(OptionHandler<bool>())
              SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
+             SqlMapper.AddTypeHandler(EmptyStringHandler())
              // string wrapped in a container
              SqlMapper.AddTypeHandler(StringContainerHandler(Text.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerHandler(EmailAddress.OfString, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerHandler(UserType.OfString, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerHandler(UserPermission.OfString, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerHandler(UserGroup.OfString, (fun x -> x.Value)))
              // string wrapped in an optional container
              SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(EmailAddress.OfString, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserType.OfString, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserPermission.OfString, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserGroup.OfString, (fun x -> x.Value))))

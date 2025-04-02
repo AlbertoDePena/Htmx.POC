@@ -11,19 +11,21 @@ module DemoView =
             match this with
             | RandomNumberOutput -> "RandomNumberOutput"
 
-    [<NoEquality>]
-    [<NoComparison>]
-    type MainProps = { Shared: Html.SharedProps }
+    type MainProps =
+        { FormFieldName: string
+          RequestToken: string }
 
     let renderMain (props: MainProps) : string =
-        let mainContent =
-            $"""
-            <div hx-target="#{ElementId.RandomNumberOutput}" hx-swap="innerHTML" hx-indicator=".loader-container">
+        $"""
+            <div>
                 <h3 class="title is-size-1">
                     Random Number Generator
                 </h3>
 
-                <button class="button is-small is-primary block" type="button" hx-get="/Demo/Random">
+                <button class="button is-small is-primary block" type="button" 
+                    hx-get="/Demo/Random"
+                    hx-target="#{ElementId.RandomNumberOutput}" 
+                    hx-swap="innerHTML">
                     Get Random Number
                 </button>
 
@@ -37,15 +39,11 @@ module DemoView =
 
                 <div class="box">
                     <form hx-post="/Demo/Save">
-                        {Html.antiforgery props.Shared.GetAntiforgeryToken}
+                        {Html.antiforgery props.FormFieldName props.RequestToken}
                         <input class="input is-small" placeholder="Enter some text" type="text" />
                         <hr />
                         <button class="button is-small" type="submit">Save</button>
                     </form>
-                </div>
-
-                <div class="loader-container">
-                    <div class="loader"></div>
                 </div>
 
                 <div class="box">
@@ -64,10 +62,3 @@ module DemoView =
                     hx-target="this"></div>
             </div>
             """
-
-        match props.Shared.IsHtmxBoosted with
-        | true -> mainContent
-        | false ->
-            IndexView.renderPage
-                { UserName = props.Shared.UserName
-                  MainContent = mainContent }
