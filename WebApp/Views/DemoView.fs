@@ -6,10 +6,12 @@ module DemoView =
     [<RequireQualifiedAccess>]
     type ElementId =
         | RandomNumberOutput
+        | ChartJsContainer
 
         override this.ToString() =
             match this with
             | RandomNumberOutput -> "RandomNumberOutput"
+            | ChartJsContainer -> "ChartJsContainer"
 
     type MainProps =
         { FormFieldName: string
@@ -50,12 +52,12 @@ module DemoView =
                     <button class="button is-small is-primary block" type="button" 
                         hx-get="/Demo/Chart" 
                         hx-swap="innerHTML"
-                        hx-target="#chartjs-container">
+                        hx-target="#{ElementId.ChartJsContainer}">
                         Load ChartJs
                     </button>
                 </div>
 
-                <div class="box chartjs-container" id="chartjs-container" 
+                <div class="box chartjs-container" id="{ElementId.ChartJsContainer}" 
                     hx-get="/Demo/Chart" 
                     hx-trigger="load" 
                     hx-swap="innerHTML"

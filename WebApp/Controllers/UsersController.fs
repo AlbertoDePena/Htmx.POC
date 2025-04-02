@@ -27,11 +27,16 @@ type UsersController
     member this.IndexAlt() : Task<IActionResult> =
         task {
             let antiforgeryToken = this.GetAntiforgeryToken()
-            let props: UserView.MainProps = { FormFieldName = antiforgeryToken.FormFieldName; RequestToken = antiforgeryToken.RequestToken }
 
-            let mainContent = UserView.renderMain props
+            let props: UserView.MainProps =
+                { FormFieldName = antiforgeryToken.FormFieldName
+                  RequestToken = antiforgeryToken.RequestToken }
 
-            let pageProps: IndexView.PageProps = { PageName = "Users"; UserName = "John Doe"; MainContent = mainContent }
+            let pageProps: IndexView.PageProps =
+                { PageName = "Users"
+                  UserName = this.GetUserName()
+                  MainContent = UserView.renderMain props }
+
             let htmlContent = IndexView.renderPage pageProps
 
             return this.HtmlContent htmlContent

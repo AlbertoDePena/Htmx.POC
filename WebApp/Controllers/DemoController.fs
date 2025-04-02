@@ -18,11 +18,16 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
     member this.Index() : Task<IActionResult> =
         task {
             let antiforgeryToken = this.GetAntiforgeryToken()
-            let props: DemoView.MainProps = { FormFieldName = antiforgeryToken.FormFieldName; RequestToken = antiforgeryToken.RequestToken }
 
-            let mainContent = DemoView.renderMain props
+            let props: DemoView.MainProps =
+                { FormFieldName = antiforgeryToken.FormFieldName
+                  RequestToken = antiforgeryToken.RequestToken }
 
-            let pageProps: IndexView.PageProps = { PageName = "Demo"; UserName = "John Doe"; MainContent = mainContent }
+            let pageProps: IndexView.PageProps =
+                { PageName = "Demo"
+                  UserName = this.GetUserName()
+                  MainContent = DemoView.renderMain props }
+
             let htmlContent = IndexView.renderPage pageProps
 
             return this.HtmlContent htmlContent
@@ -36,7 +41,7 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
 
                 let randomNumber = random.NextDouble()
 
-                return this.HtmlContent (randomNumber.ToString())
+                return this.HtmlContent(randomNumber.ToString())
             else
                 return! this.Index()
         }
@@ -56,12 +61,12 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
             if this.Request.IsHtmx() then
                 do! Task.Delay 1000
 
-                let randomNumbers = 
-                    [1..3] 
+                let randomNumbers =
+                    [ 1..3 ]
                     |> List.map (fun _ -> random.Next(1, 10))
                     |> System.Text.Json.JsonSerializer.Serialize
 
-                let htmlContent = 
+                let htmlContent =
                     $"""                    
                     <canvas id="myChart"></canvas>                
                     <script>                        
@@ -86,6 +91,7 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
                         }});
                     </script>
                     """
+
                 return this.HtmlContent htmlContent
             else
                 return! this.Index()
