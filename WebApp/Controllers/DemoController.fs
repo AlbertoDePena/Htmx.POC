@@ -69,26 +69,28 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
                 let htmlContent =
                     $"""                    
                     <canvas id="myChart"></canvas>                
-                    <script>                        
-                        new Chart(document.getElementById('myChart'), {{
-                            type: 'bar',
-                            data: {{
-                                labels: ['Number 1', 'Number 2', 'Number 3'], 
-                                datasets: [{{
-                                    label: 'Random Numbers',
-                                    data: {randomNumbers},
-                                    borderWidth: 1
-                                }}]
-                            }},
-                            options: {{
-                                maintainAspectRatio: false,
-                                scales: {{
-                                    y: {{
-                                        beginAtZero: true
+                    <script>      
+                        (function () {{
+                            new Chart(document.getElementById('myChart'), {{
+                                type: 'bar',
+                                data: {{
+                                    labels: ['Number 1', 'Number 2', 'Number 3'], 
+                                    datasets: [{{
+                                        label: 'Random Numbers',
+                                        data: {randomNumbers},
+                                        borderWidth: 1
+                                    }}]
+                                }},
+                                options: {{
+                                    maintainAspectRatio: false,
+                                    scales: {{
+                                        y: {{
+                                            beginAtZero: true
+                                        }}
                                     }}
                                 }}
-                            }}
-                        }});
+                            }});
+                        }})();                                          
                     </script>
                     """
 
