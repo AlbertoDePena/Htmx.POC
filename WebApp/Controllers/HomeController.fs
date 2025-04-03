@@ -7,9 +7,10 @@ open Microsoft.AspNetCore.Antiforgery
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 
-open WebApp.Views
+open WebApp.Views.Layout
+open WebApp.Views.Home
 
-type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) =
+type HomeController(logger: ILogger<HomeController>, antiforgery: IAntiforgery) =
     inherit HtmxController(antiforgery)
 
     let random = Random()
@@ -19,16 +20,16 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
         task {
             let antiforgeryToken = this.GetAntiforgeryToken()
 
-            let props: DemoView.MainProps =
+            let homeViewModel: HomeViewModel =
                 { FormFieldName = antiforgeryToken.FormFieldName
                   RequestToken = antiforgeryToken.RequestToken }
 
-            let pageProps: IndexView.PageProps =
+            let layoutViewModel: LayoutViewModel =
                 { PageName = "Demo"
                   UserName = this.GetUserName()
-                  MainContent = DemoView.renderMain props }
+                  MainContent = HomeView.renderMain homeViewModel }
 
-            let htmlContent = IndexView.renderPage pageProps
+            let htmlContent = LayoutView.renderPage layoutViewModel
 
             return this.HtmlContent htmlContent
         }
@@ -67,29 +68,34 @@ type DemoController(logger: ILogger<DemoController>, antiforgery: IAntiforgery) 
                     |> System.Text.Json.JsonSerializer.Serialize
 
                 let htmlContent =
-                    $"""                    
-                    <canvas id="myChart"></canvas>                
+                    $"""     
+                    <div class="box chartjs-container" id="ChartJsContainer">
+                        <canvas id="myChart"></canvas>
+                    </div>               
+                                  
                     <script>      
                         (function () {{
-                            new Chart(document.getElementById('myChart'), {{
-                                type: 'bar',
-                                data: {{
-                                    labels: ['Number 1', 'Number 2', 'Number 3'], 
-                                    datasets: [{{
-                                        label: 'Random Numbers',
-                                        data: {randomNumbers},
-                                        borderWidth: 1
-                                    }}]
-                                }},
-                                options: {{
-                                    maintainAspectRatio: false,
-                                    scales: {{
-                                        y: {{
-                                            beginAtZero: true
+                            setTimeout(function () {{                                                            
+                                new Chart(document.getElementById('myChart'), {{
+                                    type: 'bar',
+                                    data: {{
+                                        labels: ['Number 1', 'Number 2', 'Number 3'], 
+                                        datasets: [{{
+                                            label: 'Random Numbers',
+                                            data: {randomNumbers},
+                                            borderWidth: 1
+                                        }}]
+                                    }},
+                                    options: {{
+                                        maintainAspectRatio: false,
+                                        scales: {{
+                                            y: {{
+                                                beginAtZero: true
+                                            }}
                                         }}
                                     }}
-                                }}
-                            }});
+                                }});
+                            }}, 0);
                         }})();                                          
                     </script>
                     """

@@ -86,3 +86,8 @@ tbody tr td {
     max-height: 300px !important;
     min-height: 300px !important;
 }
+
+/* Preventing Web Components FOUC */
+:not(:defined) {
+    visibility: hidden;
+}

@@ -1,4 +1,4 @@
-﻿namespace WebApp.Views
+﻿namespace WebApp.Views.Html
 
 open System
 open System.Globalization
